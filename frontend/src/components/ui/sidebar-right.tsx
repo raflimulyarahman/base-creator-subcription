@@ -4,11 +4,13 @@ import { useWallet } from "@/context/WalletContext";
 import { useLight } from "@/context/LightContext";
 import Image from "next/image";
 import LogoBased from "../../../public/logobased.png";
+import { useUsers } from "@/context/UsersContext";
 
 export default function SidebarRight() {
   const { isDark } = useLight();
   const { role, isLoading } = useWallet();
-  console.log(role, isLoading);
+  const { usersAll } = useUsers();
+  console.log(usersAll);
 
   return (
     <>
@@ -25,9 +27,9 @@ export default function SidebarRight() {
             <h1 className="font mono text-sm">Account Users</h1>
           </div>
           <div className="flex flex-col px-4 py-4 gap-3 h-[400px] overflow-y-auto">
-            {[...Array(15)].map((_, i) => (
+            {usersAll.map((user, i) => (
               <div
-                key={i}
+                key={user.id_users}
                 className="flex items-center gap-3 p-3 transition cursor-pointer"
               >
                 <Image
@@ -37,10 +39,21 @@ export default function SidebarRight() {
                   height={40}
                   className="rounded-full object-cover"
                 />
+
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold">User {i + 1}</span>
-                  <span className="text-xs text-gray-500">
-                    user{i + 1}@mail.com
+                  <span className="font-mono text-sm font-semibold">
+                    {user.first_name || user.last_name
+                      ? `${user.first_name ?? ""} ${
+                          user.last_name ?? ""
+                        }`.trim()
+                      : `${user.address?.address.slice(
+                          0,
+                          6
+                        )}...${user.address?.address.slice(-4)}`}
+                  </span>
+
+                  <span className="font-mono text-xs text-gray-500">
+                    {user.role?.role}
                   </span>
                 </div>
               </div>

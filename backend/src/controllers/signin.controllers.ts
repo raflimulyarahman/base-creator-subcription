@@ -44,6 +44,7 @@ export const signIn = async (req: Request, res: Response) => {
         country: "",
         jenis_kelamin: null,
         bio: "",
+        foto: "",
       });
     }
 
@@ -56,6 +57,7 @@ export const signIn = async (req: Request, res: Response) => {
     );
 
     // ✅ Simpan refresh token dan user ke session
+    (req.session as any).accessToken = accessToken;
     (req.session as any).refreshToken = refreshToken;
     (req.session as any).user = {
       userId: user.id_users,
@@ -95,8 +97,10 @@ export const getSession = (req: Request, res: Response) => {
     return res.status(401).json({ message: "Not authenticated" });
   }
 
-  // Mengirimkan data session yang telah disimpan
-  res.json(req.session.user); // Kirimkan informasi user dan role
+  res.json({
+    ...req.session.user,
+    accessToken: (req.session as any).accessToken, // ✅ KIRIM
+  });
 };
 
 export const refreshToken = (req: Request, res: Response) => {

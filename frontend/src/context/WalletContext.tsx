@@ -55,6 +55,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (data?.role && data?.userId) {
         setRole(data.role);
         setUserId(data.userId);
+        setAccessToken(data.accessToken);
         return true;
       }
       return false;
@@ -90,10 +91,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const loginData = await loginRes.json();
       console.log("[WalletProvider] loginData:", loginData);
       setRole(loginData.user?.role ?? null);
-      setUserId(loginData.user?.id_users ?? null);
-      setAccessToken(loginData?.accessToken);
+      setUserId(loginData.user?.userId ?? null);
+      setAccessToken(loginData?.accessToken ?? null);
 
-      await restoreSession();
+      //await restoreSession();
     } catch (err) {
       console.error("[WalletProvider] autoLogin failed", err);
       setRole(null);

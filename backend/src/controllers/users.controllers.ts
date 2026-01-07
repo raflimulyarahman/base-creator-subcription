@@ -83,6 +83,7 @@ export const updateUser = async (req: Request, res: Response) => {
       country,
       jenis_kelamin,
       bio,
+      foto,
       id_address,
       id_role
     } = req.body; 
@@ -101,6 +102,7 @@ export const updateUser = async (req: Request, res: Response) => {
       country: country ?? user.country,
       jenis_kelamin: jenis_kelamin ?? user.jenis_kelamin,
       bio: bio ?? user.bio,
+      foto: foto ?? user.foto,
       id_address: id_address ?? user.id_address,
       id_role: id_role ?? user.id_role
     });

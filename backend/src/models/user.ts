@@ -10,11 +10,15 @@ interface UserAttributes {
   country: string;
   jenis_kelamin: "L" | "P" | null;
   bio?: string;
+  foto?: string;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, "id_users"> {}
 
-export default class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+export default class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
   declare id_users: string;
   declare id_address: string;
   declare id_role: string;
@@ -24,6 +28,7 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
   declare country: string;
   declare jenis_kelamin: "L" | "P" | null;
   declare bio?: string;
+  declare foto?: string;
 
   static initModel(sequelize: Sequelize) {
     User.init(
@@ -41,6 +46,7 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
         country: { type: DataTypes.STRING, allowNull: false },
         jenis_kelamin: { type: DataTypes.ENUM("L", "P"), allowNull: true },
         bio: { type: DataTypes.TEXT },
+        foto: { type: DataTypes.TEXT },
       },
       { sequelize, tableName: "Users" }
     );
