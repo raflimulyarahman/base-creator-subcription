@@ -2,15 +2,21 @@
 import Toast from "@/components/ui/toast";
 import { useLight } from "@/context/LightContext";
 import { useWallet } from "@/context/WalletContext";
+import { useUsers } from "@/context/UsersContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { useState } from "react";
 export default function Navbar() {
   const { isDark, toggle } = useLight();
   const { role } = useWallet();
-  const [showToast, setShowToast] = useState(false);
-  console.log(isDark);
 
+  const { user } = useUsers();
+  const [showToast, setShowToast] = useState(false);
+  const avatarSrc =
+    user?.foto && user.foto !== ""
+      ? user.foto
+      : "https://i.pravatar.cc/150?img=1";
+      
   const handleClick = () => {
     if (role === "Users") {
       setShowToast(true);
@@ -34,7 +40,7 @@ export default function Navbar() {
       <div className="h-full flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3 md:hidden">
           <Image
-            src="https://i.pravatar.cc/150?img=1"
+            src={avatarSrc}
             alt="User Avatar"
             width={40}
             height={40}
@@ -86,7 +92,8 @@ export default function Navbar() {
                 <button
                   onClick={openAccountModal}
                   title="Account"
-                  className="rounded-lg p-2 transition hidden md:block">
+                  className="rounded-lg p-2 transition hidden md:block"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -115,7 +122,7 @@ export default function Navbar() {
 
           <button
             onClick={toggle}
-            className="fixed bottom-24 right-4 bg-gray-300 shadow z-80 p-3 rounded-full bg-transition transition shadow-lg focus:outline-none"
+            className="fixed bottom-24 animate-bounce right-4 bg-gray-300 shadow z-80 p-3 rounded-full bg-transition transition shadow-lg focus:outline-none"
           >
             {isDark ? (
               <svg
@@ -150,9 +157,7 @@ export default function Navbar() {
             )}
           </button>
 
-          <button
-            onClick={handleClick}
-            className="rounded-lg p-2 transition">
+          <button onClick={handleClick} className="rounded-lg p-2 transition">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
