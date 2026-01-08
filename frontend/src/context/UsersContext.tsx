@@ -81,13 +81,6 @@ export function UsersProvider({ children }: { children: ReactNode }) {
                 },
                 body: formData,
             });
-            console.log("updateProfileUsers called with userId:", userId);
-            console.log("updateProfileUsers response headers:", res.headers);
-            console.log("updateProfileUsers response url:", accessToken);
-
-            const text = await res.text(); // read raw response
-            console.log("updateProfileUsers status:", res.status);
-            console.log("updateProfileUsers response:", text);
 
             if (!res.ok) throw new Error(`Failed to update user: ${res.status}`);
             const data = JSON.parse(text);

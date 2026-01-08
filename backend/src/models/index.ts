@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import Address from "./address";
-
 import Role from "./role";
+import Subscribe from "./subscribe";
 import User from "./user";
 
 import configFile from "../../config/config.json";
@@ -26,11 +26,15 @@ if (config.use_env_variable) {
 User.initModel(sequelize);
 Address.initModel(sequelize);
 Role.initModel(sequelize);
+Subscribe.initModel(sequelize);
+
+Subscribe.belongsTo(User, { foreignKey: "id_users", as: "user" });
 
 Address.hasMany(User, { foreignKey: "id_address" });
 
 Role.hasMany(User, { foreignKey: "id_role" });
 
+User.hasMany(Subscribe, { foreignKey: "id_users" });
 User.belongsTo(Address, { foreignKey: "id_address", as: "address" });
 User.belongsTo(Role, { foreignKey: "id_role", as: "role" });
 
@@ -40,6 +44,7 @@ const db = {
   User,
   Address,
   Role,
+  Subscribe
 };
 
 export default db;

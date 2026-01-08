@@ -1,13 +1,24 @@
 "use client";
 import { useLight } from "@/context/LightContext";
+import { useSubscribe } from "@/context/SubscribeContext";
+import { useUsers } from "@/context/UsersContext";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import { useState } from "react";
 
 export default function SubscribePages() {
   const { isDark } = useLight();
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const { user } = useUsers();
+  const { createSubscribe } = useSubscribe();
   const totalCards = 3;
+
+  const bronzePlan = {
+    type_subscribe: "BRONZE",
+    id_users: user.id_users,
+    status_subscribe: "Active",
+    subscribe: "1 Month",
+  };
+
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? totalCards - 1 : prev - 1));
@@ -16,6 +27,16 @@ export default function SubscribePages() {
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === totalCards - 1 ? 0 : prev + 1));
   };
+
+  const handleSubscribe = async () => {
+    if (!user) return;
+    try {
+      const res = await createSubscribe(bronzePlan);
+      console.log(res);
+    } catch (err) {
+      console.error("Error subscribing:", err);
+    }
+  }
 
   return (
     <ProtectedRoute allowedRoles={["Users"]}>
@@ -38,7 +59,7 @@ export default function SubscribePages() {
                       style={{ backgroundColor: "#dda873ff" }}
                     >
                       <h1 className="text-black font-bold text-[20px] font-mono">
-                        BRONZE
+                        {bronzePlan.type_subscribe}
                       </h1>
                     </div>
                   </div>
@@ -65,7 +86,7 @@ export default function SubscribePages() {
                   </div>
 
                   <div className="flex flex-col items-center mt-4">
-                    <button className="font-mono mt-auto w-full text-white font-semibold py-3 rounded-xl bg-black hover:bg-gray-700 transition shadow-md">
+                    <button onClick={handleSubscribe} className="font-mono mt-auto w-full text-white font-semibold py-3 rounded-xl bg-black hover:bg-gray-700 transition shadow-md">
                       Pay Now
                     </button>
                   </div>

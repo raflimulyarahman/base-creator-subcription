@@ -10,7 +10,7 @@ interface UserAttributes {
   username: string;
   birth_years: number | null;
   country: string;
-  jenis_kelamin: "L" | "P" | null;
+  jenis_kelamin: "F" | "M" | null;
   bio?: string;
   foto?: string;
 }
@@ -30,7 +30,7 @@ export default class User
   declare last_name: string;
   declare birth_years: number | null;
   declare country: string;
-  declare jenis_kelamin: "L" | "P" | null;
+  declare jenis_kelamin: "F" | "M" | null;
   declare bio?: string;
   declare foto?: string;
 

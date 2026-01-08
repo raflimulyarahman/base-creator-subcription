@@ -6,6 +6,7 @@ import session from "express-session";
 import addresRouter from "./router/addres.route";
 import rolesRoute from "./router/roles.route";
 import signinRoute from "./router/signin.route";
+import subscribeRouter from "./router/subscribe.route";
 import usersRoute from "./router/users.route";
 
 const app: Application = express();
@@ -45,5 +46,5 @@ app.use("/api/users", usersRoute);
 app.use("/api/address", addresRouter);
 app.use("/api/roles", rolesRoute);
 app.use("/api/signin", signinRoute);
-
+app.use("/api/subscribe", subscribeRouter);
 export default app;
