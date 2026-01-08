@@ -14,7 +14,7 @@ export default function SubscribePages() {
 
   const bronzePlan = {
     type_subscribe: "BRONZE",
-    id_users: user.id_users,
+    id_users: user?.id | null,
     status_subscribe: "Active",
     subscribe: "1 Month",
   };
