@@ -3,6 +3,7 @@ import { useLight } from "@/context/LightContext";
 import { useWallet } from "@/context/WalletContext";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import Image from "next/image";
+import Link from "next/link";
 export default function Dashboard() {
   const { isDark } = useLight();
   const { role } = useWallet();
@@ -52,9 +53,11 @@ export default function Dashboard() {
                 </p>
 
                 {/* Action */}
-                <button className={`font-mono mt-auto w-full text-white font-semibold py-3 rounded-xl ${isDark ? "bg-gray-900" : "bg-black"} hover:bg-gray-800 transition shadow-md`}>
-                  Join Creator
-                </button>
+                <Link href="/dashboard/users/profile">
+                  <button className={`font-mono mt-auto w-full text-white font-semibold py-3 rounded-xl ${isDark ? "bg-gray-900" : "bg-black"} hover:bg-gray-800 transition shadow-md`}>
+                    Join Creator
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

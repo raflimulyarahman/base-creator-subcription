@@ -1,12 +1,12 @@
 "use client";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
 import { useWallet } from "@/context/WalletContext";
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 type UUID = string;
 
@@ -23,6 +23,7 @@ type UsersContextType = {
   setUsersAll: React.Dispatch<React.SetStateAction<User[]>>;
   fetchUserById: (userId: UUID) => Promise<User | null>;
   fetchUsersAll: () => Promise<User[]>;
+    updateProfileUsers: (userId: UUID) => Promise<User | null>;
 };
 
 const UsersContext = createContext<UsersContextType | null>(null);
@@ -61,7 +62,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch users");
+        console.log("fetchUsersAll status:", res.status);
       const data = await res.json();
       return data.data ?? [];
     } catch (err) {
@@ -69,6 +70,36 @@ export function UsersProvider({ children }: { children: ReactNode }) {
       return [];
     }
   };
+
+    const updateProfileUsers = async (userId: UUID, formData: FormData): Promise<User | null> => {
+        try {
+            const res = await fetch(`http://localhost:8000/api/users/${userId}`, {
+                credentials: "include",
+                method: "PUT",
+                headers: {
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                body: formData,
+            });
+            console.log("updateProfileUsers called with userId:", userId);
+            console.log("updateProfileUsers response headers:", res.headers);
+            console.log("updateProfileUsers response url:", accessToken);
+
+            const text = await res.text(); // read raw response
+            console.log("updateProfileUsers status:", res.status);
+            console.log("updateProfileUsers response:", text);
+
+            if (!res.ok) throw new Error(`Failed to update user: ${res.status}`);
+            const data = JSON.parse(text);
+            return data.data ?? null;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    };
+
+
+
 
   // 🔹 fetch current user
   useEffect(() => {
@@ -94,6 +125,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         setUsersAll,
         fetchUserById,
         fetchUsersAll,
+              updateProfileUsers
       }}
     >
       {children}

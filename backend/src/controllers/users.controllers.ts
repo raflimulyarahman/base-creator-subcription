@@ -83,18 +83,17 @@ export const updateUser = async (req: Request, res: Response) => {
       country,
       jenis_kelamin,
       bio,
-      foto,
+      username,
+      email,
       id_address,
       id_role
     } = req.body; 
 
-    
     const user = await db.User.findOne({ where: { id_users: id } });
     if (!user) {
       return res.status(404).json({ message: "User tidak ditemukan" });
     }
 
-    
     await user.update({
       first_name: first_name ?? user.first_name,
       last_name: last_name ?? user.last_name,
@@ -102,7 +101,9 @@ export const updateUser = async (req: Request, res: Response) => {
       country: country ?? user.country,
       jenis_kelamin: jenis_kelamin ?? user.jenis_kelamin,
       bio: bio ?? user.bio,
-      foto: foto ?? user.foto,
+      username: username ?? user.username,
+      email: email ?? user.email,
+      foto: req.file ? req.file.filename : user.foto, 
       id_address: id_address ?? user.id_address,
       id_role: id_role ?? user.id_role
     });

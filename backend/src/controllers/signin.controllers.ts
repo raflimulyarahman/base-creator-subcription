@@ -1,13 +1,14 @@
+import { verifyMessage } from "ethers";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 import { generateTokens } from "../middleware/generate.token";
 import db from "../models";
-import { verifyMessage } from "ethers";
-
 export const signIn = async (req: Request, res: Response) => {
   try {
     const { address, signature } = req.body;
     const nonce = (req.session as any).nonce;
+    const uuid = uuidv4();
 
     if (!nonce) {
       return res.status(400).json({ message: "Nonce not found" });
@@ -42,6 +43,8 @@ export const signIn = async (req: Request, res: Response) => {
         last_name: "",
         birth_years: null,
         country: "",
+        email: `${uuid}@dummy.local`,
+        username:`user_${uuid.slice(0, 8)}`,
         jenis_kelamin: null,
         bio: "",
         foto: "",

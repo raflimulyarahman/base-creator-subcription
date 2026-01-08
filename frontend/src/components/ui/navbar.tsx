@@ -1,8 +1,8 @@
 "use client";
-import Toast from "@/components/ui/toast";
+import ToastError from "@/components/ui/toastError";
 import { useLight } from "@/context/LightContext";
-import { useWallet } from "@/context/WalletContext";
 import { useUsers } from "@/context/UsersContext";
+import { useWallet } from "@/context/WalletContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export default function Navbar() {
       md:bg-transparent`}
     >
       <div className="justify-center items-center">
-        <Toast
+        <ToastError
           show={showToast}
           onClose={() => setShowToast(false)}
           message="you are not accessed to this feature"
