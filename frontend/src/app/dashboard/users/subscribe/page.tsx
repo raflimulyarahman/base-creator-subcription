@@ -30,13 +30,15 @@ export default function SubscribePages() {
 
   const handleSubscribe = async () => {
     if (!user) return;
+
     try {
       const res = await createSubscribe(bronzePlan);
-      console.log(res);
-    } catch (err) {
-      console.error("Error subscribing:", err);
-    }
+    console.log("Subscribe success:", res);
+  } catch (err) {
+    console.error("Error subscribing:", err);
   }
+  };
+
 
   return (
     <ProtectedRoute allowedRoles={["Users"]}>

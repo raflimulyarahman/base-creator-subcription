@@ -1,10 +1,10 @@
 "use client";
 import ToastSuccess from "@/components/ui/toastSuccess";
+import { useLight } from "@/context/LightContext";
+import { useUsers } from "@/context/UsersContext";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useLight } from "@/context/LightContext";
-import { useUsers } from "@/context/UsersContext";
 import { useRef, useState } from "react";
 import Based from "../../../../../public/based.png";
 export default function Profile() {
@@ -18,7 +18,7 @@ export default function Profile() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const jenis_kelaminRef = useRef<HTMLInputElement>(null);
-  const birth_years = useRef<HTMLInputElement>(null);
+  const birth_yearsRef = useRef<HTMLInputElement>(null);
   const bio = useRef<HTMLInputElement>(null);
   console.log("User Data:", user);
 
@@ -33,7 +33,7 @@ export default function Profile() {
       if (usernameRef.current) formData.append("username", usernameRef.current.value);
       if (emailRef.current) formData.append("email", emailRef.current.value);
       if (jenis_kelaminRef.current) formData.append("jenis_kelamin", jenis_kelaminRef.current.value);
-      if (birth_years.current) formData.append("birth_years", birth_years.current.value);
+      if (birth_yearsRef.current) formData.append("birth_years", birth_yearsRef.current.value);
       if (bio.current) formData.append("bio", bio.current.value);
       if (selectedFile) formData.append("foto", selectedFile);
 
@@ -178,7 +178,7 @@ export default function Profile() {
                       Birt Date <span className="text-red-500">*</span>
                     </label>
                     <input
-                      ref={birth_years}
+                      ref={birth_yearsRef}
                       defaultValue={user?.birth_years}
                       type="date"
                       className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}

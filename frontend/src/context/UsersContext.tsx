@@ -82,6 +82,8 @@ export function UsersProvider({ children }: { children: ReactNode }) {
                 body: formData,
             });
 
+            const text = await res.text(); // read raw response
+
             if (!res.ok) throw new Error(`Failed to update user: ${res.status}`);
             const data = JSON.parse(text);
             return data.data ?? null;

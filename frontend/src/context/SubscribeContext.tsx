@@ -13,10 +13,11 @@ export interface Subscribe {
 
 type SubscribeContextType = {
     subscribe: Subscribe | null;
-    createSubscribe: () => Promise<void>;
+    createSubscribe: (payload: Omit<Subscribe, "id">) => Promise<Subscribe>;
     loading: boolean;
     success: boolean;
 };
+
 
 const SubscribeContext = createContext<SubscribeContextType | undefined>(undefined);
 
@@ -24,10 +25,12 @@ export const SubscribeProvider = ({ children }: { children: React.ReactNode }) =
     const [subscribe, setSubscribe] = useState<Subscribe | null>(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-   
+
     const { accessToken } = useWallet();
 
-    const createSubscribe = async (Subscribe: Subscribe) => {
+    const createSubscribe = async (
+        payload: Omit<Subscribe, "id">
+    ): Promise<Subscribe> => {
         try {
             setLoading(true);
 
@@ -38,7 +41,7 @@ export const SubscribeProvider = ({ children }: { children: React.ReactNode }) =
                     "Content-Type": "application/json",
                     ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
                 },
-                body: Subscribe,
+                body: JSON.stringify(payload),
             });
 
             if (!res.ok) {
@@ -48,8 +51,8 @@ export const SubscribeProvider = ({ children }: { children: React.ReactNode }) =
             const data: Subscribe = await res.json();
             setSubscribe(data);
             setSuccess(true);
-        } catch (err) {
-            console.error(err);
+
+            return data;
         } finally {
             setLoading(false);
         }
@@ -57,17 +60,13 @@ export const SubscribeProvider = ({ children }: { children: React.ReactNode }) =
 
     return (
         <SubscribeContext.Provider
-            value={{
-                subscribe,
-                createSubscribe,
-                loading,
-                success,
-            }}
+            value={{ subscribe, createSubscribe, loading, success }}
         >
             {children}
         </SubscribeContext.Provider>
     );
 };
+
 
 export const useSubscribe = () => {
     const context = useContext(SubscribeContext);
