@@ -4,17 +4,21 @@ export interface SubscribeAttributes {
   id_subscribe: string;
   id_users: string;
   type_subscribe: string;
-  subscibe: string;
-    status_subscribe: string;
+  subscribe: string;
+  status_subscribe: string;
 }
 
-export interface SubscribeCreationAttributes extends Optional<SubscribeAttributes, "id_subscribe"> {}
+export interface SubscribeCreationAttributes
+  extends Optional<SubscribeAttributes, "id_subscribe"> {}
 
-export default class Subscribe extends Model<SubscribeAttributes, SubscribeCreationAttributes> implements SubscribeAttributes {
+export default class Subscribe
+  extends Model<SubscribeAttributes, SubscribeCreationAttributes>
+  implements SubscribeAttributes
+{
   declare id_subscribe: string;
   declare id_users: string;
   declare type_subscribe: string;
-   declare subscibe: string;
+  declare subscribe: string;
   declare status_subscribe: string;
 
   static initModel(sequelize: Sequelize) {
@@ -27,7 +31,7 @@ export default class Subscribe extends Model<SubscribeAttributes, SubscribeCreat
         },
         id_users: { type: DataTypes.UUID, allowNull: false },
         type_subscribe: { type: DataTypes.STRING, allowNull: false },
-        subscibe: { type: DataTypes.STRING, allowNull: false },
+        subscribe: { type: DataTypes.STRING, allowNull: false },
         status_subscribe: { type: DataTypes.STRING, allowNull: false },
       },
       {
@@ -39,7 +43,5 @@ export default class Subscribe extends Model<SubscribeAttributes, SubscribeCreat
     );
   }
 
-  static associate(models: any) {
-    
-  }
+  static associate(models: any) {}
 }

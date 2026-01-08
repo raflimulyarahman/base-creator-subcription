@@ -8,14 +8,15 @@ interface UserAttributes {
   last_name: string;
   email: string;
   username: string;
-  birth_years: number | null;
+  birth_years: string;
   country: string;
   jenis_kelamin: "F" | "M" | null;
   bio?: string;
   foto?: string;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes,  "id_users" | "email" | "username"> {}
+interface UserCreationAttributes
+  extends Optional<UserAttributes, "id_users" | "email" | "username"> {}
 
 export default class User
   extends Model<UserAttributes, UserCreationAttributes>
@@ -28,7 +29,7 @@ export default class User
   declare id_role: string;
   declare first_name: string;
   declare last_name: string;
-  declare birth_years: number | null;
+  declare birth_years: string;
   declare country: string;
   declare jenis_kelamin: "F" | "M" | null;
   declare bio?: string;
@@ -46,11 +47,21 @@ export default class User
         id_role: { type: DataTypes.UUID, allowNull: false },
         first_name: { type: DataTypes.STRING, allowNull: false },
         last_name: { type: DataTypes.STRING, allowNull: false },
-        username: { type: DataTypes.STRING, allowNull: false, unique: true, defaultValue: "" },
-        email: { type: DataTypes.STRING, allowNull: false, unique: true, defaultValue: "", },
-        birth_years: { type: DataTypes.INTEGER, allowNull: true },
+        username: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+          defaultValue: "",
+        },
+        email: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+          defaultValue: "",
+        },
+        birth_years: { type: DataTypes.STRING, allowNull: true },
         country: { type: DataTypes.STRING, allowNull: false },
-        jenis_kelamin: { type: DataTypes.ENUM("L", "P"), allowNull: true },
+        jenis_kelamin: { type: DataTypes.ENUM("F", "M"), allowNull: true },
         bio: { type: DataTypes.TEXT },
         foto: { type: DataTypes.TEXT },
       },

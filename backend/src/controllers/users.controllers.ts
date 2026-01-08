@@ -1,12 +1,21 @@
 import { Request, Response } from "express";
-import db from '../models';
+import db from "../models";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { id_address, id_role, first_name, last_name, birth_years, country, jenis_kelamin, bio } = req.body;
+    const {
+      id_address,
+      id_role,
+      first_name,
+      last_name,
+      birth_years,
+      country,
+      jenis_kelamin,
+      bio,
+    } = req.body;
     const newUser = await db.User.create({
       id_address,
-        id_role,
+      id_role,
       first_name,
       last_name,
       birth_years,
@@ -33,14 +42,16 @@ export const getUser = async (req: Request, res: Response) => {
     const users = await db.User.findAll({
       include: [
         { model: db.Address, as: "address" }, // alias harus sama dengan User.belongsTo
-        { model: db.Role, as: "role" },       // alias sama dengan association Role
+        { model: db.Role, as: "role" }, // alias sama dengan association Role
       ],
     });
 
     return res.status(200).json({ message: "Get users success", data: users });
   } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: "Failed to get users", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Failed to get users", error: error.message });
   }
 };
 
@@ -86,8 +97,8 @@ export const updateUser = async (req: Request, res: Response) => {
       username,
       email,
       id_address,
-      id_role
-    } = req.body; 
+      id_role,
+    } = req.body;
 
     const user = await db.User.findOne({ where: { id_users: id } });
     if (!user) {
@@ -103,20 +114,20 @@ export const updateUser = async (req: Request, res: Response) => {
       bio: bio ?? user.bio,
       username: username ?? user.username,
       email: email ?? user.email,
-      foto: req.file ? req.file.filename : user.foto, 
+      foto: req.file ? req.file.filename : user.foto,
       id_address: id_address ?? user.id_address,
-      id_role: id_role ?? user.id_role
+      id_role: id_role ?? user.id_role,
     });
 
     return res.status(200).json({
       message: "User berhasil diupdate",
-      data: user
+      data: user,
     });
   } catch (error: any) {
     console.error(error);
     return res.status(500).json({
       message: "Gagal mengupdate user",
-      error: error.message
+      error: error.message,
     });
   }
 };
