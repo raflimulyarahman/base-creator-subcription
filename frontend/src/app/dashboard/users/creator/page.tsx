@@ -3,7 +3,7 @@
 import { useLight } from "@/context/LightContext";
 import Image from "next/image";
 
-export default function SearchPages() {
+export default function CreatorPages() {
   const { isDark } = useLight();
 
   return (
@@ -61,9 +61,44 @@ export default function SearchPages() {
 
       {/* CONTENT */}
       <div className="max-w-3xl mx-auto px-4 py-6">
-        <p className="text-sm text-gray-500">
-          Start typing to search content...
-        </p>
+        {/* Creator list */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Creator Card */}
+          <button className="flex items-center gap-4 p-4 rounded-xl  hover:border-blue-500 hover:bg-blue-50 transition text-left">
+            <img
+              src="https://i.pravatar.cc/150?img=12"
+              alt="creator"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+
+            <div className="flex-1">
+              <h3 className="font-mono text-sm font-semibold">epacrypt</h3>
+              <p className="text-xs text-gray-500">@epacrypt</p>
+            </div>
+
+            <span className="text-xs px-3 py-1 rounded-full bg-blue-600 text-white">
+              Select
+            </span>
+          </button>
+
+          {/* Creator Card */}
+          <button className="flex items-center gap-4 p-4 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-left">
+            <img
+              src="https://i.pravatar.cc/150?img=32"
+              alt="creator"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+
+            <div className="flex-1">
+              <h3 className="font-mono text-sm font-semibold">cryptolab</h3>
+              <p className="text-xs text-gray-500">@cryptolab</p>
+            </div>
+
+            <span className="text-xs px-3 py-1 rounded-full bg-blue-600 text-white">
+              Select
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

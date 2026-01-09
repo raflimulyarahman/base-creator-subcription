@@ -8,29 +8,6 @@ export default function GroupChating() {
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-8 py-4">
-        <div className="flex items-center gap-4 md:gap-6">
-          <Image
-            src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-            alt="Group Avatar"
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div className="flex flex-col">
-            <h1 className={`font-bold text-lg md:text-xl ${isDark ? "text-white" : "text-gray-900"}`}>
-              Group Creator 1
-            </h1>
-            <span className="text-sm md:text-base text-gray-400">90 Members</span>
-          </div>
-        </div>
-        <button className="text-blue-500 font-semibold hover:text-blue-600 transition">
-          Info
-        </button>
-      </div>
-
-      {/* Chat Area */}
       <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 flex flex-col gap-3 mb-28">
         {/* Creator Message */}
         <div className="flex items-start gap-2">

@@ -29,12 +29,17 @@ export default function Profile() {
     try {
       const formData = new FormData();
 
-      if (firstNameRef.current) formData.append("first_name", firstNameRef.current.value);
-      if (lastNameRef.current) formData.append("last_name", lastNameRef.current.value);
-      if (usernameRef.current) formData.append("username", usernameRef.current.value);
+      if (firstNameRef.current)
+        formData.append("first_name", firstNameRef.current.value);
+      if (lastNameRef.current)
+        formData.append("last_name", lastNameRef.current.value);
+      if (usernameRef.current)
+        formData.append("username", usernameRef.current.value);
       if (emailRef.current) formData.append("email", emailRef.current.value);
-      if (jenis_kelaminRef.current) formData.append("jenis_kelamin", jenis_kelaminRef.current.value);
-      if (birth_yearsRef.current) formData.append("birth_years", birth_yearsRef.current.value);
+      if (jenis_kelaminRef.current)
+        formData.append("jenis_kelamin", jenis_kelaminRef.current.value);
+      if (birth_yearsRef.current)
+        formData.append("birth_years", birth_yearsRef.current.value);
       if (bio.current) formData.append("bio", bio.current.value);
       if (selectedFile) formData.append("foto", selectedFile);
 
@@ -43,7 +48,7 @@ export default function Profile() {
       if (updatedUser) {
         setUser(updatedUser);
         setShowToast(true);
-        router.push("/dashboard/users/subscribe"); 
+        router.push("/dashboard/users/subscribe");
       } else {
         console.error("Failed to update profile: backend returned null");
       }
@@ -53,7 +58,7 @@ export default function Profile() {
   };
 
   return (
-    <ProtectedRoute allowedRoles={["Users","Creators"]}>
+    <ProtectedRoute allowedRoles={["Users", "Creators"]}>
       <div className="justify-center items-center">
         <ToastSuccess
           show={showToast}
@@ -63,7 +68,9 @@ export default function Profile() {
       </div>
       <div className="w-full md:px-8 lg:px-16 py-10 px-8">
         <div className="mt-1">
-          <div className={`min-h-screen ${ isDark ? "text-white" : "text-black"}`}>
+          <div
+            className={`min-h-screen ${isDark ? "text-white" : "text-black"}`}
+          >
             <div className="p-2">
               <div className="flex items-center gap-6 mb-10">
                 <div>
@@ -86,11 +93,15 @@ export default function Profile() {
                       <label className="relative rounded-full overflow-hidden cursor-pointer group">
                         <input
                           type="file"
-                          onChange={(e) => e.target.files && setSelectedFile(e.target.files[0])}
+                          onChange={(e) =>
+                            e.target.files && setSelectedFile(e.target.files[0])
+                          }
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         />
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                          <span className="text-sm font-medium text-white">Change</span>
+                          <span className="text-sm font-medium text-white">
+                            Change
+                          </span>
                         </div>
                       </label>
                     </div>
@@ -113,14 +124,15 @@ export default function Profile() {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                   <div className="flex flex-col gap-1">
                     <label className="text-sm font-medium">
                       First Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       ref={firstNameRef}
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                       defaultValue={user?.first_name}
                       placeholder="input first your name ..."
                     />
@@ -132,7 +144,9 @@ export default function Profile() {
                     </label>
                     <input
                       ref={lastNameRef}
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                       defaultValue={user?.last_name}
                       placeholder="input last your name ..."
                     />
@@ -144,7 +158,9 @@ export default function Profile() {
                     </label>
                     <input
                       ref={usernameRef}
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                       defaultValue={user?.username}
                       placeholder="input your username ..."
                     />
@@ -156,7 +172,9 @@ export default function Profile() {
                     </label>
                     <input
                       ref={emailRef}
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                       defaultValue={user?.email}
                       placeholder="input email your ..."
                     />
@@ -168,7 +186,9 @@ export default function Profile() {
                     </label>
                     <input
                       ref={jenis_kelaminRef}
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                       defaultValue={user?.jenis_kelamin}
                       placeholder="input your gender ..."
                     />
@@ -182,19 +202,21 @@ export default function Profile() {
                       ref={birth_yearsRef}
                       defaultValue={user?.birth_years}
                       type="date"
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                     />
                   </div>
 
                   <div className="md:col-span-2 flex flex-col gap-1">
-                    <label className="text-sm font-medium">
-                      Bio 
-                    </label>
+                    <label className="text-sm font-medium">Bio</label>
                     <textarea
                       rows={4}
                       ref={bio}
                       defaultValue={user?.bio}
-                      className={`w-full px-4 py-3 rounded-md ${isDark ? "bg-gray-800" : "bg-white"} border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                      className={`w-full px-4 py-3 rounded-md ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } border border-black/10 focus:outline-none focus:ring-2 focus:ring-red-500`}
                       placeholder="Tell us about yourself..."
                     />
                   </div>
@@ -202,7 +224,10 @@ export default function Profile() {
               </section>
 
               <div className="mt-4 bottom-6 right-6">
-                <button onClick={handleSubmit} className="font-mono px-6 py-3 bg-blue-900 text-white rounded-md font-semibold hover:bg-blue-700">
+                <button
+                  onClick={handleSubmit}
+                  className="font-mono px-6 py-3 bg-blue-900 text-white rounded-md font-semibold hover:bg-blue-700"
+                >
                   Send Changes
                 </button>
               </div>

@@ -11,60 +11,6 @@ export default function Dashboard() {
   return (
     <ProtectedRoute allowedRoles={["Users","Creators"]}>
       <div className="w-full">
-        <div className="grid grid-cols-1">
-           {role === "Users" ? (
-          <div className={`relative p-2 ${isDark ? "text-white" : "text-black"} flex flex-col`}>
-            <div className="absolute rounded-3xl" />
-            <div className="relative flex justify-center">
-              <div className="group flex flex-col w-full max-w-sm transition">
-                <div className="flex items-center justify-center ">
-                  <div className="flex items-center justify-center w-32 h-32 group-hover:scale-105 transition-transform">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-20 h-20"
-                    >
-                      <path
-                        d="M7 14C7 11.1911 7 9.78661 7.67412 8.77772C7.96596 8.34096 8.34096 7.96596 8.77772 7.67412C9.78661 7 11.1911 7 14 7C16.8089 7 18.2134 7 19.2223 7.67412C19.659 7.96596 20.034 8.34096 20.3259 8.77772C21 9.78661 21 11.1911 21 14C21 16.8089 21 18.2134 20.3259 19.2223C20.034 19.659 19.659 20.034 19.2223 20.3259C18.2134 21 16.8089 21 14 21C11.1911 21 9.78661 21 8.77772 20.3259C8.34096 20.034 7.96596 19.659 7.67412 19.2223C7 18.2134 7 16.8089 7 14Z"
-                          stroke="currentColor"
-                      />
-                      <path
-                        d="M7 18C4.79086 18 3 16.2091 3 14V10.5C3 7.21252 3 5.56878 3.90796 4.46243C4.07418 4.25989 4.25989 4.07418 4.46243 3.90796C5.56878 3 7.21252 3 10.5 3H14C16.2091 3 18 4.79086 18 7"
-                          stroke="currentColor"
-                      />
-                      <path
-                        d="M15.0834 12.3162C16.3392 13.0412 16.967 13.4037 16.9984 13.942C17.0006 13.9808 17.0006 14.0196 16.9984 14.0583C16.967 14.5966 16.3392 14.9591 15.0834 15.6841C13.8277 16.4091 13.1998 16.7716 12.7179 16.5296C12.6833 16.5122 12.6497 16.4928 12.6172 16.4715C12.1667 16.1752 12.1667 15.4502 12.1667 14.0002C12.1667 12.5502 12.1667 11.8252 12.6172 11.5289C12.6497 11.5075 12.6833 11.4881 12.7179 11.4707C13.1998 11.2287 13.8277 11.5912 15.0834 12.3162Z"
-                          stroke="currentColor"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Title */}
-                  <h3 className="font-mono text-center text-xl font-bold mb-2">
-                    123 People Join Creator
-                  </h3>
-
-                {/* Description */}
-                <p className="font-mono text-center text-sm text-gray-500 mb-4">
-                  Manage and submit creator profiles
-                </p>
-
-                {/* Action */}
-                <Link href="/dashboard/users/profile">
-                  <button className={`font-mono mt-auto w-full text-white font-semibold py-3 rounded-xl ${isDark ? "bg-gray-900" : "bg-black"} hover:bg-gray-800 transition shadow-md`}>
-                    Join Creator
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        ) : null}
-        </div>
-
         <div className="grid grid-cols-1 py-4">
           <div className={`w-full  mx-auto ${ isDark ? "bg-gray-900" : "bg-white" } md:rounded-2xl md:w-3/5`}>
             <div className="flex items-center px-4 py-3">

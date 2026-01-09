@@ -7,10 +7,12 @@ import SidebarLeft from "@/components/ui/sidebar-left";
 import SidebarRight from "@/components/ui/sidebar-right";
 import { useWallet } from "@/context/WalletContext";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import MobileSidebar from "@/components/ui/MobileSidebar";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { role, isLoading } = useWallet();
+  const [open, setOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -30,15 +32,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (!role) return null;
 
-  const hideNavbar = pathname.startsWith("/dashboard/users/chating") || pathname.startsWith("/dashboard/users/notif") || pathname.startsWith("/dashboard/users/search");
+  const hideNavbar = pathname.startsWith("/dashboard/users/chating");
   const hideNavigator = pathname.startsWith("/dashboard/users/chating");
-
   return (
     <div className="flex min-h-screen">
       <SidebarLeft />
       <div className="flex flex-col flex-1">
-        {!hideNavbar && <Navbar />}
-
+        {!hideNavbar && <Navbar onOpenSidebar={() => setOpen(true)} />}
+        <MobileSidebar open={open} onClose={() => setOpen(false)} />
         <main className="flex-1 w-full flex justify-center pb-6">
           <div className="w-full">{children}</div>
         </main>

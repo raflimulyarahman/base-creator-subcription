@@ -5,11 +5,13 @@ import Image from "next/image";
 
 export default function CreatorChating() {
   const { isDark } = useLight();
+
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-8 py-4 z-10">
-        <div className="flex items-center gap-3">
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 flex flex-col gap-3 mb-28">
+        {/* Creator Message */}
+        <div className="flex items-start gap-2">
           <Image
             src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
             alt="Creator Avatar"
@@ -17,140 +19,65 @@ export default function CreatorChating() {
             height={40}
             className="w-10 h-10 rounded-full object-cover"
           />
-          <h1
-            className={`font-bold text-lg md:text-xl ${isDark ? "text-white" : "text-gray-900"
+          <div>
+            <p
+              className={`text-sm font-semibold ${
+                isDark ? "text-white" : "text-gray-800"
               }`}
-          >
-            Creator 1
-          </h1>
-        </div>
-        <button className="text-blue-500 font-semibold">Info</button>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 flex flex-col gap-4 mb-20">
-        {/* Creator message */}
-        <div className="flex justify-start">
-          <div className="flex flex-col">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-gray-200 text-gray-900 rounded-bl-none">
+            >
+              AI Creator
+            </p>
+            <div
+              className={`max-w-[70vw] px-4 py-2 rounded-xl ${
+                isDark ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-900"
+              } rounded-bl-none mt-1`}
+            >
               Hello! How can I help you today?
             </div>
             <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
+              className={`text-xs mt-1 ${
+                isDark ? "text-gray-400" : "text-gray-500"
+              }`}
             >
               10:15 AM
             </span>
           </div>
         </div>
 
-        {/* User message */}
-        <div className="flex justify-end">
+        {/* User Message */}
+        <div className="flex justify-end items-start gap-2">
           <div className="flex flex-col items-end">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-blue-500 text-white rounded-br-none">
-              Hi! I need some advice.
-            </div>
-            <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
+            <p
+              className={`text-sm font-semibold ${
+                isDark ? "text-white" : "text-blue-600"
+              }`}
             >
-              10:16 AM
-            </span>
-          </div>
-        </div>
-
-        {/* Creator message */}
-        <div className="flex justify-start">
-          <div className="flex flex-col">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-gray-200 text-gray-900 rounded-bl-none">
-              Sure! What kind of advice are you looking for?
+              You
+            </p>
+            <div className="max-w-[70vw] px-4 py-2 mt-1 rounded-xl bg-blue-500 text-white rounded-br-none">
+              I think we should prioritize improving AI accuracy.
             </div>
             <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
+              className={`text-xs mt-1 ${
+                isDark ? "text-gray-400" : "text-gray-500"
+              }`}
             >
               10:17 AM
             </span>
           </div>
+          <Image
+            src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+            alt="Your Avatar"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full object-cover"
+          />
         </div>
 
-        {/* User message */}
-        <div className="flex justify-end">
-          <div className="flex flex-col items-end">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-blue-500 text-white rounded-br-none">
-              About improving productivity in AI projects.
-            </div>
-            <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
-            >
-              10:18 AM
-            </span>
-          </div>
-        </div>
-
-        {/* Creator message */}
-        <div className="flex justify-start">
-          <div className="flex flex-col">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-gray-200 text-gray-900 rounded-bl-none">
-              Sure! What kind of advice are you looking for?
-            </div>
-            <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
-            >
-              10:17 AM
-            </span>
-          </div>
-        </div>
-
-        {/* User message */}
-        <div className="flex justify-end">
-          <div className="flex flex-col items-end">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-blue-500 text-white rounded-br-none">
-              About improving productivity in AI projects.
-            </div>
-            <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
-            >
-              10:18 AM
-            </span>
-          </div>
-        </div>
-
-        {/* Creator message */}
-        <div className="flex justify-start">
-          <div className="flex flex-col">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-gray-200 text-gray-900 rounded-bl-none">
-              Sure! What kind of advice are you looking for?
-            </div>
-            <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
-            >
-              10:17 AM
-            </span>
-          </div>
-        </div>
-
-        {/* User message */}
-        <div className="flex justify-end">
-          <div className="flex flex-col items-end">
-            <div className="max-w-[70%] px-4 py-2 rounded-xl bg-blue-500 text-white rounded-br-none">
-              About improving productivity in AI projects.
-            </div>
-            <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
-            >
-              10:18 AM
-            </span>
-          </div>
-        </div>
+        {/* Another Creator Message */}
       </div>
 
-      {/* Input Box */}
+      {/* Input Box - Fixed Bottom */}
       <div className="fixed bottom-0 left-0 w-full flex justify-center px-4 md:px-8 py-3">
         <div className="flex w-full max-w-2xl gap-3">
           <input
@@ -176,7 +103,6 @@ export default function CreatorChating() {
           </button>
         </div>
       </div>
-
     </div>
   );
 }

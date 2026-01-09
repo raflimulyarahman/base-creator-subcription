@@ -4,12 +4,23 @@ import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import { useWallet } from "@/context/WalletContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-export default function Navbar() {
+export default function Navbar({
+  onOpenSidebar,
+}: {
+  onOpenSidebar: () => void;
+}) {
   const { isDark, toggle } = useLight();
   const { role } = useWallet();
+  const pathname = usePathname();
+  const isNotif = pathname === "/dashboard/users/notif";
+  const isSearch = pathname === "/dashboard/users/search";
+  const isCreator = pathname === "/dashboard/users/creator";
+  const isBiodata = pathname === "/dashboard/users/bio";
+  const isSubscribe = pathname === "/dashboard/users/subscribe";
 
   const { user } = useUsers();
   const [showToast, setShowToast] = useState(false);
@@ -40,22 +51,51 @@ export default function Navbar() {
       </div>
       <div className="h-full flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3 md:hidden">
-          <Image
-            src={avatarSrc}
-            alt="User Avatar"
-            width={40}
-            height={40}
-            className="rounded-lg object-cover"
-          />
+          <button
+            onClick={onOpenSidebar}
+            className="md:hidden flex items-center gap-3"
+          >
+            <Image
+              src={avatarSrc}
+              alt="User Avatar"
+              width={40}
+              height={40}
+              className="rounded-lg object-cover"
+            />
+          </button>
         </div>
         <div className="flex w-full items-center justify-center gap-3 md:hidden">
           <ul className="flex gap-4 text-sm font-medium">
-            <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus-visible:ring-0 focus:outline-none">
-              Trade
-            </button>
-            <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus-visible:ring-0 focus:outline-none">
-              Talk
-            </button>
+            {isNotif ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Notification
+              </button>
+            ) : isSearch ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Search
+              </button>
+            ) : isCreator ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Option Creator
+              </button>
+            ) : isBiodata ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Biodata
+              </button>
+            ) : isSubscribe ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Make Subscribe
+              </button>
+            ) : (
+              <>
+                <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                  Trade
+                </button>
+                <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                  Talk
+                </button>
+              </>
+            )}
           </ul>
         </div>
 
@@ -158,7 +198,10 @@ export default function Navbar() {
             )}
           </button>
 
-          <Link href="/dashboard/users/chating" className="rounded-lg p-2 transition">
+          <Link
+            href="/dashboard/users/chating"
+            className="rounded-lg p-2 transition"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
