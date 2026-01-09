@@ -67,19 +67,19 @@ export default function NavbarChating() {
                                 Notification
                             </button>
                         )}
-
-                        {!pathname.startsWith("/dashboard/users/search") && (
-                            <button
-                                className={`font-mono font-bold text-[20px] transition focus-visible:ring-0 focus:outline-none ${pathname.startsWith("/dashboard/users/notif")
-                                    ? "text-black"
-                                    : isDark
-                                        ? "text-white"
-                                        : "text-black"
-                                    }`}
-                            >
-                                Search
-                            </button>
-                        )}
+                        {!pathname.startsWith("/dashboard/users/chating") &&
+                            !pathname.startsWith("/dashboard/users/notif") && (
+                                <button
+                                    className={`font-mono font-bold text-[20px] transition focus-visible:ring-0 focus:outline-none ${pathname.startsWith("/dashboard/users/search")
+                                        ? "text-blue-500"
+                                        : isDark
+                                            ? "text-white"
+                                            : "text-black"
+                                        }`}
+                                >
+                                    Search
+                                </button>
+                            )}
                     </ul>
                 </div>
 
