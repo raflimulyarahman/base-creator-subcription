@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "root123",
-    "database": "edu_fun",
+    "password": null,
+    "database": "sub",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
