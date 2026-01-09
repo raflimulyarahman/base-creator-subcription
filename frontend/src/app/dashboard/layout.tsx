@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (!role) return null;
 
-  const hideNavbar = pathname.startsWith("/dashboard/users/chating") || pathname.startsWith("/dashboard/users/notif");
+  const hideNavbar = pathname.startsWith("/dashboard/users/chating") || pathname.startsWith("/dashboard/users/notif") || pathname.startsWith("/dashboard/users/search");
   const hideNavigator = pathname.startsWith("/dashboard/users/chating");
 
   return (
