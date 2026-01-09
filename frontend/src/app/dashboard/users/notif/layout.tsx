@@ -3,7 +3,7 @@
 import NavbarChating from "@/components/ui/navbarchating";
 import { ReactNode } from "react";
 
-export default function ChatingLayout({ children }: { children: ReactNode }) {
+export default function NotifLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-col flex-1">

@@ -3,8 +3,9 @@
 import { useLight } from "@/context/LightContext";
 import Image from "next/image";
 
-export default function CreatorChating() {
+export default function AIChating() {
   const { isDark } = useLight();
+
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
@@ -21,7 +22,7 @@ export default function CreatorChating() {
             className={`font-bold text-lg md:text-xl ${isDark ? "text-white" : "text-gray-900"
               }`}
           >
-            Creator 1
+            AI 1 Bankr
           </h1>
         </div>
         <button className="text-blue-500 font-semibold">Info</button>

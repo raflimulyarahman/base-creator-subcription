@@ -4,6 +4,7 @@ import { useWallet } from "@/context/WalletContext";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import Image from "next/image";
 import Link from "next/link";
+
 export default function Dashboard() {
   const { isDark } = useLight();
   const { role } = useWallet();

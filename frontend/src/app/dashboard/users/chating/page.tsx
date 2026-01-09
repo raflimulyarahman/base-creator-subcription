@@ -1,10 +1,14 @@
+"use client";
+
+import { useLight } from "@/context/LightContext";
 import Image from "next/image";
+import Link from "next/link";
 export default function Chating() {
+  const { isDark } = useLight();
   return (
     <div className="w-screen py-6 md:py-8">
-
       <div className="flex items-center gap-3 px-4 md:px-8 mb-2">
-        <h1 className="text-lg font-bold md:text-xl text-gray-900">
+        <h1 className={`text-lg font-bold md:text-xl ${isDark ? "text-white" : "text-gray-900"}`}>
           Chat With AI Agent
         </h1>
         <svg
@@ -13,7 +17,7 @@ export default function Chating() {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-6 h-6 text-gray-600"
+          className={`w-6 h-6  ${isDark ? "text-white" : "text-gray-600"} `}
         >
           <path
             strokeLinecap="round"
@@ -22,7 +26,7 @@ export default function Chating() {
           />
         </svg>
       </div>
-
+      <Link href="/dashboard/users/chating/ai">
       <div
         className="
       flex gap-4 px-4 md:px-8 py-2
@@ -35,6 +39,7 @@ export default function Chating() {
     "
       >
         {[1, 2, 3, 4].map((i) => (
+
           <div
             key={i}
             className="
@@ -69,14 +74,17 @@ export default function Chating() {
               </p>
             </div>
           </div>
+
         ))}
       </div>
+      </Link>
 
       <div className="mt-4 px-4 md:px-8">
-        <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3">
+        <h2 className={`text-lg md:text-xl font-bold ${isDark ? "text-white" : "text-gray-900"} mb-3`}>
           Creator Groups
         </h2>
 
+        <Link href="/dashboard/users/chating/grup">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {[1, 2, 3, 4].map((i) => (
             <div
@@ -92,7 +100,7 @@ export default function Chating() {
                   className="w-15 h-15 md:w-24 md:h-24 rounded-full object-cover mr-4"
                 />
                 <div className="flex flex-col justify-center">
-                  <h3 className="font-semibold text-gray-900 text-sm md:text-base">
+                  <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-900"} text-sm md:text-base`}>
                     Creator Content Group {i}
                   </h3>
                   <p className="text-xs text-gray-500">Creator: Jakarta</p>
@@ -106,20 +114,21 @@ export default function Chating() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6 text-gray-400"
+                className={`w-6 h-6 ${isDark ? "text-white" : "text-gray-400"} `}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
               </svg>
             </div>
           ))}
         </div>
+        </Link>
       </div>
 
       <div className="mt-4 px-4 md:px-8">
-        <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3">
+        <h2 className={`text-lg md:text-xl font-bold ${isDark ? "text-white" : "text-gray-900"} mb-3`}>
           Direct Message With Creator
         </h2>
-
+        <Link href="/dashboard/users/chating/creator">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {[1, 2, 3, 4].map((i) => (
             <div
@@ -135,7 +144,7 @@ export default function Chating() {
                   className="w-15 h-15 md:w-24 md:h-24 rounded-full object-cover mr-4"
                 />
                 <div className="flex flex-col justify-center">
-                  <h3 className="font-semibold text-gray-900 text-sm md:text-base">
+                  <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-900"} text-sm md:text-base`}>
                     Creator {i}
                   </h3>
                   <p className="text-lg text-gray-500">Last Post</p>
@@ -148,13 +157,14 @@ export default function Chating() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6 text-gray-400"
+                className={`w-6 h-6 ${isDark ? "text-white" : "text-gray-400"} `}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
               </svg>
             </div>
           ))}
         </div>
+        </Link>
       </div>
     </div>
 

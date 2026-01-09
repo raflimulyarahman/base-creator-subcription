@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import Based from "../../../../../public/based.png";
+
 export default function Profile() {
   const { isDark } = useLight();
   const router = useRouter();
