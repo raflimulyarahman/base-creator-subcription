@@ -3,25 +3,12 @@ import db from "../models";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const {
-      id_address,
-      id_role,
-      first_name,
-      last_name,
-      birth_years,
-      country,
-      jenis_kelamin,
-      bio,
-    } = req.body;
+    const { id_address, id_role, first_name, last_name } = req.body;
     const newUser = await db.User.create({
       id_address,
       id_role,
       first_name,
       last_name,
-      birth_years,
-      country,
-      jenis_kelamin,
-      bio,
     });
 
     return res.status(201).json({
@@ -87,18 +74,7 @@ export const getUserId = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const {
-      first_name,
-      last_name,
-      birth_years,
-      country,
-      jenis_kelamin,
-      bio,
-      username,
-      email,
-      id_address,
-      id_role,
-    } = req.body;
+    const { first_name, last_name, username, id_address, id_role } = req.body;
 
     const user = await db.User.findOne({ where: { id_users: id } });
     if (!user) {
@@ -108,12 +84,7 @@ export const updateUser = async (req: Request, res: Response) => {
     await user.update({
       first_name: first_name ?? user.first_name,
       last_name: last_name ?? user.last_name,
-      birth_years: birth_years ?? user.birth_years,
-      country: country ?? user.country,
-      jenis_kelamin: jenis_kelamin ?? user.jenis_kelamin,
-      bio: bio ?? user.bio,
       username: username ?? user.username,
-      email: email ?? user.email,
       foto: req.file ? req.file.filename : user.foto,
       id_address: id_address ?? user.id_address,
       id_role: id_role ?? user.id_role,

@@ -3,14 +3,14 @@
 import { useWallet } from "@/context/WalletContext";
 import { useLight } from "@/context/LightContext";
 import Image from "next/image";
-import LogoBased from "../../../public/logobased.png";
+//import LogoBased from "../../../public/based.png";
 import { useUsers } from "@/context/UsersContext";
 
 export default function SidebarRight() {
   const { isDark } = useLight();
   const { role, isLoading } = useWallet();
   const { usersAll } = useUsers();
-  console.log(usersAll);
+  console.log(usersAll, "ini");
 
   return (
     <>
@@ -27,37 +27,45 @@ export default function SidebarRight() {
             <h1 className="font mono text-sm">Account Users</h1>
           </div>
           <div className="flex flex-col px-4 py-4 gap-3 h-[400px] overflow-y-auto">
-            {usersAll.map((user, i) => (
-              <div
-                key={user.id_users}
-                className="flex items-center gap-3 p-3 transition cursor-pointer"
-              >
-                <Image
-                  src={`https://i.pravatar.cc/150?img=${i + 1}`}
-                  alt="User Avatar"
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
-                />
+            {usersAll && usersAll.length > 0 ? (
+              usersAll.map((user, i) => (
+                <div
+                  key={user.id_users}
+                  className="flex items-center gap-3 p-3 transition cursor-pointer"
+                >
+                  <Image
+                    src={`https://i.pravatar.cc/150?img=${i + 1}`}
+                    alt="User Avatar"
+                    width={40}
+                    height={40}
+                    className="rounded-full object-cover"
+                  />
 
-                <div className="flex flex-col">
-                  <span className="font-mono text-sm font-semibold">
-                    {user.first_name || user.last_name
-                      ? `${user.first_name ?? ""} ${
-                          user.last_name ?? ""
-                        }`.trim()
-                      : `${user.address?.address.slice(
-                          0,
-                          6
-                        )}...${user.address?.address.slice(-4)}`}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-mono text-sm font-semibold">
+                      {user.first_name || user.last_name
+                        ? `${user.first_name ?? ""} ${
+                            user.last_name ?? ""
+                          }`.trim()
+                        : `${user.address?.address.slice(
+                            0,
+                            6
+                          )}...${user.address?.address.slice(-4)}`}
+                    </span>
 
-                  <span className="font-mono text-xs text-gray-500">
-                    {user.role?.role}
-                  </span>
+                    {role ? (
+                      <span className="text-xs font-bold text-gray-600">
+                        {role}
+                      </span> // Akses properti 'role' dari objek 'role'
+                    ) : (
+                      <span>No role available</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div>No users available</div> // Placeholder jika usersAll kosong
+            )}
           </div>
         </div>
       </aside>

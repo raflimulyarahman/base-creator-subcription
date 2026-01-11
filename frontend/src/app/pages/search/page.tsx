@@ -30,6 +30,7 @@ export default function SearchPages() {
                 rounded-xl
                 px-12 py-3
                 text-sm
+                border
                 focus:outline-none
                 focus:ring-2
                 ${

@@ -15,7 +15,7 @@ import ThemeWrapper from "./ThemeWrapper";
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
 const config = getDefaultConfig({
-  appName: "Base Education",
+  appName: "Base Indonesia",
   projectId,
   chains: [baseSepolia],
 });

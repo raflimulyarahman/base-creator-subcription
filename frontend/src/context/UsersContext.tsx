@@ -1,29 +1,39 @@
 "use client";
+
 import { useWallet } from "@/context/WalletContext";
+import { fetchWithAuth } from "@/store/fetchWithAuth";
+import { subscriptionManagerAbi } from "@/abi/SubscriptionManager";
+import { useWriteContract } from "wagmi";
+import { CONTRACT_ADDRESSES } from "@/config/contract";
+type UUID = string;
 import {
   createContext,
   ReactNode,
   useContext,
   useEffect,
   useState,
+  useCallback,
 } from "react";
 
-type UUID = string;
-
-interface User {
-  id: UUID;
-  address: string;
+export interface User {
+  id_users: UUID;
+  address: { address: string };
+  first_name: string;
+  last_name: string;
   role: string;
 }
 
-type UsersContextType = {
+export type UsersContextType = {
   user: User | null;
   usersAll: User[];
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   setUsersAll: React.Dispatch<React.SetStateAction<User[]>>;
   fetchUserById: (userId: UUID) => Promise<User | null>;
   fetchUsersAll: () => Promise<User[]>;
-  updateProfileUsers: (userId: UUID) => Promise<User | null>;
+  updateProfileUsers: (
+    userId: UUID,
+    formData: FormData
+  ) => Promise<User | null>;
 };
 
 const UsersContext = createContext<UsersContextType | null>(null);
@@ -31,87 +41,135 @@ const UsersContext = createContext<UsersContextType | null>(null);
 export function UsersProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [usersAll, setUsersAll] = useState<User[]>([]);
-  const { userId, accessToken } = useWallet();
+  const { userId, accessToken, sendRefreshToken } = useWallet();
+  const { writeContractAsync } = useWriteContract();
+  console.log(usersAll, "users");
 
-  const fetchUserById = async (userId: UUID): Promise<User | null> => {
+  // fetch to requst id_users
+  const fetchUserById = useCallback(
+    async (userId: string) => {
+      if (!userId) return null;
+      try {
+        const res = await fetchWithAuth(
+          `http://localhost:8000/api/users/${userId}`,
+          {
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              ...(accessToken
+                ? { Authorization: `Bearer ${accessToken}` }
+                : {}),
+            },
+          },
+          accessToken,
+          sendRefreshToken
+        );
+        console.log(res, "fetchid users");
+
+        if (!res.ok) {
+          console.log(`Fetch failed with status: ${res.status}`);
+          return null;
+        }
+        const data = await res.json();
+        return data?.data ?? null;
+      } catch (err) {
+        console.error("Error fetching user:", err);
+        return null;
+      }
+    },
+    [accessToken, sendRefreshToken]
+  );
+
+  // fetch to requst all users
+  const fetchUsersAll = useCallback(async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/users/${userId}`, {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      if (!accessToken) return [];
+
+      const res = await fetchWithAuth(
+        "http://localhost:8000/api/users",
+        {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      });
-
-      if (!res.ok) throw new Error("Failed to fetch user");
-      const data = await res.json();
-      return data.data ?? data;
+        accessToken,
+        sendRefreshToken
+      );
+      return res.data;
     } catch (err) {
-      console.error(err);
-      return null;
-    }
-  };
-
-  const fetchUsersAll = async (): Promise<User[]> => {
-    try {
-      const res = await fetch("http://localhost:8000/api/users", {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-      });
-
-      console.log("fetchUsersAll status:", res.status);
-      const data = await res.json();
-      return data.data ?? [];
-    } catch (err) {
-      console.error(err);
+      console.error("Error fetching users:", err);
       return [];
     }
-  };
+  }, [accessToken, sendRefreshToken]);
 
+  // update user profile and wagmi register creator
   const updateProfileUsers = async (
-    userId: UUID,
+    id: UUID,
     formData: FormData
   ): Promise<User | null> => {
-    try {
-      const res = await fetch(`http://localhost:8000/api/users/${userId}`, {
-        credentials: "include",
-        method: "PUT",
-        headers: {
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: formData,
-      });
+    if (!accessToken || !sendRefreshToken) return null;
 
+    try {
+      const res = await writeContractAsync({
+        address: CONTRACT_ADDRESSES.SubscriptionManager,
+        abi: subscriptionManagerAbi,
+        functionName: "registerCreator",
+        args: ["lestri", "lestry001", "urlsjdadasddd"],
+      });
       console.log(res);
 
-      const text = await res.text(); // read raw response
+      // pakai fetchWithAuth untuk otomatis handle token refresh
+      const data = await fetchWithAuth(
+        `http://localhost:8000/api/users/${id}`,
+        {
+          method: "PUT",
+          body: formData, // formData tidak perlu content-type, browser akan set otomatis
+          credentials: "include",
+        },
+        accessToken,
+        sendRefreshToken
+      );
 
-      if (!res.ok) throw new Error(`Failed to update user: ${res.status}`);
-      const data = JSON.parse(text);
-      return data.data ?? null;
+      // pastikan data ada
+      return data?.data ?? data ?? null;
     } catch (err) {
-      console.error(err);
+      console.error("updateProfileUsers error:", err);
       return null;
     }
   };
 
-  // 🔹 fetch current user
+  //UseEffect GetUser Id
   useEffect(() => {
-    if (!userId) {
-      setUser(null);
-      return;
+    const fetchData = async () => {
+      if (!userId) {
+        setUser(null);
+        return;
+      }
+
+      const userData = await fetchUserById(userId);
+      setUser(userData);
+    };
+
+    fetchData();
+  }, [userId, accessToken, fetchUserById]);
+
+  //UseEffect GetUser All
+  useEffect(() => {
+    if (accessToken) {
+      fetchUsersAll()
+        .then((users) => {
+          console.log("Users fetched and updated:", users);
+          setUsersAll(users);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("No access token available.");
     }
-
-    fetchUserById(userId).then(setUser);
-  }, [userId, accessToken]);
-
-  // 🔹 fetch all users
-  useEffect(() => {
-    fetchUsersAll().then(setUsersAll);
-  }, [accessToken]);
+  }, [accessToken, fetchUsersAll]);
 
   return (
     <UsersContext.Provider
@@ -132,8 +190,6 @@ export function UsersProvider({ children }: { children: ReactNode }) {
 
 export const useUsers = () => {
   const ctx = useContext(UsersContext);
-  if (!ctx) {
-    throw new Error("useUsers must be used within UsersProvider");
-  }
+  if (!ctx) throw new Error("useUsers must be used within UsersProvider");
   return ctx;
 };

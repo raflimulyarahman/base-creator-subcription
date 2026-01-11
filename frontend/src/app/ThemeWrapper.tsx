@@ -12,7 +12,7 @@ export default function ThemeWrapper({
   return (
     <div
       className={`min-h-screen transition-colors duration-300 
-      ${isDark ? "bg-black text-white" : "bg-gray-100 text-black"}`}
+      ${isDark ? "bg-black text-white" : "bg-white text-black"}`}
     >
       {children}
     </div>

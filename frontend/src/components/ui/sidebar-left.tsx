@@ -61,7 +61,8 @@ export default function SidebarLeft() {
               <p className="text-sm font-bold">
                 {user?.first_name || user?.last_name
                   ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
-                  : shortAddress(user?.id_address)}
+                  : shortAddress(user?.address)}{" "}
+                {/* Karena address adalah string langsung */}
               </p>
 
               <svg

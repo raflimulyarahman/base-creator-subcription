@@ -2,12 +2,12 @@
 import { useLight } from "@/context/LightContext";
 import { useSubscribe } from "@/context/SubscribeContext";
 import { useUsers } from "@/context/UsersContext";
-import ProtectedRoute from "@/utils/ProtectedRoute";
-import ToastSuccess from "@/components/ui/toastSuccess";
+import ProtectedRoute from "@/store/ProtectedRoute";
+import ToastSuccess from "@/components/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SubscribePages() {
+export default function PaySubPages() {
   const { isDark } = useLight();
   const router = useRouter();
   const [showToast, setShowToast] = useState(false);

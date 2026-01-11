@@ -1,27 +1,21 @@
 "use client";
 
 import ButtonNavigator from "@/components/ui/button-navigation";
-import Loading from "@/components/ui/loading";
 import Navbar from "@/components/ui/navbar";
 import SidebarLeft from "@/components/ui/sidebar-left";
 import SidebarRight from "@/components/ui/sidebar-right";
-import { useWallet } from "@/context/WalletContext";
-import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { ReactNode, useState } from "react";
 import MobileSidebar from "@/components/ui/MobileSidebar";
+import Loading from "@/components/ui/loading";
+import { useWallet } from "@/context/WalletContext";
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { role, isLoading } = useWallet();
+export default function ClientShell({ children }: { children: ReactNode }) {
+  const { isLoading } = useWallet();
   const [open, setOpen] = useState(false);
-  const router = useRouter();
+  //const router = useRouter();
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (!isLoading && !role) {
-      router.replace("/signin");
-    }
-  }, [role, isLoading, router]);
-
+  console.log(isLoading, "loading");
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -30,15 +24,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!role) return null;
-
-  const hideNavbar = pathname.startsWith("/dashboard/users/chating");
-  const hideNavigator = pathname.startsWith("/dashboard/users/chating");
+  const hideNavbar = pathname.startsWith("/pages/chating");
+  const hideNavigator = pathname.startsWith("/pages/chating");
   return (
     <div className="flex min-h-screen">
       <SidebarLeft />
       <div className="flex flex-col flex-1">
-        {!hideNavbar && <Navbar onOpenSidebar={() => setOpen(true)} />}
+        {!isLoading && !hideNavbar && (
+          <Navbar onOpenSidebar={() => setOpen(true)} />
+        )}
         <MobileSidebar open={open} onClose={() => setOpen(false)} />
         <main className="flex-1 w-full flex justify-center pb-6">
           <div className="w-full">{children}</div>

@@ -6,8 +6,8 @@ export default function NavbarChating() {
   const { isDark, toggle } = useLight();
   const router = useRouter();
   const pathname = usePathname();
-  const isCreatorChat = pathname === "/dashboard/users/chating/creator";
-  const isCreatorGroup = pathname === "/dashboard/users/chating/group";
+  const isCreatorChat = pathname === "/pages/chating/creator";
+  const isCreatorGroup = pathname === "/pages/chating/group";
   return (
     <nav
       className={`w-full h-16 transition-colors duration-300

@@ -10,7 +10,6 @@ export default function NotificationPages() {
             className={`min-h-screen px-4 py-6 ${isDark ? "bg-black text-white" : "bg-transparation text-gray-900"
                 }`}
         >
-
             {/* Notification 2 */}
             <div
                 className={`flex items-start gap-3 p-4 rounded-xl mt-3 ${isDark ? "bg-gray-800/50" : "bg-white"
