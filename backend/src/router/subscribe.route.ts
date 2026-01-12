@@ -4,6 +4,6 @@ import { checkRole } from "../middleware/verify.roles";
 import { verifyToken } from "../middleware/verify.token";
 const router = Router();
 
-router.get("/", verifyToken, checkRole(["Admin","Users"]), subscibeController.getSubscribe);
-router.post("/", verifyToken, checkRole(["Admin","Users"]), subscibeController.createSubscribe);
+router.get("/", verifyToken, checkRole(["Creators","Users"]), subscibeController.getSubscribe);
+router.post("/", verifyToken, checkRole(["Creators","Users"]), subscibeController.createSubscribe);
 export default router;

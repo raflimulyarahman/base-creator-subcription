@@ -4,59 +4,50 @@ export async function fetchWithAuth(
   token: string | null,
   sendRefreshToken: () => Promise<string | null>
 ) {
-  let authToken = token;
+  const authToken = token;
 
-  // Log token untuk memastikan nilainya
-  console.log("Auth Token:", authToken);
+  // Tentukan headers tanpa memaksa content-type
+  const headers: Record<string, string> = {
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    ...options.headers,
+  };
 
-  // Mengirim permintaan pertama dengan token yang ada
+  // Hanya set JSON jika body bukan FormData
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
   let res = await fetch(url, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      ...options.headers,
-    },
+    headers,
     credentials: "include",
   });
 
-  // Log status response pertama
-  console.log("Initial response status:", res.status);
-
-  // Menangani status 401 Unauthorized (token kadaluarsa)
+  // Retry jika 401
   if (res.status === 401) {
-    console.log("Token expired or unauthorized. Attempting to refresh...");
     const newToken = await sendRefreshToken();
-    if (!newToken) {
-      console.log("Failed to refresh token");
-      throw new Error("Unauthorized, refresh failed");
-    }
-    console.log("New token received:", newToken);
+    if (!newToken) throw new Error("Unauthorized, refresh failed");
 
-    // Retry request with new token
+    const retryHeaders = {
+      ...(headers),
+      Authorization: `Bearer ${newToken}`,
+    };
+
     res = await fetch(url, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${newToken}`,
-        ...options.headers,
-      },
+      headers: retryHeaders,
       credentials: "include",
     });
-
-    console.log("Retry response status:", res.status);
   }
 
-  // Jika respons bukan OK (misalnya status 500, 404, dll), lempar error
-  if (!res.ok) {
-    console.log(`Fetch failed with status ${res.status}`);
+  // Jangan langsung `res.json()` kalau bukan JSON
+  const contentType = res.headers.get("content-type");
+  let data: any;
+  if (contentType && contentType.includes("application/json")) {
+    data = await res.json();
+  } else {
+    data = await res.text(); // fallback, misal untuk FormData response plain text
   }
-  console.log(res);
-  // Parsing respons JSON
-  const jsonResponse = await res.json();
 
-  // Log JSON response yang diterima
-  console.log("Response JSON:", jsonResponse);
-
-  return jsonResponse;
+  return data;
 }

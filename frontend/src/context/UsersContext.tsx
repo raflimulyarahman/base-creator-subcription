@@ -1,20 +1,19 @@
 "use client";
 
+import { subscriptionManagerAbi } from "@/abi/SubscriptionManager";
+import { CONTRACT_ADDRESSES } from "@/config/contract";
 import { useWallet } from "@/context/WalletContext";
 import { fetchWithAuth } from "@/store/fetchWithAuth";
-import { subscriptionManagerAbi } from "@/abi/SubscriptionManager";
-import { useWriteContract } from "wagmi";
-import { CONTRACT_ADDRESSES } from "@/config/contract";
-type UUID = string;
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
-  useCallback,
 } from "react";
-
+import { useWriteContract } from "wagmi";
+type UUID = string;
 export interface User {
   id_users: UUID;
   address: { address: string };
@@ -112,15 +111,19 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     if (!accessToken || !sendRefreshToken) return null;
 
     try {
+
+      const fullName = formData.get("first_name") + " " + formData.get("last_name");
+
+      const username = formData.get("username") as string;
+      const fotoFile = formData.get("foto") as File;
       const res = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
         functionName: "registerCreator",
-        args: ["lestri", "lestry001", "urlsjdadasddd"],
+        args: [fullName, username, fotoFile],
       });
-      console.log(res);
 
-      // pakai fetchWithAuth untuk otomatis handle token refresh
+      if (res) {
       const data = await fetchWithAuth(
         `http://localhost:8000/api/users/${id}`,
         {
@@ -132,8 +135,10 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         sendRefreshToken
       );
 
-      // pastikan data ada
+        console.log(data, "update profile");
       return data?.data ?? data ?? null;
+      }
+      return null;
     } catch (err) {
       console.error("updateProfileUsers error:", err);
       return null;
