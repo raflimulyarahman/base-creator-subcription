@@ -19,7 +19,7 @@ Desain UI tersedia di Google Drive:
 
 ## Flow Frontend
 
-<img src="images/flow_public_access.png" alt="Flow Public Access Home" width="600"/>
+<img src="https://drive.google.com/file/d/1LAVjF--rAwEpro84JTQOrzPwN6WDNew5/view?usp=drive_link" alt="Flow Public Access Home" width="600"/>
 
 
 **Users →**  
