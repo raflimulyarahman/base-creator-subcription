@@ -5,7 +5,7 @@
 
 Platform subscription berbasis blockchain yang menghubungkan **Creator** dengan **Users** melalui sistem tier (Bronze, Silver, Gold) dengan NFT badges sebagai bukti dukungan.
 
-![Prifyd System Flowchart](https://drive.google.com/thumbnail?id=1UjDFov08WSkLp459q6Gq0RwSq1vrkFfK&sz=w800)
+<img src="https://drive.google.com/uc?export=view&id=1UjDFov08WSkLp459q6Gq0RwSq1vrkFfK" alt="Prifyd System Flowchart" width="800"/>
 
 **Alur Sistem:**
 
