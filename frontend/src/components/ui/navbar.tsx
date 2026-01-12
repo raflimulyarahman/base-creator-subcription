@@ -10,17 +10,23 @@ import Link from "next/link";
 import { useState } from "react";
 export default function Navbar({
   onOpenSidebar,
+  activeTab,
+  setActiveTab,
 }: {
   onOpenSidebar: () => void;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
 }) {
   const { isDark, toggle } = useLight();
   const { role } = useWallet();
   const pathname = usePathname();
+  const tabs = ["Followed", "Trade", "Talk"];
   const isNotif = pathname === "/pages/notif";
   const isSearch = pathname === "/pages/search";
   const isCreator = pathname === "/pages/creator";
   const isRegist = pathname === "/pages/regist";
   const isSubscribe = pathname === "/pages/subscribe";
+  const isPaySubscribe = pathname === "/pages/subscribe/[id_address]";
   const isProfile = pathname === "/pages/profile";
   const router = useRouter();
   const { user } = useUsers();
@@ -88,52 +94,71 @@ export default function Navbar({
           ) : (
             <button
               onClick={avatarClick}
-              className="md:hidden flex items-center gap-3"
+              className="md:hidden flex items-center gap-3 py-4"
             >
               <Image
                 src={avatarSrc}
                 alt="User Avatar"
-                width={40}
-                height={40}
-                className="rounded-lg object-cover"
+                width={50}
+                height={50}
+                className="rounded-full object-cover"
               />
             </button>
           )}
         </div>
         <div className="flex w-full items-center justify-center gap-3 md:hidden">
-          <ul className="flex gap-4 text-sm font-medium">
+          <ul className="flex gap-3 text-sm font-medium">
             {isNotif ? (
-              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+              <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
                 Notification
               </button>
             ) : isSearch ? (
-              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+              <button className="font-bold text-base transition focus:outline-none">
                 Search
               </button>
             ) : isCreator ? (
-              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+              <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
                 Option Creator
               </button>
             ) : isRegist ? (
-              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+              <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
                 Registrasi Creator
               </button>
             ) : isSubscribe ? (
-              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+              <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
                 Make Subscribe
               </button>
             ) : isProfile ? (
-              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+              <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
                 Profile
+              </button>
+            ) : isPaySubscribe ? (
+              <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
+                Subscribe
               </button>
             ) : (
               <>
-                <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
-                  Trade
-                </button>
-                <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
-                  Talk
-                </button>
+                <div className="w-full">
+                  <div className="flex gap-6">
+                    {tabs.map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`relative pb-2 font-bold transition-colors focus:outline-none
+              ${
+                activeTab === tab
+                  ? "text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }
+              after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-blue-600 after:rounded-full after:transition-all
+              ${activeTab === tab ? "after:w-full" : "after:w-0"}
+            `}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </>
             )}
           </ul>
@@ -166,41 +191,6 @@ export default function Navbar({
         </div>
 
         <div className="flex items-center gap-3 md:gap-4">
-          <ConnectButton.Custom>
-            {({ account, mounted, openAccountModal }) => {
-              if (!mounted || !account) return null;
-              return (
-                <button
-                  onClick={openAccountModal}
-                  title="Account"
-                  className="rounded-lg p-2 transition hidden md:block"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      d="M3 6V17C3 18.8856 3 19.8284 3.58579 20.4142C4.17157 21 5.11438 21 7 21H17C18.8856 21 19.8284 21 20.4142 20.4142C21 19.8284 21 18.8856 21 17V12C21 10.1144 21 9.17157 20.4142 8.58579C19.8284 8 18.8856 8 17 8H7.82843C6.67474 8 6.0979 8 5.56035 7.84678C5.26506 7.7626 4.98044 7.64471 4.71212 7.49543C4.22367 7.22367 3.81578 6.81578 3 6ZM3 6C3 5.06812 3 4.60218 3.15224 4.23463C3.35523 3.74458 3.74458 3.35523 4.23463 3.15224C4.60218 3 5.06812 3 6 3H16"
-                      stroke="currentColor"
-                      strokeWidth="null"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    ></path>
-                    <path
-                      d="M18 14.5C18 15.3284 17.3284 16 16.5 16C15.6716 16 15 15.3284 15 14.5C15 13.6716 15.6716 13 16.5 13C17.3284 13 18 13.6716 18 14.5Z"
-                      stroke="currentColor"
-                      strokeWidth="null"
-                    ></path>
-                  </svg>
-                </button>
-              );
-            }}
-          </ConnectButton.Custom>
-
           <button
             onClick={toggle}
             className="fixed bottom-24 animate-bounce right-4 bg-gray-300 shadow z-80 p-3 rounded-full bg-transition transition shadow-lg focus:outline-none"
