@@ -17,6 +17,10 @@ Desain UI tersedia di Google Drive:
 
 ---
 
+## Architecture
+
+![Subscription System Flowchart](docs/architecture-flowchart.png)
+
 ## Struktur Folder Frontend
 
 ```bash
