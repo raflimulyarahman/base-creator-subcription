@@ -45,7 +45,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
         <main className="flex-1 w-full flex justify-center pb-6">
           <div className="w-full">
             {React.isValidElement(children)
-              ? React.cloneElement(children, { activeTab })
+              ? React.cloneElement(children as React.ReactElement<{ activeTab?: string }>, { activeTab })
               : children}
           </div>
         </main>
