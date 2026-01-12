@@ -19,11 +19,11 @@ Desain UI tersedia di Google Drive:
 
 ## Flow Frontend
 
-**Public → Access Home Only**  
+<img src="images/flow_public_access.png" alt="Flow Public Access Home" width="600"/>
+
 
 **Users →**  
-- Registrasi Creator  
-- Search Creator → Pilih Creator → Subscribe → Vote → Withdraw  
+
 
 **Creator →**  
 - Buat Subscription  
