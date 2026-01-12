@@ -1,14 +1,13 @@
 import { useLight } from "@/context/LightContext";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useWallet } from "@/context/WalletContext";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import Toast from "./Toast";
 import { useState } from "react";
+import Toast from "./Toast";
 
 export default function ButtonNavigator() {
   const { isDark } = useLight();
   const { role } = useWallet();
-  const pages = "pages";
   const [showToast, setShowToast] = useState(false);
   const handleClickNotif = () => {
     if (!role) {
@@ -56,7 +55,7 @@ export default function ButtonNavigator() {
           </svg>
         </Link>
         <Link
-          href={`/${pages}/search`}
+          href="/pages/search"
           className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group"
         >
           <svg

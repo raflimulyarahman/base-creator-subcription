@@ -5,7 +5,7 @@ export async function fetchWithAuth(
   sendRefreshToken: () => Promise<string | null>
 ) {
   const authToken = token;
-
+  console.log(authToken, "authToken");
   // Tentukan headers tanpa memaksa content-type
   const headers: Record<string, string> = {
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),

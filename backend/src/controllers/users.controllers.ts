@@ -85,7 +85,7 @@ export const updateUser = async (req: Request, res: Response) => {
     // if (!creatorsRole) return res.status(500).json({ message: "Role 'Creators' tidak ditemukan" });
     // console.log(creatorsRole);
     const fotoUrl = req.file
-      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+      ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
       : user.foto;
 
     const updatedUser = await user.update({

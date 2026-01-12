@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "i.pravatar.cc",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/images/**",
+      },
     ],
   },
   async rewrites() {

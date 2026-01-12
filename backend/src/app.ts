@@ -2,12 +2,12 @@ import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import session from "express-session";
 
+import path from "path";
 import addresRouter from "./router/addres.route";
 import rolesRoute from "./router/roles.route";
 import signinRoute from "./router/signin.route";
 import subscribeRouter from "./router/subscribe.route";
 import usersRoute from "./router/users.route";
-
 const app: Application = express();
 
 // 1️⃣ CORS
@@ -36,7 +36,10 @@ app.use(express.json()); // untuk JSON
 app.use(express.urlencoded({ extended: true })); // untuk x-www-form-urlencoded
 
 // 4️⃣ Static folder
-app.use("/images", express.static("uploads"));
+app.use(
+  "/images",
+  express.static(path.join(__dirname, "/images"))
+);
 
 // 5️⃣ Session
 app.use(session({
