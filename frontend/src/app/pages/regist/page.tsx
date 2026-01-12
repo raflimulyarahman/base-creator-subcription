@@ -2,7 +2,7 @@
 import ToastSuccess from "@/components/ui/Toast";
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
-import { useWallet } from "@/context/WalletContext";
+import { useWallet, UserRole } from "@/context/WalletContext";
 import ProtectedRoute from "@/store/ProtectedRoute";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -37,7 +37,7 @@ export default function RegistCreators() {
         formData.append("foto", selectedFile);
       }
       const registeredCreator = await updateProfileUsers(userId, formData);
-      setRole(registeredCreator?.role ?? null);
+      setRole((registeredCreator?.role as UserRole) ?? null);
       console.log(registeredCreator?.role, "role");
       setShowToast(true);
     } catch (error) {
