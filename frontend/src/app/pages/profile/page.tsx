@@ -15,7 +15,7 @@ export default function ProfilePages() {
   const tabs = ["Post", "Assert", "Cast", "Replies", "Badge"];
   const [activeTab, setActiveTab] = useState("Post"); // Set default to 'Faucet'
 
-  const tabContent = {
+  const tabContent: Record<string, React.ReactNode> = {
     Post: (
       <div>
         <h1>this post</h1>
