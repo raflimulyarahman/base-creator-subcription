@@ -41,7 +41,8 @@ src/
 
 **Users →**  
 
-<img src="https://drive.google.com/file/d/1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf/view?usp=sharing" alt="Flow Public Access Home" width="600"/>
+<img src="https://drive.google.com/uc?export=view&id=1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf" alt="Flow Public Access Home" width="600"/>
+
 
 **Creator →**  
 - Buat Subscription  
