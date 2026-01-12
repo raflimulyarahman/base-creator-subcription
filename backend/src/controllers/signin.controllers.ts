@@ -1,13 +1,14 @@
+import { verifyMessage } from "ethers";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 import { generateTokens } from "../middleware/generate.token";
 import db from "../models";
-import { verifyMessage } from "ethers";
-
 export const signIn = async (req: Request, res: Response) => {
   try {
     const { address, signature } = req.body;
     const nonce = (req.session as any).nonce;
+    const uuid = uuidv4();
 
     if (!nonce) {
       return res.status(400).json({ message: "Nonce not found" });
@@ -40,10 +41,7 @@ export const signIn = async (req: Request, res: Response) => {
         id_role: role.id_role,
         first_name: "",
         last_name: "",
-        birth_years: null,
-        country: "",
-        jenis_kelamin: null,
-        bio: "",
+        username: `user_${uuid.slice(0, 8)}`,
         foto: "",
       });
     }
@@ -56,7 +54,6 @@ export const signIn = async (req: Request, res: Response) => {
       userRole!.role
     );
 
-    // ✅ Simpan refresh token dan user ke session
     (req.session as any).accessToken = accessToken;
     (req.session as any).refreshToken = refreshToken;
     (req.session as any).user = {
@@ -85,10 +82,7 @@ export const signIn = async (req: Request, res: Response) => {
 
 export const getNonce = (req: Request, res: Response) => {
   const nonce = crypto.randomUUID();
-
-  // simpan nonce di session
   (req.session as any).nonce = nonce;
-
   return res.json({ nonce });
 };
 
@@ -100,12 +94,12 @@ export const getSession = (req: Request, res: Response) => {
   res.json({
     ...req.session.user,
     accessToken: (req.session as any).accessToken, // ✅ KIRIM
+    refreshToken: (req.session as any).refreshToken, // ✅ KIRIM
   });
 };
 
 export const refreshToken = (req: Request, res: Response) => {
   const storedToken = (req.session as any).refreshToken;
-
   if (!storedToken) {
     return res.status(401).json({ message: "No refresh token" });
   }
@@ -131,21 +125,17 @@ export const refreshToken = (req: Request, res: Response) => {
 };
 
 export const logout = (req: Request, res: Response) => {
-  // Hapus session dari server
   req.session.destroy((err) => {
     if (err) {
       console.error("Logout error:", err);
       return res.status(500).json({ message: "Logout failed" });
     }
 
-    // Hapus cookie yang menyimpan session ID di browser
     res.clearCookie("sid", {
-      httpOnly: true, // pastikan cookie hanya bisa diakses melalui HTTP (tidak di JavaScript)
-      sameSite: "lax", // cookie hanya akan dikirim di request yang berasal dari origin yang sama
-      secure: false, // set true jika menggunakan HTTPS
+      httpOnly: true, 
+      sameSite: "lax", 
+      secure: false, 
     });
-
-    // Mengirimkan response logout sukses
     return res.json({ message: "Logout success" });
   });
 };

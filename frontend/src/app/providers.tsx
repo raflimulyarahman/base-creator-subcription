@@ -3,6 +3,7 @@
 import { LightProvider } from "@/context/LightContext";
 import { WalletProvider } from "@/context/WalletContext";
 
+import { SubscribeProvider } from "@/context/SubscribeContext";
 import { UsersProvider } from "@/context/UsersContext";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -14,7 +15,7 @@ import ThemeWrapper from "./ThemeWrapper";
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
 const config = getDefaultConfig({
-  appName: "Base Education",
+  appName: "Base Indonesia",
   projectId,
   chains: [baseSepolia],
 });
@@ -30,7 +31,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <RainbowKitProvider>
               <WalletProvider>
                 <UsersProvider>
-                  {children}
+                  <SubscribeProvider>
+                    {children}
+                  </SubscribeProvider>
                 </UsersProvider>
               </WalletProvider>
             </RainbowKitProvider>

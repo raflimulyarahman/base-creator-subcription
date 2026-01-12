@@ -61,7 +61,8 @@ export default function SidebarLeft() {
               <p className="text-sm font-bold">
                 {user?.first_name || user?.last_name
                   ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
-                  : shortAddress(user?.id_address)}
+                  : shortAddress(user?.address)}{" "}
+                {/* Karena address adalah string langsung */}
               </p>
 
               <svg
@@ -114,7 +115,7 @@ export default function SidebarLeft() {
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
-                  class="size-6"
+                  className="size-6"
                 >
                   <path
                     stroke-linecap="round"

@@ -1,60 +1,141 @@
 "use client";
-import Toast from "@/components/ui/toast";
+import Toast from "@/components/ui/Toast";
 import { useLight } from "@/context/LightContext";
-import { useWallet } from "@/context/WalletContext";
 import { useUsers } from "@/context/UsersContext";
+import { useWallet } from "@/context/WalletContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
-export default function Navbar() {
+export default function Navbar({
+  onOpenSidebar,
+}: {
+  onOpenSidebar: () => void;
+}) {
   const { isDark, toggle } = useLight();
   const { role } = useWallet();
-
+  const pathname = usePathname();
+  const isNotif = pathname === "/pages/notif";
+  const isSearch = pathname === "/pages/search";
+  const isCreator = pathname === "/pages/creator";
+  const isRegist = pathname === "/pages/regist";
+  const isSubscribe = pathname === "/pages/subscribe";
+  const isProfile = pathname === "/pages/profile";
+  const router = useRouter();
   const { user } = useUsers();
   const [showToast, setShowToast] = useState(false);
   const avatarSrc =
     user?.foto && user.foto !== ""
       ? user.foto
       : "https://i.pravatar.cc/150?img=1";
-      
+
   const handleClick = () => {
-    if (role === "Users") {
+    if (!role) {
       setShowToast(true);
       return;
     }
   };
 
+  console.log(role, "ini role");
+
+  const avatarClick = () => {
+    if (!role) {
+      setShowToast(true);
+      return;
+    }
+
+    onOpenSidebar();
+  };
+
   return (
     <nav
       className={`w-full h-16 transition-colors duration-300
-      ${isDark ? "bg-black text-white" : "bg-transparent text-black"}
+      ${isDark ? "bg-black text-white" : "bg-white text-black"}
       md:bg-transparent`}
     >
       <div className="justify-center items-center">
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
-          message="you are not accessed to this feature"
+          message="not access"
+          type="error" // bisa "error" juga
         />
       </div>
       <div className="h-full flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3 md:hidden">
-          <Image
-            src={avatarSrc}
-            alt="User Avatar"
-            width={40}
-            height={40}
-            className="rounded-lg object-cover"
-          />
+          {isProfile ? (
+            <button
+              onClick={() => router.back()}
+              className="p-2 rounded-lg hover:bg-gray-100 transition"
+              aria-label="Back"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1"
+                stroke="currentColor"
+                className="size-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+          ) : (
+            <button
+              onClick={avatarClick}
+              className="md:hidden flex items-center gap-3"
+            >
+              <Image
+                src={avatarSrc}
+                alt="User Avatar"
+                width={40}
+                height={40}
+                className="rounded-lg object-cover"
+              />
+            </button>
+          )}
         </div>
         <div className="flex w-full items-center justify-center gap-3 md:hidden">
           <ul className="flex gap-4 text-sm font-medium">
-            <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus-visible:ring-0 focus:outline-none">
-              Trade
-            </button>
-            <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus-visible:ring-0 focus:outline-none">
-              Talk
-            </button>
+            {isNotif ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Notification
+              </button>
+            ) : isSearch ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Search
+              </button>
+            ) : isCreator ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Option Creator
+              </button>
+            ) : isRegist ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Registrasi Creator
+              </button>
+            ) : isSubscribe ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Make Subscribe
+              </button>
+            ) : isProfile ? (
+              <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                Profile
+              </button>
+            ) : (
+              <>
+                <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                  Trade
+                </button>
+                <button className="font-mono font-bold text-sm hover:text-blue-500 transition focus:outline-none">
+                  Talk
+                </button>
+              </>
+            )}
           </ul>
         </div>
 

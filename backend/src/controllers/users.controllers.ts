@@ -1,18 +1,14 @@
 import { Request, Response } from "express";
-import db from '../models';
+import db from "../models";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { id_address, id_role, first_name, last_name, birth_years, country, jenis_kelamin, bio } = req.body;
+    const { id_address, id_role, first_name, last_name } = req.body;
     const newUser = await db.User.create({
       id_address,
-        id_role,
+      id_role,
       first_name,
       last_name,
-      birth_years,
-      country,
-      jenis_kelamin,
-      bio,
     });
 
     return res.status(201).json({
@@ -33,14 +29,16 @@ export const getUser = async (req: Request, res: Response) => {
     const users = await db.User.findAll({
       include: [
         { model: db.Address, as: "address" }, // alias harus sama dengan User.belongsTo
-        { model: db.Role, as: "role" },       // alias sama dengan association Role
+        { model: db.Role, as: "role" }, // alias sama dengan association Role
       ],
     });
 
     return res.status(200).json({ message: "Get users success", data: users });
   } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: "Failed to get users", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Failed to get users", error: error.message });
   }
 };
 
@@ -76,46 +74,35 @@ export const getUserId = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const {
-      first_name,
-      last_name,
-      birth_years,
-      country,
-      jenis_kelamin,
-      bio,
-      foto,
-      id_address,
-      id_role
-    } = req.body; 
+    const { first_name, last_name, username } = req.body; // tidak ada id_role
 
-    
     const user = await db.User.findOne({ where: { id_users: id } });
-    if (!user) {
-      return res.status(404).json({ message: "User tidak ditemukan" });
-    }
+    if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
-    
-    await user.update({
+    // Cari role "Creators" dari database
+    const creatorsRole = await db.Role.findOne({ where: { role: "Creators" } });
+    console.log(creatorsRole);
+    // if (!creatorsRole) return res.status(500).json({ message: "Role 'Creators' tidak ditemukan" });
+    // console.log(creatorsRole);
+    const fotoUrl = req.file
+      ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+      : user.foto;
+
+    const updatedUser = await user.update({
       first_name: first_name ?? user.first_name,
       last_name: last_name ?? user.last_name,
-      birth_years: birth_years ?? user.birth_years,
-      country: country ?? user.country,
-      jenis_kelamin: jenis_kelamin ?? user.jenis_kelamin,
-      bio: bio ?? user.bio,
-      foto: foto ?? user.foto,
-      id_address: id_address ?? user.id_address,
-      id_role: id_role ?? user.id_role
+      username: username ?? user.username,
+      foto: fotoUrl,
+      id_role: creatorsRole?.id_role, // langsung pakai Creators
     });
 
-    return res.status(200).json({
-      message: "User berhasil diupdate",
-      data: user
-    });
-  } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Gagal mengupdate user",
-      error: error.message
-    });
+    console.log(updatedUser);
+
+    return res.status(200).json({ message: "User berhasil diupdate", data: updatedUser, role: creatorsRole?.role, });
+  } catch (err: any) {
+    console.error(err);
+    return res.status(500).json({ message: "Gagal mengupdate user", error: err.message });
   }
 };
+
+

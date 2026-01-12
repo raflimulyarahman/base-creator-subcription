@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
-export default function Toast({ message, show, onClose }) {
+export default function toastError({ message, show, onClose }) {
     useEffect(() => {
         if (show) {
             const timer = setTimeout(() => {

@@ -2,6 +2,7 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/context/WalletContext";
+import Loading from "@/components/ui/loading";
 
 interface Props {
   children: ReactNode;
@@ -14,12 +15,16 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
 
   useEffect(() => {
     if (!isLoading && !allowedRoles.includes(role || "")) {
-      router.replace("/dashboard"); // redirect kalau tidak sesuai
+      router.replace("/");
     }
   }, [role, isLoading, allowedRoles, router]);
 
   if (isLoading || !allowedRoles.includes(role || ""))
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading />
+      </div>
+    );
 
   return <>{children}</>;
 }

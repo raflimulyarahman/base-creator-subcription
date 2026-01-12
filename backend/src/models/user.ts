@@ -6,28 +6,24 @@ interface UserAttributes {
   id_role: string;
   first_name: string;
   last_name: string;
-  birth_years: number | null;
-  country: string;
-  jenis_kelamin: "L" | "P" | null;
-  bio?: string;
+  username: string;
   foto?: string;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, "id_users"> {}
+interface UserCreationAttributes
+  extends Optional<UserAttributes, "id_users" | "username"> {}
 
 export default class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
+  declare email: string;
+  declare username: string;
   declare id_users: string;
   declare id_address: string;
   declare id_role: string;
   declare first_name: string;
   declare last_name: string;
-  declare birth_years: number | null;
-  declare country: string;
-  declare jenis_kelamin: "L" | "P" | null;
-  declare bio?: string;
   declare foto?: string;
 
   static initModel(sequelize: Sequelize) {
@@ -42,10 +38,12 @@ export default class User
         id_role: { type: DataTypes.UUID, allowNull: false },
         first_name: { type: DataTypes.STRING, allowNull: false },
         last_name: { type: DataTypes.STRING, allowNull: false },
-        birth_years: { type: DataTypes.INTEGER, allowNull: true },
-        country: { type: DataTypes.STRING, allowNull: false },
-        jenis_kelamin: { type: DataTypes.ENUM("L", "P"), allowNull: true },
-        bio: { type: DataTypes.TEXT },
+        username: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+          defaultValue: "",
+        },
         foto: { type: DataTypes.TEXT },
       },
       { sequelize, tableName: "Users" }

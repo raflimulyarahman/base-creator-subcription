@@ -1,6 +1,11 @@
 import "./globals.css";
 import Providers from "./providers";
-export const metadata = { title: "Base Education" };
+import ClientShell from "./client-shell";
+
+export const metadata = {
+  title: "Base Indonesia",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -8,8 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-100">
-        <Providers>{children}</Providers>
+      <body className="min-h-screen bg-white">
+        <Providers>
+          <ClientShell>{children}</ClientShell>
+        </Providers>
       </body>
     </html>
   );
