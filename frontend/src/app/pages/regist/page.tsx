@@ -23,6 +23,10 @@ export default function RegistCreators() {
     if (!role || role !== "Users") {
       return
     };
+    if (!userId) {
+      console.error("User ID is required");
+      return;
+    }
 
     try {
       const formData = new FormData();
