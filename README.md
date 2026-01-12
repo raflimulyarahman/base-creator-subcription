@@ -1,12 +1,27 @@
 ````markdown
+# PRIFYD - Creator Subscription Platform
+
+## 🔄 System Overview
+
+Platform subscription berbasis blockchain yang menghubungkan **Creator** dengan **Users** melalui sistem tier (Bronze, Silver, Gold) dengan NFT badges sebagai bukti dukungan.
+
+<img src="https://drive.google.com/uc?export=view&id=1UjDFov08WSkLp459q6Gq0RwSq1vrkFfK" alt="Prifyd System Flowchart" width="800"/>
+
+**Alur Sistem:**
+
+- 👤 **User** → Cari creator favorit → Subscribe tier pilihan → Dapat NFT Badge
+- 🎨 **Creator** → Buat subscription tiers → Terima pembayaran → Buat konten eksklusif
+
+---
+
 # FRONTEND
 
 ## Teknologi
 
-- **Next.js**: v16.1.0  
-- **Wagmi**: v2.19.5  
-- **RainbowKit**: v2.2.10  
-- **Tailwind CSS**: v4.1.18  
+- **Next.js**: v16.1.0
+- **Wagmi**: v2.19.5
+- **RainbowKit**: v2.2.10
+- **Tailwind CSS**: v4.1.18
 
 ---
 
@@ -16,12 +31,6 @@ Desain UI tersedia di Google Drive:
 [Link Desain Google Drive](https://drive.google.com/drive/folders/1uEAbpJPImF7Rb21D62fa5KU1BZiFZ_84?usp=sharing)
 
 ---
-
-## Architecture
-
-![Subscription System Flowchart]
-<img width="2592" height="1648" alt="Flowchart" src="https://github.com/user-attachments/assets/f302db84-78d0-416f-b12b-94c63341ddf8" />
-
 
 ## Struktur Folder Frontend
 
@@ -35,25 +44,27 @@ src/
 ├─ store/         # Zustand / Store
 ├─ config/        # Config Smart Contract
 └─ abi/           # ABI Smart Contract
+```
 ````
 
 ---
 
-## Flow Frontend ##
+## Flow Frontend
 
-**Public** 
+**Public**
 
 <img src="https://drive.google.com/uc?export=view&id=1LAVjF--rAwEpro84JTQOrzPwN6WDNew5" alt="Flow Public Access Home" width="600"/>
 
-**Users**  
+**Users**
 
 <img src="https://drive.google.com/uc?export=view&id=1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf" alt="Flow Public Access Home" width="600"/>
 
 <img src="https://drive.google.com/uc?export=view&id=1voJK92GSxiYSrPalJUiA4gFBI_WkoctP" alt="Flow Public Access Home" width="600"/>
 
-**Creator →**  
-- Buat Subscription  
-- Buat Konten Exclusive  
+**Creator →**
+
+- Buat Subscription
+- Buat Konten Exclusive
 
 ## Access Router Frontend
 
@@ -95,8 +106,8 @@ Registrasi creator baru di Subscription Manager Smart Contract.
 
 ```jsx
 await useWriteContract({
-  address,         // Alamat kontrak
-  abi,             // ABI kontrak
+  address, // Alamat kontrak
+  abi, // ABI kontrak
   functionName: "registerCreator",
   args: [_handle, _name, _profileURI], // Handle, nama, profileURI
 });
@@ -106,9 +117,9 @@ console.log(res);
 
 **Parameters**:
 
-* `_handle` (string) — username / handle creator
-* `_name` (string) — nama creator
-* `_profileURI` (string) — URI profile creator
+- `_handle` (string) — username / handle creator
+- `_name` (string) — nama creator
+- `_profileURI` (string) — URI profile creator
 
 ---
 
@@ -129,9 +140,9 @@ console.log(res);
 
 **Parameters**:
 
-* **bronzePrice** (BigInt): `"100000000000000"`
-* **silverPrice** (BigInt): `"500000000000000"`
-* **goldPrice** (BigInt): `"1000000000000000"`
+- **bronzePrice** (BigInt): `"100000000000000"`
+- **silverPrice** (BigInt): `"500000000000000"`
+- **goldPrice** (BigInt): `"1000000000000000"`
 
 ---
 
@@ -153,21 +164,21 @@ console.log(res);
 
 **Output** (`TierConfig`):
 
-* `name` (string) — Nama tier
-* `price` (uint256) — Harga dalam wei
-* `duration` (uint256) — Durasi subscription (detik)
-* `isActive` (bool) — Status aktif
-* `metadataURI` (string) — URI metadata tambahan
-* `maxSupply` (uint256) — Maksimum subscription allowed
-* `minHoldTime` (uint256) — Minimum hold time
+- `name` (string) — Nama tier
+- `price` (uint256) — Harga dalam wei
+- `duration` (uint256) — Durasi subscription (detik)
+- `isActive` (bool) — Status aktif
+- `metadataURI` (string) — URI metadata tambahan
+- `maxSupply` (uint256) — Maksimum subscription allowed
+- `minHoldTime` (uint256) — Minimum hold time
 
 ---
 
 ## Contoh Frontend Wagmi Usage
 
 ```jsx
-import { useContractRead, useContractWrite } from 'wagmi';
-import SubscriptionABI from '@/abi/SubscriptionManager.json';
+import { useContractRead, useContractWrite } from "wagmi";
+import SubscriptionABI from "@/abi/SubscriptionManager.json";
 
 const contractAddress = "0x...";
 
@@ -200,10 +211,10 @@ function MyComponent() {
 
 ## Notes
 
-* Semua alamat kontrak dan ABI harus disesuaikan dengan jaringan yang digunakan (Mainnet, Testnet, Local).
-* Tailwind digunakan untuk styling responsif, termasuk dark mode support.
-* RainbowKit digunakan untuk koneksi wallet user (Metamask, WalletConnect, dsb).
-* Wagmi memudahkan interaksi smart contract secara reaktif dan watchable.
+- Semua alamat kontrak dan ABI harus disesuaikan dengan jaringan yang digunakan (Mainnet, Testnet, Local).
+- Tailwind digunakan untuk styling responsif, termasuk dark mode support.
+- RainbowKit digunakan untuk koneksi wallet user (Metamask, WalletConnect, dsb).
+- Wagmi memudahkan interaksi smart contract secara reaktif dan watchable.
 
 ---
 
