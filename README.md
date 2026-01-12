@@ -19,7 +19,9 @@ Desain UI tersedia di Google Drive:
 
 ## Architecture
 
-![Subscription System Flowchart](docs/architecture-flowchart.png)
+![Subscription System Flowchart]
+<img width="2592" height="1648" alt="Flowchart" src="https://github.com/user-attachments/assets/f302db84-78d0-416f-b12b-94c63341ddf8" />
+
 
 ## Struktur Folder Frontend
 
