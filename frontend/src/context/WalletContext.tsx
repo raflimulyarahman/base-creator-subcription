@@ -23,6 +23,7 @@ type WalletContextType = {
   isLoading: boolean;
   logout: () => Promise<void>;
   sendRefreshToken: () => Promise<string | null>;
+  setRole: (role: UserRole) => void;
 };
 
 const WalletContext = createContext<WalletContextType>({
@@ -35,6 +36,7 @@ const WalletContext = createContext<WalletContextType>({
   isLoading: true,
   logout: async () => {},
   sendRefreshToken: async () => null,
+  setRole: () => {},
 });
 
 export function WalletProvider({ children }: { children: ReactNode }) {
@@ -160,6 +162,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isLoading,
         logout,
         sendRefreshToken,
+        setRole,
       }}
     >
       {children}
