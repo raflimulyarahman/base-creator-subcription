@@ -37,7 +37,7 @@ export default function RegistCreators() {
         formData.append("foto", selectedFile);
       }
       const registeredCreator = await updateProfileUsers(userId, formData);
-      setRole(registeredCreator?.role);
+      setRole(registeredCreator?.role ?? null);
       console.log(registeredCreator?.role, "role");
       setShowToast(true);
     } catch (error) {
