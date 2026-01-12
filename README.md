@@ -17,20 +17,6 @@ Desain UI tersedia di Google Drive:
 
 ---
 
-## Flow Frontend
-
-**Public → Access Home Only**  
-
-**Users →**  
-- Registrasi Creator  
-- Search Creator → Pilih Creator → Subscribe → Vote → Withdraw  
-
-**Creator →**  
-- Buat Subscription  
-- Buat Konten Exclusive  
-
----
-
 ## Struktur Folder Frontend
 
 ```bash
@@ -46,6 +32,21 @@ src/
 ````
 
 ---
+
+## Flow Frontend ##
+
+**Public** 
+
+<img src="https://drive.google.com/uc?export=view&id=1LAVjF--rAwEpro84JTQOrzPwN6WDNew5" alt="Flow Public Access Home" width="600"/>
+
+**Users**  
+
+<img src="https://drive.google.com/uc?export=view&id=1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf" alt="Flow Public Access Home" width="600"/>
+
+
+**Creator →**  
+- Buat Subscription  
+- Buat Konten Exclusive  
 
 ## Access Router Frontend
 
