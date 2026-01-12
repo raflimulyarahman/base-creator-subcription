@@ -39,8 +39,6 @@ src/
 
 <img src="https://drive.google.com/uc?export=view&id=1LAVjF--rAwEpro84JTQOrzPwN6WDNew5" alt="Flow Public Access Home" width="600"/>
 
-https://drive.google.com/file/d/1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf/view?usp=sharing
-
 **Users →**  
 
 <img src="https://drive.google.com/file/d/1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf/view?usp=sharing" alt="Flow Public Access Home" width="600"/>
