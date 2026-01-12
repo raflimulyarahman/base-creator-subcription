@@ -39,7 +39,7 @@ src/
 
 <img src="https://drive.google.com/uc?export=view&id=1LAVjF--rAwEpro84JTQOrzPwN6WDNew5" alt="Flow Public Access Home" width="600"/>
 
-**Users →**  
+**Users**  
 
 <img src="https://drive.google.com/uc?export=view&id=1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf" alt="Flow Public Access Home" width="600"/>
 
