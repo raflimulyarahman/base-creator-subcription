@@ -3,12 +3,13 @@
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 export default function SearchPages() {
   const { isDark } = useLight();
   const { usersAll } = useUsers();
-
+  const router = useRouter();
+  console.log(usersAll);
   const [query, setQuery] = useState("");
 
   // Filter hanya saat query diisi
@@ -25,6 +26,11 @@ export default function SearchPages() {
               username.includes(query.toLowerCase()))
           );
         });
+
+  const handleProfileClick = (id_users: string) => {
+    console.log(id_users);
+    router.push(`/pages/search/${id_users}`);
+  };
 
   return (
     <div
@@ -77,7 +83,7 @@ export default function SearchPages() {
           (filteredCreators.length > 0 ? (
             filteredCreators.map((user) => (
               <div
-                key={user.id_users}
+                key={user.id_users} onClick={() => handleProfileClick(user.id_users)}
                 className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
                   isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"
                 }`}

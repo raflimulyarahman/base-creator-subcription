@@ -3,10 +3,8 @@ import Toast from "@/components/ui/Toast";
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import { useWallet } from "@/context/WalletContext";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 export default function Navbar({
   onOpenSidebar,
@@ -23,6 +21,12 @@ export default function Navbar({
   const tabs = ["Followed", "Trade", "Talk"];
   const isNotif = pathname === "/pages/notif";
   const isSearch = pathname === "/pages/search";
+
+  const isSearchId =
+    pathname.startsWith("/pages/search/") &&
+    pathname !== "/pages/search";
+
+
   const isCreator = pathname === "/pages/creator";
   const isRegist = pathname === "/pages/regist";
   const isSubscribe = pathname === "/pages/subscribe";
@@ -70,7 +74,7 @@ export default function Navbar({
       </div>
       <div className="h-full flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3 md:hidden">
-          {isProfile ? (
+          {isProfile || isSearchId ? (
             <button
               onClick={() => router.back()}
               className="p-2 rounded-lg hover:bg-gray-100 transition"
@@ -136,7 +140,11 @@ export default function Navbar({
               <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
                 Subscribe
               </button>
-            ) : (
+                        ) : isSearchId ? (
+                          <button className="font-bold text-base hover:text-blue-500 transition focus:outline-none">
+                            Profile
+                          </button>
+                          ) : (
               <>
                 <div className="w-full">
                   <div className="flex gap-6">

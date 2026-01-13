@@ -67,6 +67,18 @@ export const SubscribeProvider = ({
     }
   };
 
+  const getTierSubscribe = async() => {
+    try {
+      const res = await writeContractAsync({
+        address: CONTRACT_ADDRESSES.SubscriptionManager,
+        abi: subscriptionManagerAbi,
+        functionName: "getTiers",
+        args: [],
+      });
+      console.log(res);
+    }
+  }
+
   return (
     <SubscribeContext.Provider
       value={{

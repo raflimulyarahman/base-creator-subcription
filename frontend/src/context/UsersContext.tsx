@@ -27,19 +27,24 @@ export type UsersContextType = {
   usersAll: User[];
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   setUsersAll: React.Dispatch<React.SetStateAction<User[]>>;
+  profileUser: User | null;
+  setProfileUser: React.Dispatch<React.SetStateAction<User | null>>;
   fetchUserById: (userId: UUID) => Promise<User | null>;
   fetchUsersAll: () => Promise<User[]>;
   updateProfileUsers: (
     userId: UUID,
     formData: FormData
   ) => Promise<User | null>;
+  getProfileUserById: (id: string) => Promise<User | null>;
 };
+
 
 const UsersContext = createContext<UsersContextType | null>(null);
 
 export function UsersProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [usersAll, setUsersAll] = useState<User[]>([]);
+  const [profileUser, setProfileUser] = useState<User | null>(null);
   const { userId, accessToken, sendRefreshToken } = useWallet();
   const { writeContractAsync } = useWriteContract();
   console.log(usersAll, "users");
@@ -145,6 +150,41 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const getProfileUserById = useCallback(
+    async (id: string) => {
+      try {
+        const data = await fetchWithAuth(
+          `http://localhost:8000/api/users/${id}`,
+          {
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              ...(accessToken
+                ? { Authorization: `Bearer ${accessToken}` }
+                : {}),
+            },
+          },
+          accessToken,
+          sendRefreshToken
+        );
+
+        console.log("Fetched profile data:", data);
+        return data?.data ?? null;
+      } catch (err) {
+        console.error("Error fetching user:", err);
+        return null;
+      }
+    },
+    [accessToken, sendRefreshToken]
+  );
+
+
+
+
+
+
+
+
   //UseEffect GetUser Id
   useEffect(() => {
     const fetchData = async () => {
@@ -186,6 +226,9 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         fetchUserById,
         fetchUsersAll,
         updateProfileUsers,
+        profileUser,
+        getProfileUserById,
+        setProfileUser
       }}
     >
       {children}
