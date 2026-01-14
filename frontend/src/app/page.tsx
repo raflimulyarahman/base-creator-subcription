@@ -1,4 +1,3 @@
-"use client";
 import { useLight } from "@/context/LightContext";
 import Image from "next/image";
 
