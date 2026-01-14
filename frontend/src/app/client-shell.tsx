@@ -1,23 +1,21 @@
 "use client";
-
-
-import React, { ReactNode, useState } from "react"; // <-- add React here
+import MobileSidebar from "@/components/ui/MobileSidebar";
 import ButtonNavigator from "@/components/ui/button-navigation";
-import Navbar from "@/components/ui/navbar";
+import Loading from "@/components/ui/loading";
+import Navbar from "@/components/Navbar/Navbar";
 import SidebarLeft from "@/components/ui/sidebar-left";
 import SidebarRight from "@/components/ui/sidebar-right";
-import { usePathname } from "next/navigation";
-import MobileSidebar from "@/components/ui/MobileSidebar";
-import Loading from "@/components/ui/loading";
+import { useLight } from "@/context/LightContext"; // <-- ambil dark mode
 import { useWallet } from "@/context/WalletContext";
+import { usePathname } from "next/navigation";
+import React, { ReactNode, useState } from "react";
 
 export default function ClientShell({ children }: { children: ReactNode }) {
   const { isLoading } = useWallet();
+  const { isDark } = useLight(); // <-- ambil dark mode
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("Followed"); // move this above early return
+  const [activeTab, setActiveTab] = useState("Followed");
   const pathname = usePathname();
-
-  // Hooks are always called in the same order now
 
   if (isLoading) {
     return (
@@ -45,7 +43,13 @@ export default function ClientShell({ children }: { children: ReactNode }) {
         <main className="flex-1 w-full flex justify-center pb-6">
           <div className="w-full">
             {React.isValidElement(children)
-              ? React.cloneElement(children as React.ReactElement<{ activeTab?: string }>, { activeTab })
+              ? React.cloneElement(
+                children as React.ReactElement<{
+                  activeTab?: string;
+                  isDark?: boolean;
+                }>,
+                { activeTab, isDark } // <-- kirim isDark ke Home
+              )
               : children}
           </div>
         </main>

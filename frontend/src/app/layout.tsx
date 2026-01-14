@@ -1,3 +1,4 @@
+import ClientShell from "./client-shell"; // import ClientShell
 import "./globals.css";
 import Providers from "./providers";
 
@@ -14,7 +15,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-white">
         <Providers>
-          {children}
+          <ClientShell>
+            {children}  {/* children sekarang dibungkus ClientShell */}
+          </ClientShell>
         </Providers>
       </body>
     </html>
