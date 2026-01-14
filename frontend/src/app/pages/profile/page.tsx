@@ -1,5 +1,3 @@
-"use client";
-
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import ProtectedRoute from "@/store/ProtectedRoute";

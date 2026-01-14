@@ -47,8 +47,6 @@ export function UsersProvider({ children }: { children: ReactNode }) {
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const { userId, accessToken, sendRefreshToken } = useWallet();
   const { writeContractAsync } = useWriteContract();
-  console.log(usersAll, "users");
-
   // fetch to requst id_users
   const fetchUserById = useCallback(
     async (userId: string) => {
@@ -68,8 +66,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
           accessToken,
           sendRefreshToken
         );
-        console.log(res, "fetchid users");
-
+       
         if (!res.ok) {
           console.log(`Fetch failed with status: ${res.status}`);
           return null;
@@ -168,7 +165,6 @@ export function UsersProvider({ children }: { children: ReactNode }) {
           sendRefreshToken
         );
 
-        console.log("Fetched profile data:", data);
         return data?.data ?? null;
       } catch (err) {
         console.error("Error fetching user:", err);
@@ -177,14 +173,6 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     },
     [accessToken, sendRefreshToken]
   );
-
-
-
-
-
-
-
-
   //UseEffect GetUser Id
   useEffect(() => {
     const fetchData = async () => {
@@ -205,7 +193,6 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     if (accessToken) {
       fetchUsersAll()
         .then((users) => {
-          console.log("Users fetched and updated:", users);
           setUsersAll(users);
         })
         .catch((err) => {

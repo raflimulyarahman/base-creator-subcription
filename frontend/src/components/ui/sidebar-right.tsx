@@ -10,8 +10,7 @@ export default function SidebarRight() {
   const { isDark } = useLight();
   const { role, isLoading } = useWallet();
   const { usersAll } = useUsers();
-  console.log(usersAll, "ini");
-
+  
   return (
     <>
       <aside className="hidden md:block w-80 h-screen sticky top-0 flex-shrink-0">

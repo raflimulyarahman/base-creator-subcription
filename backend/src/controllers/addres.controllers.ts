@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import db from '../models';
+import db from "../models";
 
 export const createAddress = async (req: Request, res: Response) => {
   try {
     const { address, status_address } = req.body;
+
     const newAddress = await db.Address.create({
       address,
       status_address,
@@ -16,12 +17,50 @@ export const createAddress = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error(error);
     return res.status(500).json({
-      message: "Failed to create user",
+      message: "Failed to create address",
       error: error.message,
     });
   }
 };
 
-export const getAddress = async (req: Request, res: Response) => {}
+export const getAddress = async (req: Request, res: Response) => {
+  try {
+    const addresses = await db.Address.findAll();
 
-export const getAddressId = async (req: Request, res: Response) => {}
+    return res.status(200).json({
+      message: "Addresses retrieved successfully",
+      data: addresses,
+    });
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Failed to retrieve addresses",
+      error: error.message,
+    });
+  }
+};
+
+export const getAddressId = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const address = await db.Address.findByPk(id);
+
+    if (!address) {
+      return res.status(404).json({
+        message: "Address not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Address retrieved successfully",
+      data: address,
+    });
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Failed to retrieve address",
+      error: error.message,
+    });
+  }
+};

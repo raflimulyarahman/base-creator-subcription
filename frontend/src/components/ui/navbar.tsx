@@ -47,8 +47,6 @@ export default function Navbar({
     }
   };
 
-  console.log(role, "ini role");
-
   const avatarClick = () => {
     if (!role) {
       setShowToast(true);

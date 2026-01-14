@@ -18,6 +18,7 @@ const config = getDefaultConfig({
   appName: "Base Indonesia",
   projectId,
   chains: [baseSepolia],
+  ssr: true,
 });
 
 const queryClient = new QueryClient();
