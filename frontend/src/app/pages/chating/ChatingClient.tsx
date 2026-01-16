@@ -13,13 +13,20 @@ export default function ChatingClient() {
   const { getAllChatPersonal } = useChatPersonal();
   const [chattAll, setAllPersonal] = useState<any[]>([]); // array of chat personal
 
+  // Assuming getAllChatPersonal should accept `userId`
   useEffect(() => {
-    (async () => {
-      if (!userId) return;
+    if (!userId) return; // Check if `userId` is available
 
-      const data = await getAllChatPersonal(userId);
-      if (data) setAllPersonal(data);
-    })();
+    const fetchData = async () => {
+      try {
+        const data = await getAllChatPersonal(userId); // Make sure this function expects `userId`
+        if (data) setAllPersonal(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [getAllChatPersonal, userId]);
 
   return (
