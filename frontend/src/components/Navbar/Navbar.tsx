@@ -1,6 +1,11 @@
 import NavbarClient from "./NavbarClient";
 
-export default function Navbar({ onOpenSidebar, activeTab, setActiveTab, currentPath }: {
+export default function Navbar({
+  onOpenSidebar,
+  activeTab,
+  setActiveTab,
+  currentPath, // Menggunakan currentPath yang diterima sebagai prop
+}: {
   onOpenSidebar: () => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -12,7 +17,7 @@ export default function Navbar({ onOpenSidebar, activeTab, setActiveTab, current
         onOpenSidebar={onOpenSidebar}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        currentPath={currentPath}
+        currentPath={currentPath} // Menggunakan prop currentPath
       />
     </nav>
   );
