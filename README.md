@@ -1,225 +1,272 @@
-````markdown
-# PRIFYD - Creator Subscription Platform
+<p align="center">
+  <img src="frontend/public/logobased.png" alt="PRIFYD Logo" width="120"/>
+</p>
 
-## 🔄 System Overview
+<h1 align="center">🎨 PRIFYD</h1>
+<h3 align="center">Web3 Creator Subscription Platform on Base</h3>
 
-Platform subscription berbasis blockchain yang menghubungkan **Creator** dengan **Users** melalui sistem tier (Bronze, Silver, Gold) dengan NFT badges sebagai bukti dukungan.
+<p align="center">
+  <strong>Empowering creators with blockchain-based subscriptions & NFT badges</strong>
+</p>
 
-<img src="https://raw.githubusercontent.com/raflimulyarahman/prifyd/main/images/system-flowchart.png" alt="Prifyd System Flowchart" width="800"/>
+<p align="center">
+  <img src="https://img.shields.io/badge/Base-Sepolia-blue?style=for-the-badge&logo=ethereum" alt="Base Sepolia"/>
+  <img src="https://img.shields.io/badge/Next.js-16.1.0-black?style=for-the-badge&logo=next.js" alt="Next.js"/>
+  <img src="https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity" alt="Solidity"/>
+  <img src="https://img.shields.io/badge/RainbowKit-2.2.10-7B3FE4?style=for-the-badge" alt="RainbowKit"/>
+</p>
 
-**Alur Sistem:**
-
-- 👤 **User** → Cari creator favorit → Subscribe tier pilihan → Dapat NFT Badge
-- 🎨 **Creator** → Buat subscription tiers → Terima pembayaran → Buat konten eksklusif
-
----
-
-# FRONTEND
-
-## Teknologi
-
-- **Next.js**: v16.1.0
-- **Wagmi**: v2.19.5
-- **RainbowKit**: v2.2.10
-- **Tailwind CSS**: v4.1.18
-
----
-
-## Desain Frontend
-
-Desain UI tersedia di Google Drive:  
-[Link Desain Google Drive](https://drive.google.com/drive/folders/1uEAbpJPImF7Rb21D62fa5KU1BZiFZ_84?usp=sharing)
+<p align="center">
+  <a href="#-demo">Demo</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-smart-contracts">Smart Contracts</a>
+</p>
 
 ---
 
-## Struktur Folder Frontend
+## 🎯 The Problem
+
+Creators struggle with:
+
+- 💸 **High platform fees** (up to 30% on traditional platforms)
+- 🔒 **No ownership** of their subscriber relationships
+- 📊 **Lack of transparency** in earnings
+- 🚫 **Centralized control** over their content
+
+## 💡 Our Solution
+
+**PRIFYD** is a decentralized subscription platform that:
+
+| Traditional Platforms | PRIFYD                      |
+| --------------------- | --------------------------- |
+| 30% platform fees     | **~2% gas fees**            |
+| Platform owns data    | **Creators own everything** |
+| Opaque payments       | **On-chain transparency**   |
+| Can be deplatformed   | **Censorship resistant**    |
+
+---
+
+## ✨ Features
+
+### **Tiered Subscriptions**
+
+Three-tier system (Bronze, Silver, Gold) with customizable pricing by creators
+
+### **NFT Badges**
+
+ERC-1155 NFT badges as proof of subscription - tradeable and collectible
+
+### **Gated Content** 🔐
+
+Smart contract-based content access control
+
+### **Seamless Web3 UX**
+
+RainbowKit integration for easy wallet connection
+
+### **Modern UI/UX**
+
+Dark/Light mode, responsive design, beautiful animations
+
+---
+
+## 🖼️ System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         PRIFYD ECOSYSTEM                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   👤 USER                           🎨 CREATOR                   │
+│      │                                  │                        │
+│      ▼                                  ▼                        │
+│   ┌──────────┐                    ┌──────────┐                  │
+│   │ Connect  │                    │ Register │                  │
+│   │  Wallet  │                    │  Profile │                  │
+│   └────┬─────┘                    └────┬─────┘                  │
+│        │                               │                        │
+│        ▼                               ▼                        │
+│   ┌──────────┐                    ┌──────────┐                  │
+│   │  Search  │◄──────────────────►│Configure │                  │
+│   │ Creators │                    │  Tiers   │                  │
+│   └────┬─────┘                    └────┬─────┘                  │
+│        │                               │                        │
+│        ▼                               ▼                        │
+│   ┌──────────┐    PAY ETH        ┌──────────┐                  │
+│   │Subscribe │──────────────────►│ Receive  │                  │
+│   │  (ETH)   │                   │ Earnings │                  │
+│   └────┬─────┘                   └──────────┘                  │
+│        │                                                        │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │ Get NFT  │                                                  │
+│   │  Badge   │                                                  │
+│   └────┬─────┘                                                  │
+│        │                                                        │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │ Access   │                                                  │
+│   │ Content  │                                                  │
+│   └──────────┘                                                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+<table>
+<tr>
+<td align="center" width="96">
+<img src="https://skillicons.dev/icons?i=nextjs" width="48" height="48" alt="Next.js" />
+<br>Next.js 16
+</td>
+<td align="center" width="96">
+<img src="https://skillicons.dev/icons?i=react" width="48" height="48" alt="React" />
+<br>React
+</td>
+<td align="center" width="96">
+<img src="https://skillicons.dev/icons?i=typescript" width="48" height="48" alt="TypeScript" />
+<br>TypeScript
+</td>
+<td align="center" width="96">
+<img src="https://skillicons.dev/icons?i=tailwind" width="48" height="48" alt="Tailwind" />
+<br>Tailwind
+</td>
+<td align="center" width="96">
+<img src="https://skillicons.dev/icons?i=solidity" width="48" height="48" alt="Solidity" />
+<br>Solidity
+</td>
+<td align="center" width="96">
+<img src="https://skillicons.dev/icons?i=nodejs" width="48" height="48" alt="Node.js" />
+<br>Node.js
+</td>
+</tr>
+</table>
+
+### Frontend
+
+- **Next.js 16** - React framework with App Router
+- **Wagmi v2** - React hooks for Ethereum
+- **RainbowKit** - Beautiful wallet connection
+- **TailwindCSS** - Utility-first styling
+
+### Backend
+
+- **Express.js** - Fast, unopinionated web framework
+- **Sequelize** - TypeScript ORM
+- **MySQL** - Relational database
+- **JWT** - Secure authentication
+
+### Smart Contracts
+
+- **Solidity 0.8.20** - Smart contract language
+- **Foundry** - Development framework
+- **OpenZeppelin** - Secure contract libraries
+
+---
+
+## 🚀 Quick Start
 
 ```bash
-src/
-├─ components/    # Komponen UI
-│  ├─ ui/
-├─ app/           # Pages untuk Users
-│  ├─ pages/
-├─ context/       # Context API
-├─ store/         # Zustand / Store
-├─ config/        # Config Smart Contract
-└─ abi/           # ABI Smart Contract
+# Clone the repo
+git clone https://github.com/raflimulyarahman/prifyd.git
+cd prifyd
+
+# Start Backend
+cd backend && npm install && npm run dev
+
+# Start Frontend (new terminal)
+cd frontend && npm install && npm run dev
 ```
-````
+
+Open [http://localhost:3000](http://localhost:3000) 🎉
 
 ---
 
-## Flow Frontend
+## 📜 Smart Contracts
 
-**Public**
+Deployed on **Base Sepolia Testnet**
 
-<img src="https://drive.google.com/uc?export=view&id=1LAVjF--rAwEpro84JTQOrzPwN6WDNew5" alt="Flow Public Access Home" width="600"/>
+| Contract                | Address         | Purpose             |
+| ----------------------- | --------------- | ------------------- |
+| **TieredBadge**         | `0xaB4a...1712` | ERC-1155 NFT Badges |
+| **SubscriptionManager** | `0xB036...eA28` | Subscription Logic  |
+| **GatedContent**        | `0x52Ed...Ea72` | Content Access      |
 
-**Users**
+### Key Functions
 
-<img src="https://drive.google.com/uc?export=view&id=1vhfgB6dqefuK8-wbSc7xao3DZaV1AUAf" alt="Flow Public Access Home" width="600"/>
+```solidity
+// Register as a creator
+function registerCreator(string handle, string name, string profileURI)
 
-<img src="https://drive.google.com/uc?export=view&id=1voJK92GSxiYSrPalJUiA4gFBI_WkoctP" alt="Flow Public Access Home" width="600"/>
+// Configure subscription tiers
+function configureTiers(uint256 bronze, uint256 silver, uint256 gold)
 
-**Creator →**
+// Subscribe to a creator
+function subscribe(address creator, uint256 tierId) payable
 
-- Buat Subscription
-- Buat Konten Exclusive
-
-## Access Router Frontend
-
-| Route                        | Component         | Access Level           | Description                              |
-| ---------------------------- | ----------------- | ---------------------- | ---------------------------------------- |
-| /                            | Home              | Public, Creator, Users | Halaman Home / Beranda                   |
-| /pages/notif                 | NotificationPages | Creator, Users         | Notifikasi                               |
-| /pages/search                | SearchPages       | Public, Creator, Users | Pencarian User                           |
-| /pages/regist                | RegistCreators    | Users                  | Registrasi Creator                       |
-| /pages/creator               | CreatorPages      | Users                  | Cari Creator untuk Subscribe             |
-| /pages/subscribe             | SubscribePages    | Creator                | Buat Subscription                        |
-| /pages/subscribe/:id_address | PaySubPages       | Users                  | Bayar Subscription: Bronze, Silver, Gold |
-| /pages/profile               | ProfilePages      | Users, Creator         | Profile                                  |
-| /pages/chating               | Chating           | Users, Creator         | Home Chating                             |
-| /pages/chating/group         | CreatorChating    | Users, Creator         | Chating dengan Creator                   |
-| /pages/chating/creator       | GroupChating      | Users, Creator         | Chating Group                            |
-
----
-
-## Color Palette (Tailwind CSS)
-
-```css
-/* Background Mode Light & Dark */
-Black: bg-black / #000000
-White: bg-white / #FFFFFF
-
-Gray: bg-gray-800 / #1F2937
-Blue: bg-blue-800 / #1E40AF
-Blue: bg-blue-300 / #93C5FD
+// Check access
+function hasAccess(address user, address creator, uint256 tierId) → bool
 ```
 
 ---
 
-## Wagmi & Smart Contract
+## 🎨 UI Preview
 
-### registerCreator
-
-Registrasi creator baru di Subscription Manager Smart Contract.
-
-```jsx
-await useWriteContract({
-  address, // Alamat kontrak
-  abi, // ABI kontrak
-  functionName: "registerCreator",
-  args: [_handle, _name, _profileURI], // Handle, nama, profileURI
-});
-
-console.log(res);
-```
-
-**Parameters**:
-
-- `_handle` (string) — username / handle creator
-- `_name` (string) — nama creator
-- `_profileURI` (string) — URI profile creator
+|      Home       |   Profile    |   Subscribe    |
+| :-------------: | :----------: | :------------: |
+| Dark/Light Mode | Dynamic Data | Tier Selection |
 
 ---
 
-### configureTiers
+## 📊 What Makes Us Different
 
-Konfigurasi harga subscription tier (Bronze, Silver, Gold).
-
-```jsx
-const res = useWriteContract({
-  address,
-  abi,
-  functionName: "configureTiers",
-  args: [bronzePrice, silverPrice, goldPrice],
-});
-
-console.log(res);
-```
-
-**Parameters**:
-
-- **bronzePrice** (BigInt): `"100000000000000"`
-- **silverPrice** (BigInt): `"500000000000000"`
-- **goldPrice** (BigInt): `"1000000000000000"`
+| Feature           | PRIFYD | Patreon | OnlyFans |
+| ----------------- | :----: | :-----: | :------: |
+| Decentralized     |   ✅   |   ❌    |    ❌    |
+| NFT Badges        |   ✅   |   ❌    |    ❌    |
+| Low Fees (<3%)    |   ✅   |   ❌    |    ❌    |
+| On-chain Payments |   ✅   |   ❌    |    ❌    |
+| Creator Owned     |   ✅   |   ❌    |    ❌    |
+| Base L2           |   ✅   |   ❌    |    ❌    |
 
 ---
 
-### getTierConfig
+## 🗺️ Roadmap
 
-Membaca informasi tier subscription dari smart contract.
-
-```jsx
-const res = useContractRead({
-  address,
-  abi,
-  functionName: "getTierConfig",
-  args: [creator, tier], // creator address dan tier number
-  watch: true,
-});
-
-console.log(res);
-```
-
-**Output** (`TierConfig`):
-
-- `name` (string) — Nama tier
-- `price` (uint256) — Harga dalam wei
-- `duration` (uint256) — Durasi subscription (detik)
-- `isActive` (bool) — Status aktif
-- `metadataURI` (string) — URI metadata tambahan
-- `maxSupply` (uint256) — Maksimum subscription allowed
-- `minHoldTime` (uint256) — Minimum hold time
+- [x] **Phase 1**: Core Platform ✅
+  - Wallet connection, Authentication, Creator registration
+- [x] **Phase 2**: Subscription System ✅
+  - Tier configuration, NFT badges, Payment flow
+- [ ] **Phase 3**: Content & Social
+  - Exclusive content posting, Messaging, Notifications
+- [ ] **Phase 4**: Growth
+  - Mobile app, Multi-chain support, DAO governance
 
 ---
 
-## Contoh Frontend Wagmi Usage
+## 🏆 Built For
 
-```jsx
-import { useContractRead, useContractWrite } from "wagmi";
-import SubscriptionABI from "@/abi/SubscriptionManager.json";
-
-const contractAddress = "0x...";
-
-function MyComponent() {
-  const { data: tier } = useContractRead({
-    address: contractAddress,
-    abi: SubscriptionABI,
-    functionName: "getTierConfig",
-    args: ["0xCreatorAddress", 1], // Bronze tier
-    watch: true,
-  });
-
-  const { write: registerCreator } = useContractWrite({
-    address: contractAddress,
-    abi: SubscriptionABI,
-    functionName: "registerCreator",
-    args: ["handle", "Name", "ipfs://profileURI"],
-  });
-
-  return (
-    <div>
-      <button onClick={() => registerCreator()}>Register Creator</button>
-      <div>Tier Price: {tier?.price?.toString()}</div>
-    </div>
-  );
-}
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/Base-Hackathon-0052FF?style=for-the-badge&logo=coinbase" alt="Base Hackathon"/>
+</p>
 
 ---
 
-## Notes
+## 📄 License
 
-- Semua alamat kontrak dan ABI harus disesuaikan dengan jaringan yang digunakan (Mainnet, Testnet, Local).
-- Tailwind digunakan untuk styling responsif, termasuk dark mode support.
-- RainbowKit digunakan untuk koneksi wallet user (Metamask, WalletConnect, dsb).
-- Wagmi memudahkan interaksi smart contract secara reaktif dan watchable.
+MIT License
 
 ---
 
-Ini sudah **versi lengkap README** untuk project frontend + smart contract kamu.
+<p align="center">
+  <strong>Made with 💙 on Base</strong>
+</p>
 
-Jika mau, aku bisa bikin versi **lebih “developer-friendly” dengan diagram flow, state context, dan route map interaktif** supaya tim dev lebih mudah memahami.
-
-Apakah mau aku buatkan juga versi itu?
+<p align="center">
+  <a href="https://github.com/raflimulyarahman/prifyd">⭐ Star us on GitHub</a>
+</p>

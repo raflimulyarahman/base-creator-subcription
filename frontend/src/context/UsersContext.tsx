@@ -13,7 +13,9 @@ import {
   useState,
 } from "react";
 import { useWriteContract } from "wagmi";
+
 type UUID = string;
+
 export interface User {
   id_users: UUID;
   address: { address: string };
@@ -38,19 +40,18 @@ export type UsersContextType = {
   getProfileUserById: (id: string) => Promise<User | null>;
 };
 
-
 const UsersContext = createContext<UsersContextType | null>(null);
 
 export function UsersProvider({ children }: { children: ReactNode }) {
+  const { userId, accessToken, sendRefreshToken, setRole } = useWallet();
   const [user, setUser] = useState<User | null>(null);
   const [usersAll, setUsersAll] = useState<User[]>([]);
   const [profileUser, setProfileUser] = useState<User | null>(null);
-  const { userId, accessToken, sendRefreshToken } = useWallet();
   const { writeContractAsync } = useWriteContract();
-  // fetch to requst id_users
   const fetchUserById = useCallback(
     async (userId: string) => {
       if (!userId) return null;
+
       try {
         const res = await fetchWithAuth(
           `http://localhost:8000/api/users/${userId}`,
@@ -66,26 +67,18 @@ export function UsersProvider({ children }: { children: ReactNode }) {
           accessToken,
           sendRefreshToken
         );
-       
-        if (!res.ok) {
-          console.log(`Fetch failed with status: ${res.status}`);
-          return null;
-        }
-        const data = await res.json();
-        return data?.data ?? null;
+        return res.data?.data ?? res.data ?? null;
       } catch (err) {
-        console.error("Error fetching user:", err);
+        console.error("fetchUserById error:", err);
         return null;
       }
     },
     [accessToken, sendRefreshToken]
   );
 
-  // fetch to requst all users
   const fetchUsersAll = useCallback(async () => {
+    if (!accessToken) return [];
     try {
-      if (!accessToken) return [];
-
       const res = await fetchWithAuth(
         "http://localhost:8000/api/users",
         {
@@ -98,26 +91,25 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         accessToken,
         sendRefreshToken
       );
-      return res.data;
+      return res.data ?? [];
     } catch (err) {
-      console.error("Error fetching users:", err);
+      console.error("fetchUsersAll error:", err);
       return [];
     }
   }, [accessToken, sendRefreshToken]);
 
-  // update user profile and wagmi register creator
   const updateProfileUsers = async (
     id: UUID,
     formData: FormData
   ): Promise<User | null> => {
     if (!accessToken || !sendRefreshToken) return null;
-
     try {
-
-      const fullName = formData.get("first_name") + " " + formData.get("last_name");
-
+      const fullName =
+        formData.get("first_name") + " " + formData.get("last_name");
       const username = formData.get("username") as string;
       const fotoFile = formData.get("foto") as File;
+
+      //Smart contract registration
       const res = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
@@ -125,22 +117,34 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         args: [fullName, username, fotoFile],
       });
 
-      if (res) {
+      if (!res) return null;
+
+      // Backend update
       const data = await fetchWithAuth(
         `http://localhost:8000/api/users/${id}`,
         {
           method: "PUT",
-          body: formData, // formData tidak perlu content-type, browser akan set otomatis
+          body: formData,
           credentials: "include",
         },
         accessToken,
         sendRefreshToken
       );
 
-        console.log(data, "update profile");
-      return data?.data ?? data ?? null;
+      const updatedUser = data?.data ?? null;
+      console.log("updateProfileUsers: updatedUser", updatedUser);
+      console.log("updateProfileUsers: role from response", data?.role);
+
+      // Set role baru di WalletContext
+      if (data?.role) {
+        const normalizedRole =
+          data.role.toLowerCase() === "creators" ? "Creators" : "Users";
+        console.log("updateProfileUsers: setting role to", normalizedRole);
+        setRole(normalizedRole);
       }
-      return null;
+
+      setUser(updatedUser);
+      return updatedUser;
     } catch (err) {
       console.error("updateProfileUsers error:", err);
       return null;
@@ -164,43 +168,23 @@ export function UsersProvider({ children }: { children: ReactNode }) {
           accessToken,
           sendRefreshToken
         );
-
         return data?.data ?? null;
       } catch (err) {
-        console.error("Error fetching user:", err);
+        console.error("getProfileUserById error:", err);
         return null;
       }
     },
     [accessToken, sendRefreshToken]
   );
-  //UseEffect GetUser Id
+
+  // Sync user on userId change
   useEffect(() => {
-    const fetchData = async () => {
-      if (!userId) {
-        setUser(null);
-        return;
-      }
+    if (!userId) return setUser(null);
+    fetchUserById(userId).then(setUser);
+  }, [userId, fetchUserById]);
 
-      const userData = await fetchUserById(userId);
-      setUser(userData);
-    };
-
-    fetchData();
-  }, [userId, accessToken, fetchUserById]);
-
-  //UseEffect GetUser All
   useEffect(() => {
-    if (accessToken) {
-      fetchUsersAll()
-        .then((users) => {
-          setUsersAll(users);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.log("No access token available.");
-    }
+    if (accessToken) fetchUsersAll().then(setUsersAll);
   }, [accessToken, fetchUsersAll]);
 
   return (
@@ -215,7 +199,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         updateProfileUsers,
         profileUser,
         getProfileUserById,
-        setProfileUser
+        setProfileUser,
       }}
     >
       {children}

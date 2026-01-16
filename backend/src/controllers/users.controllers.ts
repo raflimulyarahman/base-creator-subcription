@@ -98,11 +98,15 @@ export const updateUser = async (req: Request, res: Response) => {
 
     console.log(updatedUser);
 
-    return res.status(200).json({ message: "User berhasil diupdate", data: updatedUser, role: creatorsRole?.role, });
+    return res.status(200).json({
+      message: "User berhasil diupdate",
+      data: updatedUser,
+      role: "Creators",
+    });
   } catch (err: any) {
     console.error(err);
-    return res.status(500).json({ message: "Gagal mengupdate user", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Gagal mengupdate user", error: err.message });
   }
 };
-
-

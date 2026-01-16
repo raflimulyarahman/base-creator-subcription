@@ -1,107 +1,124 @@
 "use client";
 
-import { useLight } from "@/context/LightContext";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import ChatInput from "./ChatInput";
+import { useMessageChat, MessageChat } from "@/context/MessageContext";
+import { useWallet } from "@/context/WalletContext";
 
 export default function CreatorChating() {
-  const { isDark } = useLight();
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("chatId");
+  const { getMessagesByChatId } = useMessageChat();
+  const { userId } = useWallet();
+
+  const [messages, setMessages] = useState<MessageChat[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    (async () => {
+      const data = await getMessagesByChatId(chatId);
+      if (data) setMessages(data);
+    })();
+  }, [chatId, getMessagesByChatId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // 🔥 ambil data user dari message yang sudah ada
+  const currentUserFromMessages = messages.find(
+    (m) => m.id_users === userId
+  )?.user;
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 flex flex-col gap-3 mb-28">
-        {/* Creator Message */}
-        <div className="flex items-start gap-2">
-          <Image
-            src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-            alt="Creator Avatar"
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <p
-              className={`text-sm font-semibold ${
-                isDark ? "text-white" : "text-gray-800"
-              }`}
-            >
-              AI Creator
-            </p>
-            <div
-              className={`max-w-[70vw] px-4 py-2 rounded-xl ${
-                isDark ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-900"
-              } rounded-bl-none mt-1`}
-            >
-              Hello! How can I help you today?
-            </div>
-            <span
-              className={`text-xs mt-1 ${
-                isDark ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              10:15 AM
-            </span>
-          </div>
-        </div>
+    <div className="flex flex-col h-screen bg-gray-100 border-2 border-black">
+      {/* CHAT LIST */}
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-20 flex flex-col gap-3">
+        {messages.length ? (
+          messages.map((msg) => {
+            const isCurrentUser = msg.id_users === userId;
 
-        {/* User Message */}
-        <div className="flex justify-end items-start gap-2">
-          <div className="flex flex-col items-end">
-            <p
-              className={`text-sm font-semibold ${
-                isDark ? "text-white" : "text-blue-600"
-              }`}
-            >
-              You
-            </p>
-            <div className="max-w-[70vw] px-4 py-2 mt-1 rounded-xl bg-blue-500 text-white rounded-br-none">
-              I think we should prioritize improving AI accuracy.
-            </div>
-            <span
-              className={`text-xs mt-1 ${
-                isDark ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              10:17 AM
-            </span>
-          </div>
-          <Image
-            src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-            alt="Your Avatar"
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-        </div>
+            return (
+              <div
+                key={msg.id_message}
+                className={`flex items-start gap-2 ${
+                  isCurrentUser ? "justify-end" : "justify-start"
+                }`}
+              >
+                {!isCurrentUser && (
+                  <Image
+                    src={
+                      msg.user?.foto ||
+                      "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                    }
+                    alt="Avatar"
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                    unoptimized
+                  />
+                )}
 
-        {/* Another Creator Message */}
+                <div
+                  className={`p-3 rounded-lg max-w-[70%] shadow-md ${
+                    isCurrentUser
+                      ? "bg-blue-500 text-white rounded-br-none"
+                      : "bg-white text-gray-800 rounded-bl-none"
+                  }`}
+                >
+                  <p className="text-sm">{msg.message}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {new Date(msg.date).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+
+                {isCurrentUser && (
+                  <Image
+                    src={
+                      msg.user?.foto ||
+                      "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                    }
+                    alt="You"
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                    unoptimized
+                  />
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <p className="text-center text-gray-400 mt-4">Loading messages...</p>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Box - Fixed Bottom */}
-      <div className="fixed bottom-0 left-0 w-full flex justify-center px-4 md:px-8 py-3">
-        <div className="flex w-full max-w-2xl gap-3">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            className="flex-1 px-4 bg-white py-2 rounded-full border border-gray-500 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-              />
-            </svg>
-          </button>
-        </div>
+      {/* CHAT INPUT */}
+      <div className="sticky bottom-0 w-full bg-white px-4 py-3 shadow">
+        <ChatInput
+          currentUser={{
+            id_users: userId,
+            first_name: currentUserFromMessages?.first_name || "You",
+            last_name: currentUserFromMessages?.last_name || "",
+            foto: currentUserFromMessages?.foto || null,
+          }}
+          onSend={(newMessage) => {
+            setMessages((prev) => [...prev, newMessage]);
+          }}
+        />
       </div>
     </div>
   );

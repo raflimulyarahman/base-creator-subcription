@@ -3,11 +3,14 @@ import { useWallet } from "@/context/WalletContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { useState } from "react";
-import Toast from "./Toast";
+import Toast from "../Toast/Toast";
+import { usePathname } from "next/navigation";
 
 export default function ButtonNavigator() {
   const { isDark } = useLight();
   const { role } = useWallet();
+  const pathname = usePathname();
+
   const [showToast, setShowToast] = useState(false);
   const handleClickNotif = () => {
     if (!role) {
@@ -40,7 +43,12 @@ export default function ButtonNavigator() {
           className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group"
         >
           <svg
-            className="w-6 h-6 mb-1 text-body group-hover:text-fg-brand"
+            className={`
+      w-6 h-6 mb-1
+      ${pathname === "/" ? "text-blue-500" : "text-gray-500"}
+      group-hover:text-blue-500 group-active:text-blue-600
+      transition-colors
+    `}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -59,7 +67,12 @@ export default function ButtonNavigator() {
           className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group"
         >
           <svg
-            className="w-6 h-6 mb-1 text-body group-hover:text-fg-brand"
+            className={`
+      w-6 h-6 mb-1
+      ${pathname === "/pages/search" ? "text-blue-500" : "text-gray-500"}
+      group-hover:text-blue-500 group-active:text-blue-600
+      transition-colors
+    `}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

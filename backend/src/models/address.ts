@@ -14,7 +14,11 @@ export default class Address extends Model {
           defaultValue: DataTypes.UUIDV4,
         },
         address: { type: DataTypes.STRING, allowNull: false, unique: true },
-        status_address: { type: DataTypes.STRING, allowNull: false, defaultValue: "active" },
+        status_address: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: "active",
+        },
       },
       {
         sequelize,

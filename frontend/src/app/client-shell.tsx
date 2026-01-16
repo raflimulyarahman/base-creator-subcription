@@ -1,18 +1,22 @@
 "use client";
-import MobileSidebar from "@/components/ui/MobileSidebar";
-import ButtonNavigator from "@/components/ui/button-navigation";
-import Loading from "@/components/ui/loading";
-import Navbar from "@/components/Navbar/Navbar";
-import SidebarLeft from "@/components/ui/sidebar-left";
-import SidebarRight from "@/components/ui/sidebar-right";
-import { useLight } from "@/context/LightContext"; // <-- ambil dark mode
+
+import React, { ReactNode, useState } from "react";
+import { useLight } from "@/context/LightContext";
 import { useWallet } from "@/context/WalletContext";
 import { usePathname } from "next/navigation";
-import React, { ReactNode, useState } from "react";
+import Navbar from "@/components/Navbar/Navbar";
+import ButtonNavigator from "@/components/ButtonNavigation/ButtonNavigation";
+import Loading from "@/components/Loading/Loading";
+
+// Gunakan dynamic import untuk SidebarPages supaya SSR mati
+import dynamic from "next/dynamic";
+const SidebarPages = dynamic(() => import("@/components/Sidebar/Sidebar"), {
+  ssr: false,
+});
 
 export default function ClientShell({ children }: { children: ReactNode }) {
   const { isLoading } = useWallet();
-  const { isDark } = useLight(); // <-- ambil dark mode
+  const { isDark } = useLight();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Followed");
   const pathname = usePathname();
@@ -30,7 +34,6 @@ export default function ClientShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <SidebarLeft />
       <div className="flex flex-col flex-1">
         {!hideNavbar && (
           <Navbar
@@ -39,22 +42,25 @@ export default function ClientShell({ children }: { children: ReactNode }) {
             setActiveTab={setActiveTab}
           />
         )}
-        <MobileSidebar open={open} onClose={() => setOpen(false)} />
-        <main className="flex-1 w-full flex justify-center pb-6">
+
+        {/* Sidebar menggunakan dynamic import */}
+        <SidebarPages open={open} onClose={() => setOpen(false)} />
+
+        <main className="flex-1 w-full flex justify-center">
           <div className="w-full">
             {React.isValidElement(children)
               ? React.cloneElement(
-                children as React.ReactElement<{
-                  activeTab?: string;
-                  isDark?: boolean;
-                }>,
-                { activeTab, isDark } // <-- kirim isDark ke Home
-              )
+                  children as React.ReactElement<{
+                    activeTab?: string;
+                    isDark?: boolean;
+                  }>,
+                  { activeTab, isDark }
+                )
               : children}
           </div>
         </main>
       </div>
-      <SidebarRight />
+
       {!hideNavigator && <ButtonNavigator />}
     </div>
   );

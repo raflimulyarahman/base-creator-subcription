@@ -1,13 +1,29 @@
 "use client";
 import { useLight } from "@/context/LightContext";
 import { usePathname, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useChatPersonal } from "@/context/ChatPersonalContext";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 export default function NavbarChating() {
+  const searchParams = useSearchParams(); // <-- hook client
+  const chatId = searchParams.get("chatId"); // <-- dapat query param
   const { isDark, toggle } = useLight();
   const router = useRouter();
   const pathname = usePathname();
   const isCreatorChat = pathname === "/pages/chating/creator";
   const isCreatorGroup = pathname === "/pages/chating/group";
+  const [otherUser, setOtherUser] = useState<any>(null);
+  const { getHeaderPersonalChat } = useChatPersonal();
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    (async () => {
+      const data = await getHeaderPersonalChat(chatId);
+      setOtherUser(data);
+    })();
+  }, [chatId]);
   return (
     <nav
       className={`w-full h-16 transition-colors duration-300
@@ -43,10 +59,14 @@ export default function NavbarChating() {
             {isCreatorChat ? (
               <div className="flex items-center gap-3">
                 <Image
-                  src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                  src={
+                    otherUser?.chatRoom.user2?.foto ||
+                    "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                  }
                   alt="Creator Avatar"
                   width={40}
                   height={40}
+                  unoptimized
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div className="flex flex-col">
@@ -55,7 +75,7 @@ export default function NavbarChating() {
                       isDark ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    Creator 1
+                    {otherUser?.chatRoom.user2?.username}
                   </h1>
                   <span className="text-xs text-green-500">Online</span>
                 </div>

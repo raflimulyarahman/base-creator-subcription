@@ -59,7 +59,7 @@ export default function Toast({
           )}
         </div>
 
-        <div className="ms-3">
+        <div className="ml-3">
           <p id="toast-label" className="text-sm text-gray-600">
             {message}
           </p>

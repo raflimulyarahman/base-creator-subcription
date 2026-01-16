@@ -11,6 +11,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
 import ThemeWrapper from "./ThemeWrapper";
+import { ChatPersonalProvider } from "@/context/ChatPersonalContext";
+import { MessageChatProvider } from "@/context/MessageContext";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
@@ -33,7 +35,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               <WalletProvider>
                 <UsersProvider>
                   <SubscribeProvider>
-                    {children}
+                    <ChatPersonalProvider>
+                      <MessageChatProvider>{children}</MessageChatProvider>
+                    </ChatPersonalProvider>
                   </SubscribeProvider>
                 </UsersProvider>
               </WalletProvider>

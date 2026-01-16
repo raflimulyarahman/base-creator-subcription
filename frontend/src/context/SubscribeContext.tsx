@@ -125,8 +125,7 @@ export const SubscribeProvider = ({ children }: { children: React.ReactNode }) =
           })
         );
 
-        setTiers(tierData); // 🔥 simpan di state
-        console.log("Fetched tiers:", tierData);
+        setTiers(tierData); 
 
         return { id_subscribe: crypto.randomUUID(), address: data.data?.address };
       } catch (err) {
@@ -146,7 +145,7 @@ export const SubscribeProvider = ({ children }: { children: React.ReactNode }) =
       setSuccess,
       setSubscribe,
       getSubscribeIdTier,
-      tiers, // 🔥 expose tiers ke context
+      tiers, 
       setTiers,
     }),
     [subscribe, success, loading, getSubscribeIdTier, tiers]

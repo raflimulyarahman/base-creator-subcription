@@ -4,7 +4,8 @@ import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+
 export default function SearchPages() {
   const { isDark } = useLight();
   const { usersAll } = useUsers();
@@ -13,19 +14,25 @@ export default function SearchPages() {
   const [query, setQuery] = useState("");
 
   // Filter hanya saat query diisi
-  const filteredCreators =
-    query.trim() === ""
-      ? []
-      : usersAll?.filter((user) => {
-          const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
-          const username = user.username?.toLowerCase();
+  const filteredCreators = useMemo(() => {
+    if (!Array.isArray(usersAll)) return [];
 
-          return (
-            user.role?.role === "Creators" &&
-            (fullName.includes(query.toLowerCase()) ||
-              username.includes(query.toLowerCase()))
-          );
-        });
+    const q = query.toLowerCase().trim();
+
+    return usersAll.filter((user) => {
+      if (user.role?.role?.toLowerCase() !== "creators") return false;
+
+      if (!q) return true; // ← tampilkan semua creators
+
+      const fullName = `${user.first_name ?? ""} ${user.last_name ?? ""}`
+        .toLowerCase()
+        .trim();
+
+      const username = (user.username ?? "").toLowerCase();
+
+      return fullName.includes(q) || username.includes(q);
+    });
+  }, [query, usersAll]);
 
   const handleProfileClick = (id_users: string) => {
     console.log(id_users);
@@ -83,7 +90,8 @@ export default function SearchPages() {
           (filteredCreators.length > 0 ? (
             filteredCreators.map((user) => (
               <div
-                key={user.id_users} onClick={() => handleProfileClick(user.id_users)}
+                key={user.id_users}
+                onClick={() => handleProfileClick(user.id_users)}
                 className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
                   isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"
                 }`}
@@ -101,7 +109,9 @@ export default function SearchPages() {
                   <p className="font-semibold leading-tight">
                     {user.first_name} {user.last_name}
                   </p>
-                  <p className="text-sm text-gray-500">{user.username}</p>
+                  <p className="text-sm text-gray-500">
+                    {user.username} || {user.role?.role}
+                  </p>
                 </div>
               </div>
             ))

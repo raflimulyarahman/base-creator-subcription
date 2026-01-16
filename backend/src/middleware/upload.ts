@@ -5,7 +5,14 @@ const storage = multer.diskStorage({
     cb(null, "src/images/"); // your uploads folder
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    const timestamp = Date.now();
+
+    const safeName = file.originalname
+      .toLowerCase()
+      .replace(/\s+/g, "-") // 🔥 hapus spasi
+      .replace(/[^a-z0-9.-]/g, ""); // 🔥 hapus karakter aneh
+
+    cb(null, `${timestamp}-${safeName}`);
   },
 });
 

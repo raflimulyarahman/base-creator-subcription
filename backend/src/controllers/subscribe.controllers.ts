@@ -11,19 +11,7 @@ export const createSubscribe = async (req: Request, res: Response) => {
       status_subscribe: req.body.status_subscribe,
     });
 
-    if (newSubscribe) {
-      const user = await db.User.findOne({
-        where: { id_users: req.body.id_users },
-      });
-      if (user) {
-        db.User.update(
-          { id_role: "ad02ecbe-89ce-4163-9410-0ae078b4f69a" },
-          { where: { id_users: req.body.id_users } }
-        );
-      }
-    }
-
-    return res.status(201).json({
+    return res.status(200).json({
       message: "Roles created successfully",
       data: newSubscribe,
     });

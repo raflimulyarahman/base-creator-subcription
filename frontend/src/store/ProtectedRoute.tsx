@@ -2,7 +2,7 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/context/WalletContext";
-import Loading from "@/components/ui/loading";
+import Loading from "@/components/Loading/Loading";
 
 interface Props {
   children: ReactNode;
