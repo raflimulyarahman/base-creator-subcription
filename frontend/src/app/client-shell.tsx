@@ -40,6 +40,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
             onOpenSidebar={() => setOpen(true)}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            currentPath={pathname}
           />
         )}
 
