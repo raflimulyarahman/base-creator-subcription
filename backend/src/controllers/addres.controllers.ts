@@ -44,7 +44,17 @@ export const getAddressId = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const address = await db.Address.findByPk(id);
+    // Check if `id` is an array (e.g., query params) or malformed
+    if (Array.isArray(id)) {
+      return res.status(400).json({
+        message: "Invalid ID format. Expected a single value.",
+      });
+    }
+
+    // Optionally, convert id to a number if your primary key is numeric
+    const parsedId = isNaN(Number(id)) ? id : Number(id);
+
+    const address = await db.Address.findByPk(parsedId);
 
     if (!address) {
       return res.status(404).json({

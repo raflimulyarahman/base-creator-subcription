@@ -15,10 +15,12 @@ export default function ChatingClient() {
 
   useEffect(() => {
     (async () => {
+      if (!userId) return;
+
       const data = await getAllChatPersonal(userId);
       if (data) setAllPersonal(data);
     })();
-  }, [getAllChatPersonal]);
+  }, [getAllChatPersonal, userId]);
 
   return (
     <div className="w-screen py-2 md:py-8">
