@@ -4,10 +4,11 @@ import { Op } from "sequelize"; // If you need to perform any complex queries
 
 export const createGroupChat = async (req: Request, res: Response) => {
   const { name_group, id_users } = req.body;
-  // Mengambil file foto yang diupload
-  const foto_group = req.file
+
+  // Mengizinkan foto_group menjadi string atau null
+  const foto_group: string | null = req.file
     ? `${req.protocol}://${req.get("host")}/imagesGroup/${req.file.filename}`
-    : null; // Jika tidak ada file, foto_group bisa null
+    : null;
 
   const t = await db.sequelize.transaction();
 
@@ -16,7 +17,7 @@ export const createGroupChat = async (req: Request, res: Response) => {
     const newGroupChat = await db.GroupChat.create(
       {
         name_group,
-        foto_group, // Menyimpan URL foto
+        foto_group, // Menyimpan URL foto atau null
         id_users,
       },
       { transaction: t },
@@ -43,6 +44,7 @@ export const createGroupChat = async (req: Request, res: Response) => {
     res.status(500).send("Failed to create group chat.");
   }
 };
+
 export const getGroupChatAll = async (req: Request, res: Response) => {
   try {
     const { id_users } = req.body;

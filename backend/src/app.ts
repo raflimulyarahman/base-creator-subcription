@@ -20,7 +20,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-access-token"],
-  })
+  }),
 );
 
 // 2️⃣ Preflight
@@ -29,7 +29,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token",
   );
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   if (req.method === "OPTIONS") return res.sendStatus(200);
@@ -56,7 +56,7 @@ app.use(
       sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24,
     },
-  })
+  }),
 );
 
 app.use("/api/users", usersRoute);

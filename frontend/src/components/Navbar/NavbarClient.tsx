@@ -110,7 +110,7 @@ export default function Navbar({
                 width={50}
                 height={50}
                 unoptimized
-                className="rounded-full object-cover"
+                className="rounded-full object-cover w-13 h-10" // Ensuring both width and height are equal
               />
             </button>
           )}

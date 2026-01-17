@@ -14,9 +14,9 @@ export default function ChatingClient() {
   const { getChatGroup } = useChatGroup();
   const { getAllChatPersonal } = useChatPersonal();
   const [chattAll, setAllPersonal] = useState<any[]>([]);
-  const [chatDataGroup, setChatDataGroup] = useState(null);
-  console.log(chatDataGroup, "ini chat group");
-  console.log(userId);
+  const [chatDataGroup, setChatDataGroup] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<"groups" | "messages">("groups"); // Active tab state
+
   useEffect(() => {
     if (!userId) return;
 
@@ -49,108 +49,125 @@ export default function ChatingClient() {
 
   return (
     <div className="w-screen py-2">
-      {/* Creator Groups (optional static section) */}
-      <div className="mt-2 px-4 md:px-8">
-        <h2
-          className={`text-md md:text-lg font-bold ${
-            isDark ? "text-white" : "text-gray-900"
-          } mb-3`}
-        >
-          Creator Groups
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* example static */}
-          <div className="flex items-center justify-between rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer min-h-[88px] sm:min-h-[104px]">
-            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-              <Image
-                src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-                alt="Creator Group"
-                width={48}
-                height={48}
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
-              />
-              <div className="flex flex-col min-w-0">
-                <h3
-                  className={`font-semibold text-sm sm:text-base truncate ${
-                    isDark ? "text-white" : "text-gray-900"
-                  }`}
-                >
-                  Creator Content Group
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-500 truncate">
-                  Creator: Jakarta
-                </p>
-                <p className="text-xs text-gray-500 line-clamp-1">
-                  Shared post you might like
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* Tab Navigation */}
+      <div className="px-4 md:px-8">
+        <div className="flex space-x-4 mb-4">
+          <button
+            className={`font-semibold text-base ${
+              activeTab === "groups"
+                ? "text-blue-500 border-b-2 border-blue-500"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("groups")}
+          >
+            Group
+          </button>
+          <button
+            className={`font-semibold text-base ${
+              activeTab === "messages"
+                ? "text-blue-500 border-b-2 border-blue-500"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("messages")}
+          >
+            Creator
+          </button>
         </div>
       </div>
 
-      {/* Direct Message Section */}
-      <div className="mt-6 px-4 md:px-8">
-        <h2
-          className={`text-md md:text-lg font-bold ${
-            isDark ? "text-white" : "text-gray-900"
-          } mb-3`}
-        >
-          Direct Message With Creator
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {chattAll.length > 0 ? (
-            chattAll.map((chat: any) => {
-              const otherUser = chat.otherUser; // {id_users, first_name, last_name, foto}
-              return (
-                <Link
-                  key={chat.id_chat_personal}
-                  href={`/pages/chating/creator?chatId=${chat.id_personal_chat}`} // link ke halaman chat
+      {/* Tab Content */}
+      {activeTab === "groups" && (
+        <div className="mt-2 px-4 md:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.isArray(chatDataGroup) && chatDataGroup.length > 0 ? (
+              chatDataGroup.map((group) => (
+                <div
+                  key={group.id_group_chat}
                   className="flex items-center justify-between rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer min-h-[88px] sm:min-h-[104px]"
                 >
                   <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                     <Image
-                      src={
-                        otherUser?.foto ||
-                        "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-                      }
-                      alt={otherUser?.first_name || "User"}
+                      src={group.foto_group || "default_image_url_here"} // Fallback to default image if no foto_group is available
+                      alt={group.name_group || "Default Group"}
                       width={48}
                       height={48}
                       unoptimized
                       className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
                     />
-                    <div className="flex flex-col min-w-0">
+                    <div className="flex flex-col px-2 min-w-0">
                       <h3
-                        className={`font-semibold text-sm sm:text-base truncate ${
+                        className={`font-semibold text-base truncate ${
                           isDark ? "text-white" : "text-gray-900"
                         }`}
                       >
-                        {otherUser?.first_name || "User"}{" "}
-                        {otherUser?.last_name || ""}
+                        {group.name_group || "No Name Group"}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 truncate">
-                        @{otherUser?.username}
+                      <p className="text-xs font-semibold text-gray-500 truncate">
+                        @{group.members?.[0]?.username || "Unknown Creator"}
                       </p>
-                      {chat.lastMessage && (
-                        <p className="text-xs text-gray-500 line-clamp-1">
-                          {chat.lastMessage.message}
-                        </p>
-                      )}
+                      <p className="text-xs font-semibold text-gray-500 truncate">
+                        {group.members?.length || 0} Members
+                      </p>
                     </div>
                   </div>
-                </Link>
-              );
-            })
-          ) : (
-            <p className={`text-gray-400 ${isDark ? "text-gray-300" : ""}`}>
-              Loading direct messages...
-            </p>
-          )}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No groups found.</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === "messages" && (
+        <div className="mt-6 px-4 md:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {chattAll.length > 0 ? (
+              chattAll.map((chat: any) => {
+                const otherUser = chat.otherUser;
+                return (
+                  <Link
+                    key={chat.id_chat_personal}
+                    href={`/pages/chating/creator?chatId=${chat.id_personal_chat}`}
+                    className="flex items-center justify-between rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer min-h-[88px] sm:min-h-[104px]"
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <Image
+                        src={
+                          otherUser?.foto ||
+                          "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                        }
+                        alt={otherUser?.first_name || "User"}
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
+                      />
+                      <div className="flex flex-col px-2 min-w-0">
+                        <h3
+                          className={`font-semibold text-base truncate ${
+                            isDark ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {otherUser?.first_name || "User"}{" "}
+                          {otherUser?.last_name || ""}
+                        </h3>
+                        <p className="text-sm text-gray-500 truncate">
+                          @{otherUser?.username}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <p className={`text-gray-400 ${isDark ? "text-gray-300" : ""}`}>
+                Loading direct messages...
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -21,7 +21,7 @@ export interface ChatGroup {
 // Context type
 type ChatGroupContextType = {
   createChatGroup: (
-    payload: Omit<ChatGroup, "id_group_chat">
+    payload: Omit<ChatGroup, "id_group_chat">,
   ) => Promise<ChatGroup>;
   loading: boolean;
   success: boolean;
@@ -29,7 +29,7 @@ type ChatGroupContextType = {
 
 // Context
 const ChatGroupContext = createContext<ChatGroupContextType | undefined>(
-  undefined
+  undefined,
 );
 
 // Provider
@@ -58,7 +58,7 @@ export const ChatGroupProvider = ({
             credentials: "include",
           },
           accessToken,
-          sendRefreshToken
+          sendRefreshToken,
         );
 
         if (data) {
@@ -73,7 +73,7 @@ export const ChatGroupProvider = ({
       }
       return null;
     },
-    [accessToken, sendRefreshToken]
+    [accessToken, sendRefreshToken],
   );
 
   const getChatGroup = useCallback(
@@ -92,7 +92,7 @@ export const ChatGroupProvider = ({
             body: JSON.stringify({ id_users }),
           },
           accessToken,
-          sendRefreshToken
+          sendRefreshToken,
         );
 
         console.log(chat);
@@ -103,7 +103,7 @@ export const ChatGroupProvider = ({
         return null;
       }
     },
-    [accessToken, sendRefreshToken]
+    [accessToken, sendRefreshToken],
   );
 
   const value = useMemo(
@@ -113,7 +113,7 @@ export const ChatGroupProvider = ({
       loading,
       success,
     }),
-    [createChatGroup, loading, success] // Only memoize value when createChatGroup, loading, or success change
+    [createChatGroup, getChatGroup, loading, success], // Only memoize value when createChatGroup, loading, or success change
   );
 
   return (

@@ -7,13 +7,15 @@ export interface GroupChatAttributes {
   id_group_chat: string;
   id_users: string;
   name_group: string;
-  foto_group: string;
+  foto_group: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export interface GroupChatCreationAttributes
-  extends Optional<GroupChatAttributes, "id_group_chat"> {}
+export interface GroupChatCreationAttributes extends Optional<
+  GroupChatAttributes,
+  "id_group_chat"
+> {}
 
 export default class GroupChat
   extends Model<GroupChatAttributes, GroupChatCreationAttributes>
@@ -22,7 +24,7 @@ export default class GroupChat
   declare id_group_chat: string;
   declare id_users: string;
   declare name_group: string;
-  declare foto_group: string;
+  declare foto_group: string | null;
   declare createdAt?: Date;
   declare updatedAt?: Date;
 
@@ -41,10 +43,11 @@ export default class GroupChat
         },
         name_group: {
           type: DataTypes.STRING,
-          allowNull: false, // Group chat name cannot be null
+          allowNull: false,
         },
         foto_group: {
-          type: DataTypes.TEXT,
+          type: DataTypes.STRING,
+          allowNull: true,
         },
       },
       {
@@ -52,7 +55,7 @@ export default class GroupChat
         modelName: "GroupChat", // Corrected model name to "GroupChat"
         tableName: "GroupChats", // Corrected table name to "GroupChats"
         timestamps: true, // Enable timestamps for createdAt and updatedAt
-      }
+      },
     );
   }
 
