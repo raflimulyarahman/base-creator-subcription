@@ -130,9 +130,9 @@ export const ChatPersonalProvider = ({
         console.log(chat);
 
         // Periksa apakah response memiliki properti data
-        if (chat && chat.data) {
-          console.log("Chat Rooms:", chat.data);
-          return chat.data; // Kembalikan data chat jika ada
+        if (chat) {
+          console.log("Chat Rooms:", chat);
+          return chat; // Kembalikan data chat jika ada
         } else {
           console.warn("No chat data found");
           return null;

@@ -4,17 +4,42 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useChatPersonal } from "@/context/ChatPersonalContext";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useWallet } from "@/context/WalletContext";
+import ModalMakeGroup from "../Modal/ModalCreateGRoup";
 export default function NavbarChating() {
   const searchParams = useSearchParams(); // <-- hook client
   const chatId = searchParams.get("chatId"); // <-- dapat query param
   const { isDark, toggle } = useLight();
+  const { userId } = useWallet();
   const router = useRouter();
   const pathname = usePathname();
   const isCreatorChat = pathname === "/pages/chating/creator";
   const isCreatorGroup = pathname === "/pages/chating/group";
   const [otherUser, setOtherUser] = useState<any>(null);
   const { getHeaderPersonalChat } = useChatPersonal();
+  const menuRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false); // Menyimpan status menu (terbuka/tutup)
+
+  const [openModalMakeGroup, setOpenModalMakeGroup] = useState(false);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen); // Toggle status menu
+  };
+
+  const handleModalGroup = () => setOpenModalMakeGroup(true);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (!chatId) return;
@@ -31,7 +56,7 @@ export default function NavbarChating() {
       md:bg-transparent`}
     >
       <div className="h-full flex items-center justify-between px-4 md:px-6">
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
             className="p-2 rounded-lg hover:bg-gray-100 transition"
@@ -54,13 +79,15 @@ export default function NavbarChating() {
           </button>
         </div>
 
-        <div className="flex w-full items-center justify-center gap-3 md:hidden">
+        <div className="flex w-full items-center justify-center gap-3">
           <ul className="flex gap-4 text-sm font-medium">
             {isCreatorChat ? (
               <div className="flex items-center gap-3">
                 <Image
                   src={
-                    otherUser?.chatRoom.user2?.foto ||
+                    (userId === otherUser?.chatRoom.id_users1
+                      ? otherUser?.chatRoom.user2?.foto
+                      : otherUser?.chatRoom.user1?.foto) ||
                     "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
                   }
                   alt="Creator Avatar"
@@ -75,7 +102,9 @@ export default function NavbarChating() {
                       isDark ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {otherUser?.chatRoom.user2?.username}
+                    {userId === otherUser?.chatRoom.id_users1
+                      ? otherUser?.chatRoom.user2?.username
+                      : otherUser?.chatRoom.user1?.username}
                   </h1>
                   <span className="text-xs text-green-500">Online</span>
                 </div>
@@ -119,33 +148,6 @@ export default function NavbarChating() {
           </ul>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative hidden md:block w-72">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg
-                border border-gray-300 bg-white
-                focus:outline-none focus:ring-2 focus:ring-blue-500
-                transition"
-            />
-
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-        </div>
-
         <div className="flex items-center gap-3 md:gap-4">
           <button
             onClick={toggle}
@@ -184,7 +186,7 @@ export default function NavbarChating() {
             )}
           </button>
 
-          <button className="rounded-lg p-2 transition">
+          <button onClick={toggleMenu} className="rounded-lg p-2 transition">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -201,6 +203,28 @@ export default function NavbarChating() {
             </svg>
           </button>
         </div>
+        {/* Menu Dropdown */}
+        {isOpen && (
+          <div
+            ref={menuRef}
+            className="absolute right-0 mt-2 w-48 sm:w-56 lg:w-64 bg-white shadow-lg border-gray-200 border-2 rounded-lg"
+          >
+            <ul>
+              <button
+                onClick={handleModalGroup}
+                className="py-2 px-4 text-sm sm:text-base font-bold hover:bg-gray-200 cursor-pointer"
+              >
+                Make Group
+              </button>
+            </ul>
+          </div>
+        )}
+
+        {openModalMakeGroup && (
+          <ModalMakeGroup
+            onCloseMakeGroup={() => setOpenModalMakeGroup(false)}
+          />
+        )}
       </div>
     </nav>
   );

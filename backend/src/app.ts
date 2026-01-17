@@ -10,6 +10,7 @@ import subscribeRouter from "./router/subscribe.route";
 import usersRoute from "./router/users.route";
 import chatPersonalRoute from "./router/chat.route";
 import messageChatRoute from "./router/message.route";
+import groupChatRoute from "./router/grouchat.route";
 const app: Application = express();
 
 // 1️⃣ CORS
@@ -41,7 +42,7 @@ app.use(express.urlencoded({ extended: true })); // untuk x-www-form-urlencoded
 
 // 4️⃣ Static folder
 app.use("/images", express.static(path.join(__dirname, "/images")));
-
+app.use("/imagesGroup", express.static(path.join(__dirname, "/imagesGroup")));
 // 5️⃣ Session
 app.use(
   session({
@@ -58,7 +59,6 @@ app.use(
   })
 );
 
-// 6️⃣ Routes
 app.use("/api/users", usersRoute);
 app.use("/api/address", addresRouter);
 app.use("/api/roles", rolesRoute);
@@ -66,5 +66,6 @@ app.use("/api/signin", signinRoute);
 app.use("/api/subscribe", subscribeRouter);
 app.use("/api/chatpersonal", chatPersonalRoute);
 app.use("/api/message", messageChatRoute);
+app.use("/api/group", groupChatRoute);
 
 export default app;

@@ -77,7 +77,7 @@ export default function SidebarPages({
             <>
               <li>
                 <button
-                  onClick={() => setOpenModalSub(true)}
+                  onClick={() => setOpenModal(true)}
                   className="group flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
                 >
                   <div className="rounded-full bg-gray-200 p-2">

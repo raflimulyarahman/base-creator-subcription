@@ -25,8 +25,7 @@ export default function ButtonNavigator() {
       className={`
     fixed bottom-0 left-1/2 -translate-x-1/2
     z-50 w-full ${isDark ? "bg-gray-900" : "bg-white"}
-    border-t border-gray-300 border-default
-    md:hidden 
+    border-t border-gray-300 border-default 
   `}
     >
       <div className="justify-center items-center">

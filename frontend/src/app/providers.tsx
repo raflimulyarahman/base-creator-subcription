@@ -13,6 +13,7 @@ import { baseSepolia } from "wagmi/chains";
 import ThemeWrapper from "./ThemeWrapper";
 import { ChatPersonalProvider } from "@/context/ChatPersonalContext";
 import { MessageChatProvider } from "@/context/MessageContext";
+import { ChatGroupProvider } from "@/context/GroupChatContext";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
@@ -36,7 +37,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 <UsersProvider>
                   <SubscribeProvider>
                     <ChatPersonalProvider>
-                      <MessageChatProvider>{children}</MessageChatProvider>
+                      <MessageChatProvider>
+                        <ChatGroupProvider>{children}</ChatGroupProvider>
+                      </MessageChatProvider>
                     </ChatPersonalProvider>
                   </SubscribeProvider>
                 </UsersProvider>

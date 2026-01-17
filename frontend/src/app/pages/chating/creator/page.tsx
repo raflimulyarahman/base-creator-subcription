@@ -39,7 +39,7 @@ export default function CreatorChating() {
   )?.user;
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 border-2 border-black">
+    <div className="flex flex-col h-screen bg-gray-100">
       {/* CHAT LIST */}
       <div className="flex-1 overflow-y-auto px-4 md:px-8 py-20 flex flex-col gap-3">
         {messages.length ? (
@@ -68,14 +68,20 @@ export default function CreatorChating() {
                 )}
 
                 <div
-                  className={`p-3 rounded-lg max-w-[70%] shadow-md ${
+                  className={`p-3 rounded-lg shadow-md max-w-[70%] ${
                     isCurrentUser
                       ? "bg-blue-500 text-white rounded-br-none"
                       : "bg-white text-gray-800 rounded-bl-none"
                   }`}
+                  style={{
+                    wordWrap: "break-word", // Memastikan kata yang sangat panjang dipotong dan dibungkus
+                    whiteSpace: "pre-wrap", // Membuat teks yang panjang tetap terbaca dalam beberapa baris
+                    wordBreak: "break-word", // Menghindari overflow horizontal
+                  }}
                 >
-                  <p className="text-sm">{msg.message}</p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-sm">{msg.message}</p>{" "}
+                  {/* Menampilkan pesan */}
+                  <p className="text-xs text-black mt-1">
                     {new Date(msg.date).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",

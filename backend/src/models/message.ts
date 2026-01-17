@@ -1,4 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
+import PersonalChat from "./chat";
 
 export interface MessageChatAttributes {
   id_message: string;
@@ -44,10 +45,13 @@ export default class MessageChat
   }
 
   static associate(models: any) {
-    MessageChat.belongsTo(models.ChatPersonal, {
+    MessageChat.belongsTo(PersonalChat, {
       foreignKey: "id_personal_chat",
-      as: "personal_chat",
+      as: "personal_chat", // This is the alias used in the include
     });
-    MessageChat.belongsTo(models.User, { foreignKey: "id_users", as: "user" });
+    MessageChat.belongsTo(PersonalChat, {
+      foreignKey: "id_users",
+      as: "user",
+    });
   }
 }

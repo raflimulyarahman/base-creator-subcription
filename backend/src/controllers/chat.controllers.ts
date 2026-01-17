@@ -79,6 +79,11 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
   try {
     const { id_users } = req.body;
 
+    // Check if the user ID is available
+    if (!id_users) {
+      return res.status(400).json({ message: "User ID is required." });
+    }
+
     const chats = await db.ChatPersonal.findAll({
       where: {
         [Op.or]: [{ id_users1: id_users }, { id_users2: id_users }],
@@ -87,12 +92,24 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
         {
           model: db.User,
           as: "user1",
-          attributes: ["id_users", "first_name", "last_name", "foto"],
+          attributes: [
+            "id_users",
+            "first_name",
+            "last_name",
+            "foto",
+            "username",
+          ],
         },
         {
           model: db.User,
           as: "user2",
-          attributes: ["id_users", "first_name", "last_name", "foto"],
+          attributes: [
+            "id_users",
+            "first_name",
+            "last_name",
+            "foto",
+            "username",
+          ],
         },
         {
           model: db.MessageChat,
@@ -104,9 +121,13 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
       order: [["updatedAt", "DESC"]],
     });
 
+    if (!chats) {
+      return res.status(404).json({ message: "No personal rooms found." });
+    }
+
     const formatted = chats.map((chat) => {
       const otherUser = chat.id_users1 === id_users ? chat.user2 : chat.user1;
-      const lastMessage = chat.messages?.[0] || null;
+      const lastMessage = chat.messages?.[0] || null; // Ensure it's not undefined
 
       return {
         id_personal_chat: chat.id_personal_chat,
@@ -118,7 +139,7 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
 
     res.status(200).json(formatted);
   } catch (err: any) {
-    console.error("Failed to get all personal rooms:", err);
+    console.error("Failed to get all personal rooms:", err); // Log the error for debugging
     res.status(500).json({ message: err.message });
   }
 };

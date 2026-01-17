@@ -33,8 +33,8 @@ export default function ClientShell({ children }: { children: ReactNode }) {
   const hideNavigator = pathname.startsWith("/pages/chating");
 
   return (
-    <div className="flex min-h-screen">
-      <div className="flex flex-col flex-1">
+    <div className="flex justify-center min-h-screen">
+      <div className="flex flex-col w-full md:max-w-1/2">
         {!hideNavbar && (
           <Navbar
             onOpenSidebar={() => setOpen(true)}
@@ -47,7 +47,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
         {/* Sidebar menggunakan dynamic import */}
         <SidebarPages open={open} onClose={() => setOpen(false)} />
 
-        <main className="flex-1 w-full flex justify-center">
+        <main className="">
           <div className="w-full">
             {React.isValidElement(children)
               ? React.cloneElement(

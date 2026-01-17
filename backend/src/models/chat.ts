@@ -51,19 +51,19 @@ export default class PersonalChat
 
   static associate(models: any) {
     // Relasi dengan User
-    PersonalChat.belongsTo(models.User, {
+    PersonalChat.belongsTo(User, {
       foreignKey: "id_users1",
       as: "user1",
     });
-    PersonalChat.belongsTo(models.User, {
+    PersonalChat.belongsTo(User, {
       foreignKey: "id_users2",
       as: "user2",
     });
 
     // Relasi dengan MessageChat
-    PersonalChat.hasMany(models.MessageChat, {
+    PersonalChat.hasMany(MessageChat, {
       foreignKey: "id_personal_chat",
-      as: "messages",
+      as: "messages", // Ensure this name is consistent in your queries
     });
   }
 }

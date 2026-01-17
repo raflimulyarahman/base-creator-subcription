@@ -1,4 +1,4 @@
-import ClientShell from "./client-shell"; // import ClientShell
+import ClientShell from "./ClientShilt"; // import ClientShell
 import "./globals.css";
 import Providers from "./providers";
 

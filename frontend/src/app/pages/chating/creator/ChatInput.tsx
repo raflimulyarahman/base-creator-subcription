@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useMessageChat, MessageChat } from "@/context/MessageContext";
 
 type Props = {
@@ -19,6 +19,16 @@ export default function ChatInput({ onSend, currentUser }: Props) {
   const { createMessageChat, loading } = useMessageChat();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chatId");
+  const textareaRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset tinggi
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Sesuaikan dengan scroll height
+      textareaRef.current.style.width = "auto"; // Reset lebar
+      textareaRef.current.style.width = `${textareaRef.current.scrollWidth}px`; // Sesuaikan dengan scroll width
+    }
+  }, [message]); // Update saat message berubah
 
   const handleSend = async () => {
     if (!message.trim() || !chatId) return;
@@ -53,23 +63,52 @@ export default function ChatInput({ onSend, currentUser }: Props) {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full px-4 py-3 bg-white shadow">
-      <div className="flex max-w-2xl mx-auto gap-3">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 px-4 py-2 rounded-full border focus:ring-2 focus:ring-blue-400"
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          disabled={loading}
-        />
-        <button
-          onClick={handleSend}
-          disabled={loading}
-          className="px-4 py-2 rounded-full bg-blue-500 text-white"
-        >
-          {loading ? "Sending..." : "Send"}
-        </button>
+    <div className="fixed bottom-0 left-0 w-full px-4 py-2 bg-white shadow">
+      <div className="flex max-w-2xl mx-auto gap-3 flex-col">
+        {/* Textarea input */}
+        <div className="relative w-full">
+          <div className="relative flex items-center border rounded-lg">
+            {/* Area input yang bisa diketik */}
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="w-full pl-10 px-4 py-2 rounded-lg resize-none overflow-hidden focus:outline-none focus:border-transparent"
+              rows={1}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              disabled={loading}
+            />
+
+            {/* Tombol kirim dengan margin untuk memberi jarak */}
+            {message.trim().length > 0 && (
+              <button
+                onClick={handleSend}
+                disabled={loading}
+                className="absolute bottom-2 right-2 rounded bg-black px-1 py-1 text-white sm:w-auto mt-2 mr-2"
+              >
+                {loading ? (
+                  "Sending..."
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                    />
+                  </svg>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
