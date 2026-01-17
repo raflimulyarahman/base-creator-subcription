@@ -19,7 +19,7 @@ export default function ChatingClient() {
 
     const fetchData = async () => {
       try {
-        const data = await getAllChatPersonal(userId); // Make sure this function expects `userId`
+        const data = await getAllChatPersonal(userId: string); // Make sure this function expects `userId`
         if (data) setAllPersonal(data);
       } catch (error) {
         console.error("Error fetching data:", error);
