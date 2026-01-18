@@ -1,38 +1,21 @@
 import { useWallet } from "@/context/WalletContext";
 import { fetchWithAuth } from "@/store/fetchWithAuth";
+import { useSearchParams } from "next/navigation";
 import {
   createContext,
   useContext,
   useState,
   useMemo,
   useCallback,
+  useEffect,
 } from "react";
 
-type UUID = string;
+import { ChatGroup, ChatGroupContextType } from "@/types";
 
-// Chat Group object
-export interface ChatGroup {
-  id_group_chat: UUID;
-  id_users: string; // User ID of the creator or other relevant users
-  name_group: string;
-  foto: string; // Group's photo URL
-}
-
-// Context type
-type ChatGroupContextType = {
-  createChatGroup: (
-    payload: Omit<ChatGroup, "id_group_chat">,
-  ) => Promise<ChatGroup>;
-  loading: boolean;
-  success: boolean;
-};
-
-// Context
 const ChatGroupContext = createContext<ChatGroupContextType | undefined>(
   undefined,
 );
 
-// Provider
 export const ChatGroupProvider = ({
   children,
 }: {
@@ -40,7 +23,17 @@ export const ChatGroupProvider = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const { accessToken, sendRefreshToken } = useWallet();
+  const { accessToken, sendRefreshToken, userId } = useWallet();
+  const [chatGroups, setChatGroups] = useState<any[]>([]);
+  const [headerchatGroups, setheaderchatGroups] = useState<{
+    group: ChatGroup | null;
+    members: any[];
+  }>({
+    group: null,
+    members: [],
+  });
+  const searchParams = useSearchParams();
+  const chatGroupId = searchParams.get("chatGroupId");
 
   // Create Chat Group function wrapped in useCallback
   const createChatGroup = useCallback(
@@ -53,7 +46,7 @@ export const ChatGroupProvider = ({
         const data = await fetchWithAuth(
           `http://localhost:8000/api/group/`,
           {
-            method: "POST", // Change to POST for creating new chat group
+            method: "POST",
             body: formData,
             credentials: "include",
           },
@@ -61,15 +54,36 @@ export const ChatGroupProvider = ({
           sendRefreshToken,
         );
 
+        console.log("Response data:", data); 
+
         if (data) {
-          setSuccess(true); // Set success to true on successful response
-          return data.groupChat; // Assuming the response contains the groupChat object
+          const { groupChat, admin, members } = data;
+
+          const updatedMembers = members?.map((member) => ({
+            ...member,
+            user: member.user || { username: "Unknown Creator" }, 
+          }));
+
+          const updatedGroup = {
+            ...groupChat,
+            admin, 
+            members: updatedMembers,
+          };
+
+          console.log(updatedGroup);
+          setChatGroups((prev) => {
+            const updatedGroups = [updatedGroup, ...prev];
+            return updatedGroups; 
+          });
+
+          setSuccess(true);
+          return updatedGroup; 
         }
       } catch (error) {
         console.error("Error creating group chat:", error);
-        setSuccess(false); // Set success to false if there's an error
+        setSuccess(false);
       } finally {
-        setLoading(false); // Always stop loading when done
+        setLoading(false);
       }
       return null;
     },
@@ -79,7 +93,7 @@ export const ChatGroupProvider = ({
   const getChatGroup = useCallback(
     async (id_users: string) => {
       try {
-        const chat = await fetchWithAuth(
+        const groups = await fetchWithAuth(
           `http://localhost:8000/api/group/getHeaderGroup`,
           {
             method: "POST",
@@ -95,25 +109,91 @@ export const ChatGroupProvider = ({
           sendRefreshToken,
         );
 
-        console.log(chat);
+        setChatGroups((prev) => {
+          const map = new Map(prev.map((g) => [g.id_group_chat, g]));
+          groups.forEach((g) => map.set(g.id_group_chat, g));
+          return Array.from(map.values());
+        });
 
-        return chat; // ✅ INI YANG KURANG
+        setChatGroups(groups);
+        return groups;
       } catch (err) {
-        console.error("Error fetching chat header:", err);
-        return null;
+        console.error("Error fetching chat group:", err);
+        setChatGroups([]);
+        return [];
       }
     },
     [accessToken, sendRefreshToken],
   );
 
+  const getChatGroupId = useCallback(
+    async (id_group_chat: string) => {
+      try {
+        const response = await fetchWithAuth(
+          `http://localhost:8000/api/group/${id_group_chat}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              ...(accessToken
+                ? { Authorization: `Bearer ${accessToken}` }
+                : {}),
+            },
+          },
+          accessToken,
+          sendRefreshToken,
+        );
+        console.log(response, "Group data fetched successfully");
+
+        return response; 
+      } catch (e) {
+        console.error("Error fetching group: ", e);
+      }
+    },
+    [accessToken, sendRefreshToken], 
+  );
+
+  useEffect(() => {
+    if (userId && chatGroupId) {
+      const fetchGroupData = async () => {
+        try {
+          const headerGroup = await getChatGroupId(chatGroupId);
+          setheaderchatGroups(headerGroup);
+        } catch (error) {
+          console.error("Error fetching group data:", error);
+        }
+      };
+      fetchGroupData();
+    }
+  }, [userId, chatGroupId, getChatGroupId]);
+
+  useEffect(() => {
+    if (userId && chatGroups.length === 0) {
+      const fetchGroups = async () => {
+        await getChatGroup(userId);
+      };
+
+      fetchGroups();
+    }
+  }, [userId, chatGroups.length, getChatGroup]);
+
   const value = useMemo(
     () => ({
       createChatGroup,
       getChatGroup,
+      headerchatGroups,
+      chatGroups,
       loading,
       success,
     }),
-    [createChatGroup, getChatGroup, loading, success], // Only memoize value when createChatGroup, loading, or success change
+    [
+      createChatGroup,
+      getChatGroup,
+      headerchatGroups,
+      chatGroups,
+      loading,
+      success,
+    ],
   );
 
   return (
@@ -123,7 +203,6 @@ export const ChatGroupProvider = ({
   );
 };
 
-// Hook
 export const useChatGroup = () => {
   const context = useContext(ChatGroupContext);
   if (!context)

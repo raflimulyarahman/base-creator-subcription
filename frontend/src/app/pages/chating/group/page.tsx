@@ -1,10 +1,17 @@
 "use client";
 
+import { useChatGroup } from "@/context/GroupChatContext";
 import { useLight } from "@/context/LightContext";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 export default function GroupChating() {
+  const searchParams = useSearchParams();
+  const chatGroupId = searchParams.get("chatGroupId");
   const { isDark } = useLight();
+  const { chatGroups } = useChatGroup();
+  console.log(chatGroupId);
+  console.log(chatGroups);
 
   return (
     <div className="flex flex-col h-screen">
@@ -19,11 +26,21 @@ export default function GroupChating() {
             className="w-10 h-10 rounded-full object-cover"
           />
           <div>
-            <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-800"}`}>AI Creator</p>
-            <div className={`max-w-[70vw] px-4 py-2 rounded-xl ${isDark ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-900"} rounded-bl-none mt-1`}>
+            <p
+              className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-800"}`}
+            >
+              AI Creator
+            </p>
+            <div
+              className={`max-w-[70vw] px-4 py-2 rounded-xl ${isDark ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-900"} rounded-bl-none mt-1`}
+            >
               Hello! How can I help you today?
             </div>
-            <span className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}>10:15 AM</span>
+            <span
+              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            >
+              10:15 AM
+            </span>
           </div>
         </div>
 
@@ -40,32 +57,36 @@ export default function GroupChating() {
           {/* Content */}
           <div className="flex flex-col">
             <div
-              className={`max-w-[70vw] px-4 py-3 rounded-xl mt-1 ${isDark ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-900"
-                }`}
+              className={`max-w-[70vw] px-4 py-3 rounded-xl mt-1 ${
+                isDark ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-900"
+              }`}
             >
               <p className="font-semibold text-sm md:text-base mb-2">
                 Which feature should we prioritize next?
               </p>
 
               <div className="flex flex-col gap-2 mb-3">
-                {["Improve AI accuracy", "New UI design", "Add notifications"].map(
-                  (option, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between w-full"
-                    >
-                      <button
-                        className={`flex-1 text-left px-3 py-2 rounded-md border ${isDark
+                {[
+                  "Improve AI accuracy",
+                  "New UI design",
+                  "Add notifications",
+                ].map((option, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between w-full"
+                  >
+                    <button
+                      className={`flex-1 text-left px-3 py-2 rounded-md border ${
+                        isDark
                           ? "border-gray-600 hover:bg-gray-600"
                           : "border-gray-300 hover:bg-gray-300"
-                          } transition`}
-                      >
-                        {option}
-                      </button>
-                      <span className="ml-2 text-xs text-gray-500">1</span>
-                    </div>
-                  )
-                )}
+                      } transition`}
+                    >
+                      {option}
+                    </button>
+                    <span className="ml-2 text-xs text-gray-500">1</span>
+                  </div>
+                ))}
               </div>
 
               <button className="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 transition">
@@ -75,23 +96,31 @@ export default function GroupChating() {
 
             {/* Jam di bawah bubble */}
             <span
-              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"
-                }`}
+              className={`text-xs mt-1 ${
+                isDark ? "text-gray-400" : "text-gray-500"
+              }`}
             >
               10:17 AM
             </span>
           </div>
         </div>
 
-
         {/* User Message */}
         <div className="flex justify-end items-start gap-2">
           <div className="flex flex-col items-end">
-            <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-blue-600"}`}>You</p>
+            <p
+              className={`text-sm font-semibold ${isDark ? "text-white" : "text-blue-600"}`}
+            >
+              You
+            </p>
             <div className="max-w-[70vw] px-4 py-2 mt-1 rounded-xl bg-blue-500 text-white rounded-br-none">
               I think we should prioritize improving AI accuracy.
             </div>
-            <span className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}>10:17 AM</span>
+            <span
+              className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+            >
+              10:17 AM
+            </span>
           </div>
           <Image
             src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
@@ -103,7 +132,6 @@ export default function GroupChating() {
         </div>
 
         {/* Another Creator Message */}
-
       </div>
 
       {/* Input Box - Fixed Bottom */}

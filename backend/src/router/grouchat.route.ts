@@ -11,14 +11,21 @@ router.post(
   verifyToken,
   checkRole(["Creators"]),
   uploadGroup.single("foto"),
-  GroupController.createGroupChat
+  GroupController.createGroupChat,
 );
 
 router.post(
   "/getHeaderGroup",
   verifyToken,
   checkRole(["Users", "Creators"]),
-  GroupController.getGroupChatAll
+  GroupController.getGroupChatAll,
+);
+
+router.get(
+  "/:id_group_chat",
+  verifyToken,
+  checkRole(["Users", "Creators"]),
+  GroupController.getIdGroup,
 );
 
 export default router;

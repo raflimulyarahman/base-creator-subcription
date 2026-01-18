@@ -7,54 +7,42 @@ import { useEffect, useState } from "react";
 
 interface ModalProps {
   onClose: () => void;
+  profileUser: any;
 }
 
-export default function ModalSubscribe({ onClose }: ModalProps) {
-  const { user, profileUser } = useUsers();
-  const { createSubscribe, getSubscribeIdTier, tiers } = useSubscribe();
+export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
+  const { user } = useUsers();
+  const { paySubscribe, tiers } = useSubscribe();
   const { isDark } = useLight();
-
-  const [userSubscription, setUserSubscription] = useState<any>(null);
+  const [setUserSubscription] = useState<any>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Ambil subscription user saat modal dibuka
-  useEffect(() => {
-    const addressId = profileUser?.address?.id_address;
-    if (!addressId) return;
-
-    const fetchSubscribe = async () => {
-      const userDataSub = await getSubscribeIdTier(addressId);
-      setUserSubscription(userDataSub);
-    };
-
-    fetchSubscribe();
-  }, [profileUser?.address?.id_address]);
 
   // Hanya tier aktif
   const activeTiers = tiers.filter((tier) => tier.isActive);
   const currentTier = activeTiers[currentIndex];
-
   // Jika tidak ada tier aktif, modal tidak tampil
   if (activeTiers.length === 0 || !currentTier) return null;
 
-  const handleSubscribe = async (tierName: string) => {
-    if (!user) return;
+  const handleSubscribe = async () => {
+    // Fetching values from the context/state
+    const creatorAddress = profileUser?.address?.address;
+    const tiersId = currentTier?.id;
 
+    if (!creatorAddress || !tiersId) {
+      console.error("Missing creator address or tier ID");
+      return;
+    }
+
+    // Proceed with the subscription process
     try {
-      await createSubscribe({
-        id_users: user.id_users,
-        type_subscribe: tierName,
-        status_subscribe: "Active",
-        subscribe: "1 Month",
-      });
-      alert(`Subscribed to ${tierName} plan!`);
-
-      const updatedSub = await getSubscribeIdTier(
-        profileUser?.address?.id_address
-      );
-      setUserSubscription(updatedSub);
+      // Pass the values to the paySubscribe function
+      const result = await paySubscribe({
+        addressCreator: creatorAddress,
+        tiersId: tiersId.toString(),
+      }); // Ensure tiersId is a string
+      console.log(result);
     } catch (err) {
-      console.error(err);
+      console.error("Error subscribing:", err);
     }
   };
 

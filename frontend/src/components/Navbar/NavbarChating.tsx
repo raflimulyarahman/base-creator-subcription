@@ -6,7 +6,8 @@ import { useChatPersonal } from "@/context/ChatPersonalContext";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { useWallet } from "@/context/WalletContext";
-import ModalMakeGroup from "../Modal/ModalCreateGRoup";
+import ModalMakeGroup from "../Modal/ModalCreateGroup";
+import { useChatGroup } from "@/context/GroupChatContext";
 export default function NavbarChating() {
   const searchParams = useSearchParams(); // <-- hook client
   const chatId = searchParams.get("chatId"); // <-- dapat query param
@@ -20,11 +21,11 @@ export default function NavbarChating() {
   const { getHeaderPersonalChat } = useChatPersonal();
   const menuRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false); // Menyimpan status menu (terbuka/tutup)
-
   const [openModalMakeGroup, setOpenModalMakeGroup] = useState(false);
   const toggleMenu = () => {
     setIsOpen(!isOpen); // Toggle status menu
   };
+  const { headerchatGroups } = useChatGroup();
 
   const handleModalGroup = () => setOpenModalMakeGroup(true);
 
@@ -111,23 +112,33 @@ export default function NavbarChating() {
               </div>
             ) : isCreatorGroup ? (
               <div className="flex items-center gap-3">
+                {/* Display group image */}
                 <Image
-                  src="https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-                  alt="Group Avatar"
+                  src={
+                    headerchatGroups?.group?.foto_group ||
+                    "/images/default-group.png"
+                  } // Fallback to a default image if `foto_group` is not provided
+                  alt={headerchatGroups?.group?.name_group || "Untitled Group"}
                   width={40}
                   height={40}
+                  unoptimized
                   className="w-10 h-10 rounded-full object-cover"
                 />
+
                 <div className="flex flex-col">
+                  {/* Display group name */}
                   <h1
                     className={`font-semibold text-sm md:text-base ${
                       isDark ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    Creator Group
+                    {headerchatGroups?.group?.name_group || "Untitled Group"}
                   </h1>
+
+                  {/* Display member count and status */}
                   <span className="text-xs text-blue-500">
-                    12 members • Active
+                    {headerchatGroups?.members.length} member
+                    {headerchatGroups?.members.length !== 1 ? "s" : ""} • Active
                   </span>
                 </div>
               </div>

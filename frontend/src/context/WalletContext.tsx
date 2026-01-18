@@ -10,22 +10,7 @@ import {
   useState,
 } from "react";
 import { useAccount, useSignMessage, useAccountEffect } from "wagmi";
-
-export type UserRole = "Creators" | "Users" | null;
-type UUID = string;
-
-type WalletContextType = {
-  address?: string;
-  accessToken: string | null;
-  refreshToken: string | null;
-  isConnected: boolean;
-  role: UserRole;
-  userId: UUID | null;
-  isLoading: boolean;
-  logout: () => Promise<void>;
-  sendRefreshToken: () => Promise<string | null>;
-  setRole: (role: UserRole) => void;
-};
+import { UUID, UserRole, WalletContextType } from "@/types";
 
 const WalletContext = createContext<WalletContextType>({
   address: undefined,

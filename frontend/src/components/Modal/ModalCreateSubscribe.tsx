@@ -37,7 +37,9 @@ export default function ModalCreateSubscribe({ onCloseSub }: ModalProps) {
     const silver = Number(silverPrice.current?.value || 0);
     const gold = Number(goldPrice.current?.value || 0);
 
-    if (bronze <= 0 && silver <= 0 && gold <= 0) {
+    console.log(bronze, silver, gold);
+
+    if (!bronze && !silver && !gold) {
       setToast({
         show: true,
         type: "error",
@@ -99,7 +101,7 @@ export default function ModalCreateSubscribe({ onCloseSub }: ModalProps) {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSubmitSubscribe();
+              handleSubmitSubscribe(e);
             }}
             className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8"
           >
@@ -108,6 +110,8 @@ export default function ModalCreateSubscribe({ onCloseSub }: ModalProps) {
               <input
                 ref={bronzePrice}
                 type="number"
+                min="0.001" // Set minimum value to 0.01
+                step="any" // Allow any decimal number
                 className="px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
@@ -117,6 +121,8 @@ export default function ModalCreateSubscribe({ onCloseSub }: ModalProps) {
               <input
                 ref={silverPrice}
                 type="number"
+                min="0.001" // Set minimum value to 0.01
+                step="any" // Allow any decimal number
                 className="px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
@@ -126,6 +132,8 @@ export default function ModalCreateSubscribe({ onCloseSub }: ModalProps) {
               <input
                 ref={goldPrice}
                 type="number"
+                min="0.001" // Set minimum value to 0.01
+                step="any" // Allow any decimal number
                 className="px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>

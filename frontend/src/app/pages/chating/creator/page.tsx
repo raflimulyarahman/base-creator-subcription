@@ -35,7 +35,7 @@ export default function CreatorChating() {
 
   // 🔥 ambil data user dari message yang sudah ada
   const currentUserFromMessages = messages.find(
-    (m) => m.id_users === userId
+    (m) => m.id_users === userId,
   )?.user;
 
   return (

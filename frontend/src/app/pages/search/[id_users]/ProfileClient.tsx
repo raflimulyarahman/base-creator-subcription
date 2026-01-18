@@ -44,7 +44,7 @@ export default function ProfileClientPages({ id_users }: Props) {
       setProfileUser(userData);
     };
     getIdUsers();
-  }, [id_users, getProfileUserById]);
+  }, [id_users]);
 
   useEffect(() => {
     const addressId = profileUser?.address?.id_address;
@@ -134,7 +134,7 @@ export default function ProfileClientPages({ id_users }: Props) {
               width={60}
               height={60}
               unoptimized
-              className="rounded-full object-cover"
+              className="rounded-full object-cover w-14 h-14"
             />
           </div>
 
@@ -224,8 +224,11 @@ export default function ProfileClientPages({ id_users }: Props) {
         </div>
 
         {/* Modal */}
-        {isModalOpen && (
-          <ModalSubscribe onClose={() => setIsModalOpen(false)} />
+        {isModalOpen && profileUser && (
+          <ModalSubscribe
+            onClose={() => setIsModalOpen(false)}
+            profileUser={profileUser} // Pass profileUser here
+          />
         )}
 
         {/* Toast */}

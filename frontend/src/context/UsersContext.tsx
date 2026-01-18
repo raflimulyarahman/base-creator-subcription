@@ -4,6 +4,7 @@ import { subscriptionManagerAbi } from "@/abi/SubscriptionManager";
 import { CONTRACT_ADDRESSES } from "@/config/contract";
 import { useWallet } from "@/context/WalletContext";
 import { fetchWithAuth } from "@/store/fetchWithAuth";
+import { useWriteContract } from "wagmi";
 import {
   createContext,
   ReactNode,
@@ -12,33 +13,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useWriteContract } from "wagmi";
 
-type UUID = string;
-
-export interface User {
-  id_users: UUID;
-  address: { address: string };
-  first_name: string;
-  last_name: string;
-  role: string;
-}
-
-export type UsersContextType = {
-  user: User | null;
-  usersAll: User[];
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  setUsersAll: React.Dispatch<React.SetStateAction<User[]>>;
-  profileUser: User | null;
-  setProfileUser: React.Dispatch<React.SetStateAction<User | null>>;
-  fetchUserById: (userId: UUID) => Promise<User | null>;
-  fetchUsersAll: () => Promise<User[]>;
-  updateProfileUsers: (
-    userId: UUID,
-    formData: FormData
-  ) => Promise<User | null>;
-  getProfileUserById: (id: string) => Promise<User | null>;
-};
+import { User, UsersContextType } from "@/types";
 
 const UsersContext = createContext<UsersContextType | null>(null);
 
@@ -65,7 +41,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
             },
           },
           accessToken,
-          sendRefreshToken
+          sendRefreshToken,
         );
         return res.data?.data ?? res.data ?? null;
       } catch (err) {
@@ -73,7 +49,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         return null;
       }
     },
-    [accessToken, sendRefreshToken]
+    [accessToken, sendRefreshToken],
   );
 
   const fetchUsersAll = useCallback(async () => {
@@ -89,7 +65,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
           },
         },
         accessToken,
-        sendRefreshToken
+        sendRefreshToken,
       );
       return res.data ?? [];
     } catch (err) {
@@ -100,7 +76,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
 
   const updateProfileUsers = async (
     id: UUID,
-    formData: FormData
+    formData: FormData,
   ): Promise<User | null> => {
     if (!accessToken || !sendRefreshToken) return null;
     try {
@@ -128,7 +104,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
           credentials: "include",
         },
         accessToken,
-        sendRefreshToken
+        sendRefreshToken,
       );
 
       const updatedUser = data?.data ?? null;
@@ -166,7 +142,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
             },
           },
           accessToken,
-          sendRefreshToken
+          sendRefreshToken,
         );
         return data?.data ?? null;
       } catch (err) {
@@ -174,7 +150,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         return null;
       }
     },
-    [accessToken, sendRefreshToken]
+    [accessToken, sendRefreshToken],
   );
 
   // Sync user on userId change

@@ -11,12 +11,11 @@ import { useChatGroup } from "@/context/GroupChatContext";
 export default function ChatingClient() {
   const { isDark } = useLight();
   const { userId } = useWallet();
-  const { getChatGroup } = useChatGroup();
+  const { chatGroups } = useChatGroup();
   const { getAllChatPersonal } = useChatPersonal();
   const [chattAll, setAllPersonal] = useState<any[]>([]);
-  const [chatDataGroup, setChatDataGroup] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<"groups" | "messages">("groups"); // Active tab state
-
+  console.log(chatGroups, "members");
   useEffect(() => {
     if (!userId) return;
 
@@ -35,17 +34,6 @@ export default function ChatingClient() {
 
     fetchData();
   }, [userId]);
-
-  useEffect(() => {
-    if (userId) {
-      const fetchChat = async () => {
-        const chat = await getChatGroup(userId);
-        setChatDataGroup(chat); // Save the chat data in state
-      };
-
-      fetchChat();
-    }
-  }, [userId, getChatGroup]);
 
   return (
     <div className="w-screen py-2">
@@ -79,37 +67,38 @@ export default function ChatingClient() {
       {activeTab === "groups" && (
         <div className="mt-2 px-4 md:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.isArray(chatDataGroup) && chatDataGroup.length > 0 ? (
-              chatDataGroup.map((group) => (
+            {chatGroups.length > 0 ? (
+              chatGroups.map((group) => (
                 <div
                   key={group.id_group_chat}
                   className="flex items-center justify-between rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer min-h-[88px] sm:min-h-[104px]"
                 >
-                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                    <Image
-                      src={group.foto_group || "default_image_url_here"} // Fallback to default image if no foto_group is available
-                      alt={group.name_group || "Default Group"}
-                      width={48}
-                      height={48}
-                      unoptimized
-                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
-                    />
-                    <div className="flex flex-col px-2 min-w-0">
-                      <h3
-                        className={`font-semibold text-base truncate ${
-                          isDark ? "text-white" : "text-gray-900"
-                        }`}
-                      >
-                        {group.name_group || "No Name Group"}
-                      </h3>
-                      <p className="text-xs font-semibold text-gray-500 truncate">
-                        @{group.members?.[0]?.username || "Unknown Creator"}
-                      </p>
-                      <p className="text-xs font-semibold text-gray-500 truncate">
-                        {group.members?.length || 0} Members
-                      </p>
+                  <Link
+                    href={`/pages/chating/group?chatGroupId=${group.id_group_chat}`}
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <Image
+                        src={group.foto_group || "/images/default-group.png"}
+                        alt={group.name_group}
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
+                      />
+                      <div className="flex flex-col px-2 min-w-0">
+                        <h3
+                          className={`font-semibold text-base truncate ${
+                            isDark ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {group.name_group}
+                        </h3>
+                        <p className="text-xs font-semibold text-gray-500 truncate">
+                          @{group.members?.[0]?.username || "Unknown Creator"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))
             ) : (
