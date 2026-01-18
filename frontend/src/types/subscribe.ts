@@ -11,6 +11,7 @@ export interface Subscribe {
 export type TierInfo = {
   addressCreator: string;
   tiersId: string;
+  payTiers: string;
 };
 
 export type TierData = {

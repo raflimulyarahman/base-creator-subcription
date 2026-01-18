@@ -27,6 +27,8 @@ export default function NavbarChating() {
   };
   const { headerchatGroups } = useChatGroup();
 
+  console.log(headerchatGroups);
+
   const handleModalGroup = () => setOpenModalMakeGroup(true);
 
   useEffect(() => {
@@ -137,8 +139,8 @@ export default function NavbarChating() {
 
                   {/* Display member count and status */}
                   <span className="text-xs text-blue-500">
-                    {headerchatGroups?.members.length} member
-                    {headerchatGroups?.members.length !== 1 ? "s" : ""} • Active
+                    {/* {headerchatGroups?.members.length} member
+                    {headerchatGroups?.members.length !== 1 ? "s" : ""} • Active */}
                   </span>
                 </div>
               </div>

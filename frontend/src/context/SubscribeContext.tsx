@@ -7,6 +7,9 @@ import { fetchWithAuth } from "@/store/fetchWithAuth";
 import { createPublicClient, http } from "viem";
 import { baseSepolia } from "viem/chains";
 import { useWriteContract } from "wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { decodeEventLog } from "viem";
+import { erc1155Abi } from "@/abi/erc1155Abi";
 
 import {
   createContext,
@@ -28,6 +31,40 @@ import {
 const SubscribeContext = createContext<SubscribeContextType | undefined>(
   undefined,
 );
+
+export function parseERC1155TransferSingleLog(log: any, userAddress: string) {
+  try {
+    const decoded = decodeEventLog({
+      abi: erc1155Abi,
+      data: log.data,
+      topics: log.topics,
+    });
+
+    if (decoded.eventName === "TransferSingle") {
+      const args = decoded.args as {
+        from?: string;
+        to?: string;
+        id?: bigint;
+        value?: bigint;
+      };
+
+      // cek dulu semua properti ada
+      if (args.from && args.to && args.id !== undefined) {
+        // mint = dari address(0)
+        if (
+          args.from === "0x0000000000000000000000000000000000000000" &&
+          args.to.toLowerCase() === userAddress.toLowerCase()
+        ) {
+          return { tokenId: args.id, value: args.value };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("⚠️ Log bukan TransferSingle ERC1155:", e);
+  }
+
+  return null;
+}
 
 export const SubscribeProvider = ({
   children,
@@ -79,21 +116,47 @@ export const SubscribeProvider = ({
     }
   };
 
-  const paySubscribe = async (payload: TierInfo): Promise<TierInfo> => {
-    setLoading(true);
-    try {
-      const { addressCreator, tiersId } = payload;
-      const tierIdNumber = Number(tiersId);
+  // Helper: parse ERC-1155 TransferSingle log manual
 
-      const res = await writeContractAsync({
+  const paySubscribe = async (
+    payload: TierInfo & { userAddress: string },
+  ): Promise<{ tokenId: bigint | null }> => {
+    setLoading(true);
+
+    try {
+      const { addressCreator, tiersId, payTiers, userAddress } = payload;
+
+      // 1️⃣ Kirim transaction
+      const hash = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
         functionName: "subscribe",
-        args: [addressCreator, tierIdNumber],
+        args: [addressCreator, BigInt(tiersId)],
+        value: BigInt(payTiers),
       });
 
-      console.log(res);
-      return payload;
+      console.log("TX HASH:", hash);
+
+      // 2️⃣ Tunggu transaction di-mine
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      console.log("TX RECEIPT:", receipt);
+
+      let tokenId: bigint | null = null;
+
+      for (const log of receipt.logs) {
+        const parsed = parseERC1155TransferSingleLog(log, userAddress);
+        if (parsed) {
+          tokenId = parsed.tokenId;
+          console.log("🎉 TOKEN ID:", tokenId.toString());
+          break;
+        }
+      }
+
+      if (!tokenId) {
+        console.log("⚠️ TOKEN ID: Tidak ditemukan");
+      }
+
+      return { tokenId };
     } catch (err) {
       console.error("Error subscribing:", err);
       throw err;

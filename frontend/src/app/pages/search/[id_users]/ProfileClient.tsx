@@ -134,7 +134,7 @@ export default function ProfileClientPages({ id_users }: Props) {
               width={60}
               height={60}
               unoptimized
-              className="rounded-full object-cover w-14 h-14"
+              className="rounded-full object-cover w-14 h-1"
             />
           </div>
 

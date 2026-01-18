@@ -16,30 +16,28 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
   const { isDark } = useLight();
   const [setUserSubscription] = useState<any>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
   // Hanya tier aktif
   const activeTiers = tiers.filter((tier) => tier.isActive);
   const currentTier = activeTiers[currentIndex];
   // Jika tidak ada tier aktif, modal tidak tampil
   if (activeTiers.length === 0 || !currentTier) return null;
-
+  console.log(currentTier.price, "price");
   const handleSubscribe = async () => {
-    // Fetching values from the context/state
     const creatorAddress = profileUser?.address?.address;
-    const tiersId = currentTier?.id;
+    const tierId = currentTier?.id;
+    const price = currentTier?.price; // HARUS WEI
 
-    if (!creatorAddress || !tiersId) {
-      console.error("Missing creator address or tier ID");
+    if (!creatorAddress || tierId == null || !price) {
+      console.error("Missing creator address, tier ID, or price");
       return;
     }
 
-    // Proceed with the subscription process
     try {
-      // Pass the values to the paySubscribe function
       const result = await paySubscribe({
         addressCreator: creatorAddress,
-        tiersId: tiersId.toString(),
-      }); // Ensure tiersId is a string
+        tiersId: tierId.toString(),
+        payTiers: price,
+      });
       console.log(result);
     } catch (err) {
       console.error("Error subscribing:", err);

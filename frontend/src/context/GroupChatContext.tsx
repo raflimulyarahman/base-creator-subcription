@@ -10,12 +10,32 @@ import {
   useEffect,
 } from "react";
 
-import { ChatGroup, ChatGroupContextType } from "@/types";
+type UUID = string;
 
+// Chat Group object
+export interface ChatGroup {
+  id_group_chat: UUID;
+  id_users: string; // User ID of the creator or other relevant users
+  name_group: string;
+  foto: string; // Group's photo URL
+}
+
+// Context type
+type ChatGroupContextType = {
+  createChatGroup: (payload: FormData) => Promise<ChatGroup | null>; // Fungsi untuk membuat grup baru
+  getChatGroup: (id_users: string) => Promise<any[]>; // Fungsi untuk mengambil semua grup berdasarkan user ID
+  getChatGroupId: (id_group_chat: string) => Promise<ChatGroup | null>; // Fungsi untuk mendapatkan detail grup berdasarkan group ID
+  chatGroups: ChatGroup[]; // Daftar grup chat yang telah diambil
+  loading: boolean; // Status loading
+  success: boolean; // Status sukses dari operasi terakhir
+};
+
+// Context
 const ChatGroupContext = createContext<ChatGroupContextType | undefined>(
   undefined,
 );
 
+// Provider
 export const ChatGroupProvider = ({
   children,
 }: {
@@ -25,16 +45,9 @@ export const ChatGroupProvider = ({
   const [success, setSuccess] = useState(false);
   const { accessToken, sendRefreshToken, userId } = useWallet();
   const [chatGroups, setChatGroups] = useState<any[]>([]);
-  const [headerchatGroups, setheaderchatGroups] = useState<{
-    group: ChatGroup | null;
-    members: any[];
-  }>({
-    group: null,
-    members: [],
-  });
+  const [headerchatGroups, setheaderchatGroups] = useState<any[]>([]);
   const searchParams = useSearchParams();
   const chatGroupId = searchParams.get("chatGroupId");
-
   // Create Chat Group function wrapped in useCallback
   const createChatGroup = useCallback(
     async (formData: FormData): Promise<ChatGroup | null> => {
@@ -54,30 +67,35 @@ export const ChatGroupProvider = ({
           sendRefreshToken,
         );
 
-        console.log("Response data:", data); 
+        console.log("Response data:", data); // Check response structure
 
         if (data) {
+          // Destructure data for readability
           const { groupChat, admin, members } = data;
 
+          // Update members array by adding user info if not present
           const updatedMembers = members?.map((member) => ({
             ...member,
-            user: member.user || { username: "Unknown Creator" }, 
+            user: member.user || { username: "Unknown Creator" }, // Ensure user data exists
           }));
 
+          // Create the updated group object with all relevant data
           const updatedGroup = {
             ...groupChat,
-            admin, 
-            members: updatedMembers,
+            admin, // Add the admin data
+            members: updatedMembers, // Update the members list with user info
           };
 
           console.log(updatedGroup);
+
+          // Update the state with the new group chat
           setChatGroups((prev) => {
             const updatedGroups = [updatedGroup, ...prev];
-            return updatedGroups; 
+            return updatedGroups; // Add new group at the start of the array
           });
 
           setSuccess(true);
-          return updatedGroup; 
+          return updatedGroup; // Return the newly created group
         }
       } catch (error) {
         console.error("Error creating group chat:", error);
@@ -85,7 +103,8 @@ export const ChatGroupProvider = ({
       } finally {
         setLoading(false);
       }
-      return null;
+
+      return null; // Return null in case of failure
     },
     [accessToken, sendRefreshToken],
   );
@@ -115,7 +134,7 @@ export const ChatGroupProvider = ({
           return Array.from(map.values());
         });
 
-        setChatGroups(groups);
+        setChatGroups(groups); // 🔥 TARO DI SINI
         return groups;
       } catch (err) {
         console.error("Error fetching chat group:", err);
@@ -129,6 +148,7 @@ export const ChatGroupProvider = ({
   const getChatGroupId = useCallback(
     async (id_group_chat: string) => {
       try {
+        // Pastikan URL dibangun dengan benar
         const response = await fetchWithAuth(
           `http://localhost:8000/api/group/${id_group_chat}`,
           {
@@ -143,14 +163,15 @@ export const ChatGroupProvider = ({
           accessToken,
           sendRefreshToken,
         );
+        //const data = await response.json(); // Parse the response
         console.log(response, "Group data fetched successfully");
 
-        return response; 
+        return response; // Return the fetched data
       } catch (e) {
         console.error("Error fetching group: ", e);
       }
     },
-    [accessToken, sendRefreshToken], 
+    [accessToken, sendRefreshToken], // Menambahkan dependency untuk callback
   );
 
   useEffect(() => {
@@ -193,7 +214,7 @@ export const ChatGroupProvider = ({
       chatGroups,
       loading,
       success,
-    ],
+    ], // Only memoize value when createChatGroup, loading, or success change
   );
 
   return (
@@ -203,6 +224,7 @@ export const ChatGroupProvider = ({
   );
 };
 
+// Hook
 export const useChatGroup = () => {
   const context = useContext(ChatGroupContext);
   if (!context)
