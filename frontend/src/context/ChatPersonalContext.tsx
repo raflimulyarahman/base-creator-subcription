@@ -22,7 +22,7 @@ export interface ChatPersonal {
 // Context type
 type ChatPersonalContextType = {
   createChatPersonal: (
-    payload: Omit<ChatPersonal, "id_chat_personal">
+    payload: Omit<ChatPersonal, "id_chat_personal">,
   ) => Promise<ChatPersonal>;
   getHeaderPersonalChat: (chatId: string) => Promise<{
     chat: ChatPersonal;
@@ -35,7 +35,7 @@ type ChatPersonalContextType = {
 
 // Context
 const ChatPersonalContext = createContext<ChatPersonalContextType | undefined>(
-  undefined
+  undefined,
 );
 
 // Provider
@@ -50,7 +50,7 @@ export const ChatPersonalProvider = ({
 
   // Create personal chat
   const createChatPersonal = async (
-    payload: Omit<ChatPersonal, "id_chat_personal">
+    payload: Omit<ChatPersonal, "id_chat_personal">,
   ): Promise<ChatPersonal> => {
     setLoading(true);
     setSuccess(false);
@@ -66,7 +66,7 @@ export const ChatPersonalProvider = ({
           body: JSON.stringify(payload),
         },
         accessToken,
-        sendRefreshToken
+        sendRefreshToken,
       );
 
       setSuccess(true);
@@ -96,7 +96,7 @@ export const ChatPersonalProvider = ({
             },
           },
           accessToken,
-          sendRefreshToken
+          sendRefreshToken,
         );
 
         return chat; // ✅ INI YANG KURANG
@@ -105,11 +105,11 @@ export const ChatPersonalProvider = ({
         return null;
       }
     },
-    [accessToken, sendRefreshToken]
+    [accessToken, sendRefreshToken],
   );
 
   const getAllChatPersonal = useCallback(
-    async (id_users: string) => {
+    async (id_users: string): Promise<ChatPersonal[] | null> => {
       try {
         const chat = await fetchWithAuth(
           `http://localhost:8000/api/chatpersonal/get/`,
@@ -124,7 +124,7 @@ export const ChatPersonalProvider = ({
             body: JSON.stringify({ id_users }),
           },
           accessToken,
-          sendRefreshToken
+          sendRefreshToken,
         );
 
         console.log(chat);
@@ -142,7 +142,7 @@ export const ChatPersonalProvider = ({
         return null;
       }
     },
-    [accessToken, sendRefreshToken]
+    [accessToken, sendRefreshToken],
   );
 
   const value = useMemo(
@@ -153,7 +153,7 @@ export const ChatPersonalProvider = ({
       loading,
       success,
     }),
-    [loading, success, getHeaderPersonalChat, getAllChatPersonal]
+    [loading, success, getHeaderPersonalChat, getAllChatPersonal],
   );
 
   return (
