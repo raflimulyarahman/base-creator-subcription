@@ -14,6 +14,7 @@ export default function ModalCreateSubscribe({ onCloseSub }: ModalProps) {
   const { isDark } = useLight();
   const { userId } = useWallet();
   const { updateProfileUsers } = useUsers();
+  const { createSubscribe } = useSubscribe();
   const [isLoading, setIsLoading] = useState(false);
 
   const [toast, setToast] = useState<{
