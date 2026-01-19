@@ -1,12 +1,12 @@
 "use client";
 
-import React, { ReactNode, useState } from "react";
+import ButtonNavigator from "@/components/ButtonNavigation/ButtonNavigation";
+import Loading from "@/components/Loading/Loading";
+import Navbar from "@/components/Navbar/Navbar";
 import { useLight } from "@/context/LightContext";
 import { useWallet } from "@/context/WalletContext";
 import { usePathname } from "next/navigation";
-import Navbar from "@/components/Navbar/Navbar";
-import ButtonNavigator from "@/components/ButtonNavigation/ButtonNavigation";
-import Loading from "@/components/Loading/Loading";
+import React, { ReactNode, useState } from "react";
 
 // Gunakan dynamic import untuk SidebarPages supaya SSR mati
 import dynamic from "next/dynamic";
@@ -34,7 +34,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex justify-center min-h-screen">
-      <div className="flex flex-col w-full md:max-w-1/2">
+      <div className="flex flex-col w-full md:w-1/2 min-w-0">
         {!hideNavbar && (
           <Navbar
             onOpenSidebar={() => setOpen(true)}

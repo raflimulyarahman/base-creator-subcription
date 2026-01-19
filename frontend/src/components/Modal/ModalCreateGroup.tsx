@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import Toast from "@/components/Toast/Toast";
+import { useChatGroup } from "@/context/GroupChatContext"; // Importing context hook for creating group chat
 import { useLight } from "@/context/LightContext";
 import { useWallet } from "@/context/WalletContext";
-import { useChatGroup } from "@/context/GroupChatContext"; // Importing context hook for creating group chat
-import Toast from "@/components/Toast/Toast";
+import { useRef, useState } from "react";
 
 interface ModalProps {
   onCloseMakeGroup: () => void;
@@ -103,7 +103,7 @@ export default function ModalMakeGroup({ onCloseMakeGroup }: ModalProps) {
               e.preventDefault();
               handleSubmit();
             }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8"
+            className="grid grid-cols-1 py-2"
           >
             <div className="flex flex-col gap-1">
               <label
@@ -115,13 +115,13 @@ export default function ModalMakeGroup({ onCloseMakeGroup }: ModalProps) {
               <input
                 id="name_group"
                 ref={nameGroupRef}
-                className="px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
                 aria-label="Group name"
               />
             </div>
 
-            <div className="md:col-span-2 flex items-end gap-2 justify-end">
+            <div className="md:col-span-2 flex items-end gap-2 py-4 justify-end">
               <input
                 ref={fileRef}
                 type="file"
@@ -133,9 +133,9 @@ export default function ModalMakeGroup({ onCloseMakeGroup }: ModalProps) {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="px-3 py-1 border rounded text-xs hover:bg-gray-100 transition"
+                className="px-3 py-2 bg-gray-300 text-gray-700 font-semibold shadow-2xl rounded text-xs hover:bg-gray-200 transition"
               >
-                Upload Image
+                Upload Images
               </button>
               {selectedFile && (
                 <span className="text-xs text-gray-500 truncate">
@@ -148,7 +148,7 @@ export default function ModalMakeGroup({ onCloseMakeGroup }: ModalProps) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full inline-flex justify-center items-center font-sans font-semibold px-3 py-4 text-sm bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full inline-flex justify-center items-center font-sans font-semibold px-3 py-3 text-sm bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading && (
                   <svg
@@ -172,7 +172,7 @@ export default function ModalMakeGroup({ onCloseMakeGroup }: ModalProps) {
                     />
                   </svg>
                 )}
-                {isLoading ? "Creating..." : "Create Group"}
+                {isLoading ? "Proses ..." : "Make Group"}
               </button>
             </div>
           </form>

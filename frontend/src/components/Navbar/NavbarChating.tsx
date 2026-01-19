@@ -1,13 +1,12 @@
 "use client";
-import { useLight } from "@/context/LightContext";
-import { usePathname, useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { useChatPersonal } from "@/context/ChatPersonalContext";
-import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
-import { useWallet } from "@/context/WalletContext";
-import ModalMakeGroup from "../Modal/ModalCreateGroup";
 import { useChatGroup } from "@/context/GroupChatContext";
+import { useLight } from "@/context/LightContext";
+import { useWallet } from "@/context/WalletContext";
+import Image from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import ModalMakeGroup from "../Modal/ModalCreateGroup";
 export default function NavbarChating() {
   const searchParams = useSearchParams(); // <-- hook client
   const chatId = searchParams.get("chatId"); // <-- dapat query param
@@ -139,8 +138,9 @@ export default function NavbarChating() {
 
                   {/* Display member count and status */}
                   <span className="text-xs text-blue-500">
-                    {/* {headerchatGroups?.members.length} member
-                    {headerchatGroups?.members.length !== 1 ? "s" : ""} • Active */}
+                      {headerchatGroups?.members?.length ?? 0} member
+                      {headerchatGroups?.members?.length !== 1 ? "s" : ""}
+
                   </span>
                 </div>
               </div>

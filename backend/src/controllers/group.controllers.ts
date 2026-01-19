@@ -1,15 +1,9 @@
 import { Request, Response } from "express";
-import db from "../models";
 import { Op } from "sequelize"; // If you need to perform any complex queries
-import {
-  MemberGroupChatAttributes,
-  MemberGroupChatCreationAttributes,
-} from "../models/members";
+import db from "../models";
 
 export const createGroupChat = async (req: Request, res: Response) => {
   const { name_group, id_users } = req.body;
-
-  // Mengizinkan foto_group menjadi string atau null
   const foto_group: string | null = req.file
     ? `${req.protocol}://${req.get("host")}/imagesGroup/${req.file.filename}`
     : null;
@@ -17,17 +11,16 @@ export const createGroupChat = async (req: Request, res: Response) => {
   const t = await db.sequelize.transaction();
 
   try {
-    // Membuat Group Chat baru
     const newGroupChat = await db.GroupChat.create(
       {
         name_group,
-        foto_group, // Menyimpan URL foto atau null
+        foto_group,
         id_users,
       },
       { transaction: t },
     );
 
-    // Menambahkan member (admin) ke GroupChat
+    console.log(newGroupChat);
     const createAdminGroup = await db.MemberGroupChat.create(
       {
         id_group_chat: newGroupChat.id_group_chat,
@@ -36,44 +29,34 @@ export const createGroupChat = async (req: Request, res: Response) => {
       },
       { transaction: t },
     );
-
-    // Ambil semua anggota grup setelah admin ditambahkan
     const groupMembers = await db.MemberGroupChat.findAll({
       where: { id_group_chat: newGroupChat.id_group_chat },
       include: [
         {
           model: db.User,
-          as: "user", // Ensure the alias matches the one defined in `MemberGroupChat`
+          as: "user", 
           attributes: [
             "id_users",
             "username",
             "first_name",
             "last_name",
             "foto",
-          ], // Attributes you want to include
+          ], 
         },
       ],
       transaction: t,
     });
-
-    // Log groupMembers to inspect the structure of the response
+     await t.commit();
     console.log("Fetched groupMembers:", groupMembers);
-
-    // Now, we map through the groupMembers and correctly access `user` details
     const mappedMembers = groupMembers.map((member: any) => {
-      // Access user details inside each member object
       const user = member.user || { username: "Unknown Creator" }; // Fallback if user is missing
       return user;
     });
-
-    // Log the mapped members to verify correct data
     console.log("Mapped Members:", mappedMembers);
-
-    // Send the response with updated group and member data
-    res.status(201).json({
+    res.status(200).json({
       groupChat: newGroupChat,
       admin: createAdminGroup,
-      members: mappedMembers, // Sending the properly mapped user objects
+      members: mappedMembers,
     });
   } catch (error) {
     console.error(error);
@@ -85,15 +68,12 @@ export const createGroupChat = async (req: Request, res: Response) => {
 export const getGroupChatAll = async (req: Request, res: Response) => {
   try {
     const { id_users } = req.body;
-
-    // Fetch all group chats for the user
     const groupChats = await db.GroupChat.findAll({
       include: [
-        // Fetch members of the group
         {
           model: db.User,
           as: "members",
-          through: { attributes: [] }, // Exclude the join table data
+          through: { attributes: [] }, 
           attributes: [
             "id_users",
             "first_name",
@@ -101,27 +81,11 @@ export const getGroupChatAll = async (req: Request, res: Response) => {
             "foto",
             "username",
           ],
-          where: { id_users: { [Op.eq]: id_users } }, // Only include groups the user is in
+          where: { id_users: { [Op.eq]: id_users } }, 
         },
-        // Fetch the last message of the group chat (assuming MessageGroupChat exists)
-        {
-          model: db.MessageGroupChat,
-          as: "messages",
-          limit: 1, // Only the last message
-          order: [["createdAt", "DESC"]], // Order by the newest message
-          include: [
-            {
-              model: db.User,
-              as: "user",
-              attributes: ["id_users", "first_name", "last_name", "username"],
-            },
-          ],
-        },
-      ],
-      order: [["createdAt", "DESC"]], // Order groups by creation time (optional)
+      ]
     });
 
-    // Format the response to return useful data
     const formattedGroupChats = groupChats.map((groupChat: any) => {
       const lastMessage = groupChat.messages?.[0] || null;
 
@@ -129,18 +93,17 @@ export const getGroupChatAll = async (req: Request, res: Response) => {
         id_group_chat: groupChat.id_group_chat,
         name_group: groupChat.name_group,
         foto_group: groupChat.foto_group,
-        members: groupChat.members, // This contains the list of members
+        members: groupChat.members, 
         lastMessage: lastMessage
           ? {
               message: lastMessage.message,
               date: lastMessage.createdAt,
-              user: lastMessage.user, // User who sent the last message
+              user: lastMessage.user,
             }
           : null,
       };
     });
-
-    res.status(200).json(formattedGroupChats); // Return the formatted response
+    res.status(200).json(formattedGroupChats); 
   } catch (error) {
     console.error("Failed to get all group chats:", error);
     res.status(500).json({ message: "Failed to get all group chats." });

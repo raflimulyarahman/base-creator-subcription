@@ -9,7 +9,7 @@ const router = Router();
 router.post(
   "/",
   verifyToken,
-  checkRole(["Creators"]),
+  checkRole(["Creators","Users"]),
   uploadGroup.single("foto"),
   GroupController.createGroupChat,
 );
