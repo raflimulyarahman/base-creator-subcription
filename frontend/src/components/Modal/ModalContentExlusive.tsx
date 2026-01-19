@@ -53,49 +53,32 @@ export default function ModalContentExlusive({ onCloseContentExlusive }: ModalPr
           <h1 className="text-base font-sans text-center font-semibold mb-4">
             Post Context
           </h1>
+                  <form className="grid grid-cols-1 gap-4 py-2 w-full" onSubmit={(e) => e.preventDefault()}>
 
-          <form
-            className="grid grid-cols-1 py-2"
-                      onSubmit={(e) => {
-                          e.preventDefault();
-                          // Tambahkan fungsi submitmu di sini
-                          console.log({
-                              title: titleContent.current?.value,
-                              content: contentContent.current?.value,
-                              file: selectedFile,
-                          });
-                      }}
-          >
-            <div className="flex flex-col gap-1">
-              <label
-                className="text-xs font-sans font-medium"
-                htmlFor="name_group"
-              >
-                Title
-              </label>
-              <input
-                id="name_group"
+                      {/* Title */}
+                      <div className="flex flex-col gap-1 w-full">
+                          <label className="text-xs font-sans font-medium" htmlFor="title">
+                              Title
+                          </label>
+                          <input
+                              id="title"
                               ref={titleContent}
-                className="w-full px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                required
-                aria-label="Group name"
-              />
-            </div>
+                              className="w-full px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              required
+                          />
+                      </div>
 
-        <div className="flex flex-col gap-1">
-            <label
-                className="text-xs font-sans font-medium"
-                htmlFor="content_group"
-            >
-                Content
-            </label>
+                      {/* Content */}
+                      <div className="flex flex-col gap-1 w-full">
+                          <label className="text-xs font-sans font-medium" htmlFor="content">
+                              Content
+                          </label>
                           <textarea
-                              id="content_group"
+                              id="content"
                               rows={5}
                               ref={contentContent}
                               className="w-full px-3 py-2 rounded-lg text-base bg-gray-200 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                               required
-                              aria-label="Group content"
                               placeholder="Write something..."
                               onInput={(e) => {
                                   const target = e.target as HTMLTextAreaElement;
@@ -103,65 +86,63 @@ export default function ModalContentExlusive({ onCloseContentExlusive }: ModalPr
                                   target.style.height = target.scrollHeight + "px";
                               }}
                           />
+                      </div>
 
-        </div>
+                      {/* Upload Image */}
+                      <div className="flex flex-col gap-2 w-full">
+                          <input
+                              ref={fileRef}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
+                              aria-label="Upload group image"
+                          />
+                          <button
+                              type="button"
+                              onClick={() => fileRef.current?.click()}
+                              className="px-3 py-2 bg-gray-300 text-gray-700 font-semibold rounded text-xs hover:bg-gray-200 transition"
+                          >
+                              Upload Images
+                          </button>
+                          {selectedFile && (
+                              <span className="text-xs text-gray-500 truncate">{selectedFile.name}</span>
+                          )}
+                      </div>
 
+                      <div className="md:col-span-2 w-full mt-3">
+                          <button
+                              type="submit"
+                              disabled={isLoading}
+                              className="w-full inline-flex justify-center items-center font-sans font-semibold px-3 py-3 text-sm bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                          >
+                              {isLoading && (
+                                  <svg
+                                      className="mr-2 h-4 w-4 animate-spin text-white"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                  >
+                                      <circle
+                                          className="opacity-25"
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          stroke="currentColor"
+                                          strokeWidth="4"
+                                      />
+                                      <path
+                                          className="opacity-75"
+                                          fill="currentColor"
+                                          d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"
+                                      />
+                                  </svg>
+                              )}
+                              {isLoading ? "Proses ..." : "Post Contenxt"}
+                          </button>
+                      </div>
+                  </form>
 
-            <div className="md:col-span-2 flex items-end gap-2 py-4 justify-end">
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
-                aria-label="Upload group image"
-              />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="px-3 py-2 bg-gray-300 text-gray-700 font-semibold shadow-2xl rounded text-xs hover:bg-gray-200 transition"
-              >
-                Upload Images
-              </button>
-              {selectedFile && (
-                <span className="text-xs text-gray-500 truncate">
-                  {selectedFile.name}
-                </span>
-              )}
-            </div>
-
-            <div className="md:col-span-2 w-full mt-3">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full inline-flex justify-center items-center font-sans font-semibold px-3 py-3 text-sm bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isLoading && (
-                  <svg
-                    className="mr-2 h-4 w-4 animate-spin text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"
-                    />
-                  </svg>
-                )}
-                {isLoading ? "Proses ..." : "Make Group"}
-              </button>
-            </div>
-          </form>
         </div>
       </div>
 

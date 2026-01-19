@@ -19,7 +19,7 @@ type ExtraProps = {
   onCloseContentExlusive: () => void;
 };
 
-export default function ChatInputGroup({
+export default function ChatInputGroup({ onCloseContentExlusive,
   onSend,
   currentUser,
 }: Props & ExtraProps) {
@@ -149,7 +149,7 @@ export default function ChatInputGroup({
             )}
           </div>
           {openModalContent && (
-            <ModalContentExlusive onCloseContent={handleModalCloseExlusive} />
+            <ModalContentExlusive onCloseContentExlusive={handleModalCloseExlusive} />
           )}
         </div>
       </div>
