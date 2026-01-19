@@ -1,12 +1,12 @@
 "use client";
 
+import { useLight } from "@/context/LightContext";
+import { useUsers } from "@/context/UsersContext";
+import { useWallet } from "@/context/WalletContext";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useLight } from "@/context/LightContext";
-import { useWallet } from "@/context/WalletContext";
-import { useUsers } from "@/context/UsersContext";
-import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ModalCreateSubscribe from "../Modal/ModalCreateSubscribe";
 
 // Dynamic import modal client-only

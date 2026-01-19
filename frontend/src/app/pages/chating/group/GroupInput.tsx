@@ -1,8 +1,9 @@
 "use client";
 
+import ModalContentExlusive from "@/components/Modal/ModalContentExlusive";
+import { MessageChat, useMessageChat } from "@/context/MessageContext";
 import { useSearchParams } from "next/navigation";
-import React, { useState, useRef, useEffect } from "react";
-import { useMessageChat, MessageChat } from "@/context/MessageContext";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   onSend: (message: MessageChat) => void;
@@ -14,102 +15,145 @@ type Props = {
   };
 };
 
-export default function ChatInput({ onSend, currentUser }: Props) {
+type ExtraProps = {
+  onCloseContentExlusive: () => void;
+};
+
+export default function ChatInputGroup({
+  onSend,
+  currentUser,
+}: Props & ExtraProps) {
+
   const [message, setMessage] = useState("");
   const { createMessageChat, loading } = useMessageChat();
   const searchParams = useSearchParams();
-  const chatId = searchParams.get("chatId");
-  const textareaRef = useRef<any>(null);
+  const chatId = searchParams.get("chatGroupId"); // ⬅️ ini group
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [openModalContent, setOpenModalContent] = useState(false);
 
+  const handleModalCloseExlusive = () => setOpenModalContent(false);
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset tinggi
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Sesuaikan dengan scroll height
-      textareaRef.current.style.width = "auto"; // Reset lebar
-      textareaRef.current.style.width = `${textareaRef.current.scrollWidth}px`; // Sesuaikan dengan scroll width
-    }
-  }, [message]); // Update saat message berubah
+    if (!textareaRef.current) return;
+    textareaRef.current.style.height = "auto";
+    textareaRef.current.style.height =
+      textareaRef.current.scrollHeight + "px";
+  }, [message]);
 
   const handleSend = async () => {
     if (!message.trim() || !chatId) return;
 
-    // 🔥 OPTIMISTIC MESSAGE (PAKAI FOTO DARI PAGE)
     const optimisticMessage: MessageChat = {
       id_message: crypto.randomUUID(),
       id_personal_chat: chatId,
       id_users: currentUser.id_users,
       message: message.trim(),
       date: new Date().toISOString(),
-      user: {
-        id_users: currentUser.id_users,
-        first_name: currentUser.first_name,
-        last_name: currentUser.last_name,
-        foto: currentUser.foto,
-      },
+      user: currentUser,
     };
 
     onSend(optimisticMessage);
     setMessage("");
 
-    try {
-      await createMessageChat({
-        id_personal_chat: chatId,
-        id_users: currentUser.id_users,
-        message: optimisticMessage.message,
-      });
-    } catch (err) {
-      console.error("Failed to send message:", err);
-    }
+    await createMessageChat({
+      id_personal_chat: chatId,
+      id_users: currentUser.id_users,
+      message: optimisticMessage.message,
+    });
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full px-4 py-2 bg-white shadow">
-      <div className="flex max-w-2xl mx-auto gap-3 flex-col">
-        {/* Textarea input */}
-        <div className="relative w-full">
-          <div className="relative flex items-center border rounded-lg">
-            {/* Area input yang bisa diketik */}
+    <div className="fixed bottom-0 left-0 w-full bg-white shadow px-4 py-2">
+      <div className="w-full md:w-1/2 mx-auto">
+        <div className="flex items-center gap-2 bg-gray-200 rounded-xl px-3">
+          <button
+            onClick={() => setOpenModalContent(true)}
+            type="button"
+            className="flex items-center justify-center text-gray-600 hover:text-black transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-7 h-7"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+          </button>
+          <div className="relative flex-1">
             <textarea
               ref={textareaRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="w-full pl-10 px-4 py-2 rounded-lg resize-none overflow-hidden focus:outline-none focus:border-transparent"
+              placeholder="Message ..."
               rows={1}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={loading}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              className="
+        w-full
+        px-4
+        py-3
+        pr-12
+        rounded-xl
+        bg-gray-200
+        resize-none
+        overflow-hidden
+        focus:outline-none
+      "
             />
-
-            {/* Tombol kirim dengan margin untuk memberi jarak */}
-            {message.trim().length > 0 && (
+            {message.trim() && (
               <button
                 onClick={handleSend}
                 disabled={loading}
-                className="absolute bottom-2 right-2 rounded bg-black px-1 py-1 text-white sm:w-auto mt-2 mr-2"
+                className="
+      absolute
+      right-2
+      bottom-2
+      flex
+      items-center
+      justify-center
+      bg-black
+      text-white
+      rounded
+      p-1.5
+      hover:bg-gray-800
+      transition
+    "
               >
-                {loading ? (
-                  "Sending..."
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                    />
-                  </svg>
-                )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12
+           59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                  />
+                </svg>
               </button>
             )}
           </div>
+          {openModalContent && (
+            <ModalContentExlusive onCloseContent={handleModalCloseExlusive} />
+          )}
         </div>
       </div>
     </div>
   );
 }
+

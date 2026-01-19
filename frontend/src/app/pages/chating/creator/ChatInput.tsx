@@ -1,8 +1,8 @@
 "use client";
 
+import { MessageChat, useMessageChat } from "@/context/MessageContext";
 import { useSearchParams } from "next/navigation";
-import React, { useState, useRef, useEffect } from "react";
-import { useMessageChat, MessageChat } from "@/context/MessageContext";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   onSend: (message: MessageChat) => void;
@@ -64,28 +64,24 @@ export default function ChatInput({ onSend, currentUser }: Props) {
 
   return (
     <div className="fixed bottom-0 left-0 w-full px-4 py-2 bg-white shadow">
-      <div className="flex max-w-2xl mx-auto gap-3 flex-col">
-        {/* Textarea input */}
+      <div className="flex flex-col gap-3 w-full md:w-1/2 mx-auto">
         <div className="relative w-full">
-          <div className="relative flex items-center border rounded-lg">
-            {/* Area input yang bisa diketik */}
+          <div className="relative w-full bg-gray-300 rounded-lg flex items-center">
             <textarea
               ref={textareaRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="w-full pl-10 px-4 py-2 rounded-lg resize-none overflow-hidden focus:outline-none focus:border-transparent"
+              placeholder="Message ..."
+              className="flex-1 pr-12 pl-4 rounded-lg py-2 resize-none focus:outline-none"
               rows={1}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={loading}
             />
-
-            {/* Tombol kirim dengan margin untuk memberi jarak */}
             {message.trim().length > 0 && (
               <button
                 onClick={handleSend}
                 disabled={loading}
-                className="absolute bottom-2 right-2 rounded bg-black px-1 py-1 text-white sm:w-auto mt-2 mr-2"
+                className="absolute right-2 bottom-2 rounded bg-black px-2 py-1 text-white"
               >
                 {loading ? (
                   "Sending..."

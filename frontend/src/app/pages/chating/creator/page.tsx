@@ -1,11 +1,11 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
-import ChatInput from "./ChatInput";
-import { useMessageChat, MessageChat } from "@/context/MessageContext";
+import { MessageChat, useMessageChat } from "@/context/MessageContext";
 import { useWallet } from "@/context/WalletContext";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import ChatInput from "./ChatInput";
 
 export default function CreatorChating() {
   const searchParams = useSearchParams();
@@ -39,7 +39,7 @@ export default function CreatorChating() {
   )?.user;
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-white">
       {/* CHAT LIST */}
       <div className="flex-1 overflow-y-auto px-4 md:px-8 py-20 flex flex-col gap-3">
         {messages.length ? (
@@ -67,21 +67,20 @@ export default function CreatorChating() {
                   />
                 )}
 
-                <div
-                  className={`p-3 rounded-lg shadow-md max-w-[70%] ${
-                    isCurrentUser
+                <div className={`flex flex-col items-start max-w-[70%]`}>
+                  <div
+                    className={`p-2 rounded-lg shadow-md ${isCurrentUser
                       ? "bg-blue-500 text-white rounded-br-none"
                       : "bg-white text-gray-800 rounded-bl-none"
-                  }`}
-                  style={{
-                    wordWrap: "break-word", // Memastikan kata yang sangat panjang dipotong dan dibungkus
-                    whiteSpace: "pre-wrap", // Membuat teks yang panjang tetap terbaca dalam beberapa baris
-                    wordBreak: "break-word", // Menghindari overflow horizontal
-                  }}
-                >
-                  <p className="text-sm">{msg.message}</p>{" "}
-                  {/* Menampilkan pesan */}
-                  <p className="text-xs text-black mt-1">
+                      }`}
+                    style={{
+                      wordWrap: "break-word",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    <p className="text-base px-2">{msg.message}</p>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
                     {new Date(msg.date).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",

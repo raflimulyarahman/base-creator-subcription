@@ -76,7 +76,7 @@ export default function ChatingClient() {
                     key={group.id_group_chat}
                     href={`/pages/chating/group?chatGroupId=${group.id_group_chat}`}
                     className="
-            flex w-full items-center justify-between md:px-6 px-4 p-2
+            flex w-full items-center justify-between md:px-8 px-6 p-2
             hover:bg-gray-100 dark:hover:bg-gray-200
             transition cursor-pointer
           "
@@ -137,7 +137,11 @@ export default function ChatingClient() {
                     <Link
                       key={chat.id_chat_personal}
                       href={`/pages/chating/creator?chatId=${chat.id_personal_chat}`}
-                      className="flex items-center justify-between rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer min-h-[88px] sm:min-h-[104px]"
+                      className="
+            flex w-full items-center justify-between md:px-8 px-6 p-2
+            hover:bg-gray-100 dark:hover:bg-gray-200
+            transition cursor-pointer
+          "
                     >
                       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <Image
