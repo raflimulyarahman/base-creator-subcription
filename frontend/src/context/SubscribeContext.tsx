@@ -104,7 +104,7 @@ export const SubscribeProvider = ({
       //   id_subscribe: crypto.randomUUID(),
       //   ...payload,
       // };
-      console.log(res)
+      console.log(res);
       setSubscribe(res);
       setSuccess(true);
       return res;
@@ -118,7 +118,7 @@ export const SubscribeProvider = ({
   };
 
   const paySubscribe = async (
-    payload: PaySubscribePayload
+    payload: PaySubscribePayload,
   ): Promise<{ tokenId: bigint | null }> => {
     setLoading(true);
 
@@ -166,9 +166,7 @@ export const SubscribeProvider = ({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(accessToken
-              ? { Authorization: `Bearer ${accessToken}` }
-              : {}),
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           },
           body: JSON.stringify({
             subscibe: {
@@ -179,7 +177,7 @@ export const SubscribeProvider = ({
           }),
         },
         accessToken,
-        sendRefreshToken
+        sendRefreshToken,
       );
 
       console.log("Backend response:", response);
@@ -194,24 +192,25 @@ export const SubscribeProvider = ({
   };
 
   const getSubscribeIdTier = useCallback(
-    async (id_users: string): Promise<AddressSubscribe | null> => {
-      console.log("getTiers:", id_users);
+    async (address: string): Promise<AddressSubscribe | null> => {
+      console.log("getTiers:", address);
       try {
-        const data = await fetchWithAuth(
-          `http://localhost:8000/api/address/${id_users}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              ...(accessToken
-                ? { Authorization: `Bearer ${accessToken}` }
-                : {}),
-            },
-          },
-          accessToken,
-          sendRefreshToken,
-        );
+        // const data = await fetchWithAuth(
+        //   `http://localhost:8000/api/address/${id_users}`,
+        //   {
+        //     method: "GET",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       ...(accessToken
+        //         ? { Authorization: `Bearer ${accessToken}` }
+        //         : {}),
+        //     },
+        //   },
+        //   accessToken,
+        //   sendRefreshToken,
+        // );
 
+        // console.log(data);
         const tierIds = [1n, 2n, 3n];
 
         // 🔥 Read tiers dari kontrak
@@ -221,7 +220,7 @@ export const SubscribeProvider = ({
               address: CONTRACT_ADDRESSES.SubscriptionManager,
               abi: subscriptionManagerAbi,
               functionName: "getTierConfig",
-              args: [data.data?.address, id],
+              args: [address, id],
             });
 
             return {
@@ -237,7 +236,8 @@ export const SubscribeProvider = ({
         console.log(tierData);
         return {
           id_subscribe: crypto.randomUUID(),
-          address: data.data?.address,
+          address: address,
+          tiers: tierData,
         };
       } catch (err) {
         console.error("Error in getSubscribeIdTier:", err);
@@ -286,7 +286,6 @@ export const SubscribeProvider = ({
     }
   }, [userId, getSubscribeIdUsers]);
 
-
   const value = useMemo(
     () => ({
       subscribe,
@@ -299,11 +298,22 @@ export const SubscribeProvider = ({
       getSubscribeIdTier,
       tiers,
       paySubscribe,
-      setTiers, 
+      setTiers,
       setSubscribedata,
       getSubscribeIdUsers,
     }),
-    [subscribe, subscribedata, success, loading, tiers, setSubscribe, setSubscribedata, paySubscribe, getSubscribeIdTier, getSubscribeIdUsers],
+    [
+      subscribe,
+      subscribedata,
+      success,
+      loading,
+      tiers,
+      setSubscribe,
+      setSubscribedata,
+      paySubscribe,
+      getSubscribeIdTier,
+      getSubscribeIdUsers,
+    ],
   );
 
   return (

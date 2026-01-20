@@ -1,6 +1,7 @@
 "use client";
 import Toast from "@/components/Toast/Toast";
 import ThemeToggleButton from "@/components/ToggleButton/ThemeToggleButton";
+import { useActiveTab } from "@/context/ActiveTabContext";
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import { useWallet } from "@/context/WalletContext";
@@ -9,21 +10,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Navbar({
+export default function NavbarClient({
   onOpenSidebar,
-  activeTab,
-  setActiveTab,
+  currentPath,
 }: {
   onOpenSidebar: () => void;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  currentPath: string;
 }) {
   const { role } = useWallet();
   const pathname = usePathname();
   const { isDark } = useLight();
-
+  const { activeTab, setActiveTab } = useActiveTab();
+  const path = currentPath;
   const tabs = ["Followed", "Trade", "Talk"];
-  const isNotif = pathname === "/pages/notif";
+  const isNotif = path === "/pages/notif";
   const isSearch = pathname === "/pages/search";
 
   const isSearchId =
@@ -44,6 +44,10 @@ export default function Navbar({
       setShowToast(true);
       return;
     }
+  };
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
   };
 
   const avatarClick = () => {
@@ -99,7 +103,7 @@ export default function Navbar({
               className="flex items-center gap-3 py-4"
             >
               <Image
-                  src={user?.foto?.trim() || DEFAULT_AVATAR}
+                src={user?.foto?.trim() || DEFAULT_AVATAR}
                 alt="User Avatar"
                 width={50}
                 height={50}
@@ -150,16 +154,12 @@ export default function Navbar({
                   {tabs.map((tab) => (
                     <button
                       key={tab}
-                      onClick={() => setActiveTab(tab)}
+                      onClick={() => handleTabClick(tab)}
                       className={`relative pb-2 font-bold transition-colors focus:outline-none
-                        ${
-                          activeTab === tab
-                            ? "text-blue-600"
-                            : "text-gray-500 hover:text-gray-700"
-                        }
-                        after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-blue-600 after:rounded-full after:transition-all
-                        ${activeTab === tab ? "after:w-full" : "after:w-0"}
-                      `}
+    ${activeTab === tab ? "text-black" : "text-gray-500 hover:text-black"}
+    after:absolute after:left-1/2 after:bottom-0 after:h-[2px] after:bg-black after:rounded-full after:transition-all
+    ${activeTab === tab ? "after:w-10 after:-translate-x-1/2" : "after:w-0 after:-translate-x-1/2"}
+  `}
                     >
                       {tab}
                     </button>

@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    domains: [
+      "ik.imagekit.io",
+      "sangbuahhati.com", // tambahkan host baru ini
+    ],
     remotePatterns: [
       {
         protocol: "https",

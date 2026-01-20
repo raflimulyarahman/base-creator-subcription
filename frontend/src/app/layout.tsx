@@ -16,7 +16,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-white">
         <Providers>
           <ClientShell>
-            {children}  {/* children sekarang dibungkus ClientShell */}
+            {children} {/* Ensure children are passed down correctly */}
           </ClientShell>
         </Providers>
       </body>

@@ -18,7 +18,6 @@ export default function ClientShell({ children }: { children: ReactNode }) {
   const { isLoading } = useWallet();
   const { isDark } = useLight();
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("Followed");
   const pathname = usePathname();
 
   if (isLoading) {
@@ -35,30 +34,16 @@ export default function ClientShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex justify-center min-h-screen">
       <div className="flex flex-col w-full md:w-1/2 min-w-0">
+        {/* Navbar tanpa activeTab */}
         {!hideNavbar && (
-          <Navbar
-            onOpenSidebar={() => setOpen(true)}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            currentPath={pathname}
-          />
+          <Navbar onOpenSidebar={() => setOpen(true)} currentPath={pathname} />
         )}
 
         {/* Sidebar menggunakan dynamic import */}
         <SidebarPages open={open} onClose={() => setOpen(false)} />
 
         <main className="">
-          <div className="w-full">
-            {React.isValidElement(children)
-              ? React.cloneElement(
-                  children as React.ReactElement<{
-                    activeTab?: string;
-                    isDark?: boolean;
-                  }>,
-                  { activeTab, isDark }
-                )
-              : children}
-          </div>
+          <div className="w-full">{children}</div>
         </main>
       </div>
 

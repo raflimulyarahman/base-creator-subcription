@@ -25,14 +25,18 @@ export default function ProfileClientPages({ id_users }: Props) {
   const { createChatPersonal } = useChatPersonal();
   const { userId } = useWallet();
   const [activeTab, setActiveTab] = useState("Post");
-  const [toast, setToast] = useState<{ show: boolean; message: string; type?: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type?: "success" | "error";
+  }>({
     show: false,
     message: "",
     type: "success",
   });
 
   const tabs = ["Post", "Assert", "Cast", "Replies", "Badge"];
-  console.log(tiers);
+  console.log(tiers, "good");
   // Check if user can access chat
   const canAccessChat =
     Array.isArray(subscribedata) &&
@@ -41,7 +45,7 @@ export default function ProfileClientPages({ id_users }: Props) {
         sub.id_users === userId &&
         sub.id_creator === profileUser?.id_users &&
         sub.status_subscribe === "Done" &&
-        sub.type_subscribe === "Gold"
+        sub.type_subscribe === "Gold",
     );
 
   // Fetch profile user
@@ -59,15 +63,13 @@ export default function ProfileClientPages({ id_users }: Props) {
     if (!profileUser?.address?.address) return;
     console.log(profileUser, "address");
     const fetchTiers = async () => {
-      const res = await getSubscribeIdTier(profileUser.id_users);
-      console.log(res);
-      setTiers(res);
+      const res = await getSubscribeIdTier(profileUser.address?.address);
+      console.log(res.tiers, "res");
+      setTiers(res.tiers);
     };
 
     fetchTiers();
-  }, [profileUser?.address?.id_address, getSubscribeIdTier]);
-
-
+  }, [profileUser?.address?.id_address]);
 
   const handleSubscribeClick = () => {
     if (
@@ -88,7 +90,10 @@ export default function ProfileClientPages({ id_users }: Props) {
   const handleSetChatPersonal = async () => {
     if (!id_users || !userId) return;
     try {
-      const chat = await createChatPersonal({ id_users1: userId, id_users2: id_users });
+      const chat = await createChatPersonal({
+        id_users1: userId,
+        id_users2: id_users,
+      });
       router.push(`/pages/chating/creator?chatId=${chat.id_personal_chat}`);
     } catch (err) {
       console.error("Error opening chat:", err);
@@ -96,11 +101,31 @@ export default function ProfileClientPages({ id_users }: Props) {
   };
 
   const tabContent: Record<string, React.ReactNode> = {
-    Post: <div><h1>This is post</h1></div>,
-    Assert: <div><h1>This is assert</h1></div>,
-    Cast: <div><h1>This is cast</h1></div>,
-    Replies: <div><h1>This is replies</h1></div>,
-    Badge: <div><h1>This is badge</h1></div>,
+    Post: (
+      <div>
+        <h1>This is post</h1>
+      </div>
+    ),
+    Assert: (
+      <div>
+        <h1>This is assert</h1>
+      </div>
+    ),
+    Cast: (
+      <div>
+        <h1>This is cast</h1>
+      </div>
+    ),
+    Replies: (
+      <div>
+        <h1>This is replies</h1>
+      </div>
+    ),
+    Badge: (
+      <div>
+        <h1>This is badge</h1>
+      </div>
+    ),
   };
 
   return (
@@ -124,14 +149,30 @@ export default function ProfileClientPages({ id_users }: Props) {
               <button
                 onClick={canAccessChat ? handleSetChatPersonal : undefined}
                 disabled={!canAccessChat}
-                className={`p-2 rounded-lg transition ${canAccessChat
-                  ? "bg-gray-600 hover:bg-gray-300 cursor-pointer"
-                  : "bg-gray-400 cursor-not-allowed opacity-50"
-                  }`}
-                title={canAccessChat ? "Chat" : "Chat hanya tersedia untuk subscriber GOLD"}
+                className={`p-2 rounded-lg transition ${
+                  canAccessChat
+                    ? "bg-gray-600 hover:bg-gray-300 cursor-pointer"
+                    : "bg-gray-400 cursor-not-allowed opacity-50"
+                }`}
+                title={
+                  canAccessChat
+                    ? "Chat"
+                    : "Chat hanya tersedia untuk subscriber GOLD"
+                }
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                  />
                 </svg>
               </button>
 
@@ -151,8 +192,12 @@ export default function ProfileClientPages({ id_users }: Props) {
 
         {/* Name + Username */}
         <div className="space-y-2">
-          <h1 className="text-lg font-sarif font-semibold">{profileUser?.first_name} {profileUser?.last_name}</h1>
-          <h2 className="font-sarif text-sm text-gray-600">{profileUser?.username}</h2>
+          <h1 className="text-lg font-sarif font-semibold">
+            {profileUser?.first_name} {profileUser?.last_name}
+          </h1>
+          <h2 className="font-sarif text-sm text-gray-600">
+            {profileUser?.username}
+          </h2>
 
           {/* Stats */}
           <div className="flex gap-4">
@@ -174,10 +219,11 @@ export default function ProfileClientPages({ id_users }: Props) {
               {tabs.map((tab) => (
                 <button
                   key={tab}
-                  className={`py-2 font-sans text-base font-semibold ${activeTab === tab
-                    ? `border-b-3 border-black-500 ${isDark ? "text-white" : "text-black"}`
+                  className={`py-2 font-sans text-base font-semibold ${
+                    activeTab === tab
+                      ? `border-b-3 border-black-500 ${isDark ? "text-white" : "text-black"}`
                       : "text-gray-400"
-                    }`}
+                  }`}
                   onClick={() => setActiveTab(tab)}
                 >
                   {tab}
@@ -202,7 +248,9 @@ export default function ProfileClientPages({ id_users }: Props) {
             message={toast.message}
             show={toast.show}
             type={toast.type}
-            onClose={() => setToast({ show: false, message: "", type: "success" })}
+            onClose={() =>
+              setToast({ show: false, message: "", type: "success" })
+            }
           />
         )}
       </div>

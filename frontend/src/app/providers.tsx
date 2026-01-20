@@ -14,6 +14,7 @@ import ThemeWrapper from "./ThemeWrapper";
 import { ChatPersonalProvider } from "@/context/ChatPersonalContext";
 import { MessageChatProvider } from "@/context/MessageContext";
 import { ChatGroupProvider } from "@/context/GroupChatContext";
+import { ActiveTabProvider } from "@/context/ActiveTabContext";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
@@ -28,26 +29,28 @@ const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <LightProvider>
-      <ThemeWrapper>
-        <WagmiProvider config={config}>
-          <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider>
-              <WalletProvider>
-                <UsersProvider>
-                  <SubscribeProvider>
-                    <ChatPersonalProvider>
-                      <MessageChatProvider>
-                        <ChatGroupProvider>{children}</ChatGroupProvider>
-                      </MessageChatProvider>
-                    </ChatPersonalProvider>
-                  </SubscribeProvider>
-                </UsersProvider>
-              </WalletProvider>
-            </RainbowKitProvider>
-          </QueryClientProvider>
-        </WagmiProvider>
-      </ThemeWrapper>
-    </LightProvider>
+    <ActiveTabProvider>
+      <LightProvider>
+        <ThemeWrapper>
+          <WagmiProvider config={config}>
+            <QueryClientProvider client={queryClient}>
+              <RainbowKitProvider>
+                <WalletProvider>
+                  <UsersProvider>
+                    <SubscribeProvider>
+                      <ChatPersonalProvider>
+                        <MessageChatProvider>
+                          <ChatGroupProvider>{children}</ChatGroupProvider>
+                        </MessageChatProvider>
+                      </ChatPersonalProvider>
+                    </SubscribeProvider>
+                  </UsersProvider>
+                </WalletProvider>
+              </RainbowKitProvider>
+            </QueryClientProvider>
+          </WagmiProvider>
+        </ThemeWrapper>
+      </LightProvider>
+    </ActiveTabProvider>
   );
 }
