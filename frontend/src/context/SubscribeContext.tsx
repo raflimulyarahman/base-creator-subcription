@@ -234,8 +234,7 @@ export const SubscribeProvider = ({
           }),
         );
 
-        setTiers(tierData);
-
+        console.log(tierData);
         return {
           id_subscribe: crypto.randomUUID(),
           address: data.data?.address,

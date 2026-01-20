@@ -19,8 +19,8 @@ interface Props {
 export default function ProfileClientPages({ id_users }: Props) {
   const { isDark } = useLight();
   const router = useRouter();
-  const { profileUser, setProfileUser, getProfileUserById, getSubscribeIdTier } = useUsers();
-  const { tiers, subscribedata } = useSubscribe();
+  const { profileUser, setProfileUser, getProfileUserById } = useUsers();
+  const { tiers, subscribedata, getSubscribeIdTier, setTiers } = useSubscribe();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { createChatPersonal } = useChatPersonal();
   const { userId } = useWallet();
@@ -56,18 +56,15 @@ export default function ProfileClientPages({ id_users }: Props) {
   }, [id_users]);
 
   useEffect(() => {
-    const addressId = profileUser?.address?.id_address;
-    if (!addressId) return;
-
-    const fetchSubscribe = async () => {
-      try {
-        await getSubscribeIdTier(addressId); // context sudah setTiers di sini
-      } catch (err) {
-        console.error("Failed to fetch tiers:", err);
-      }
+    if (!profileUser?.address?.address) return;
+    console.log(profileUser?.address?.address, "address");
+    const fetchTiers = async () => {
+      const res = await getSubscribeIdTier(profileUser.address.address);
+      console.log(res);
+      setTiers(res);
     };
 
-    fetchSubscribe();
+    fetchTiers();
   }, [profileUser?.address?.id_address, getSubscribeIdTier]);
 
 
