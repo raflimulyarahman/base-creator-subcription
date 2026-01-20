@@ -3,7 +3,7 @@ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata = {
-  title: "Base Indonesia",
+  title: "True Ownership for Creators and their communities",
 };
 
 export default function RootLayout({

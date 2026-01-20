@@ -38,6 +38,8 @@ export default function CreatorChating() {
     (m) => m.id_users === userId,
   )?.user;
 
+  const DEFAULT_AVATAR = "/11789135.png";
+
   return (
     <div className="flex flex-col h-screen bg-gray-white">
       {/* CHAT LIST */}
@@ -57,7 +59,7 @@ export default function CreatorChating() {
                   <Image
                     src={
                       msg.user?.foto ||
-                      "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                      DEFAULT_AVATAR
                     }
                     alt="Avatar"
                     width={40}

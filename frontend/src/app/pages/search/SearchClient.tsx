@@ -4,7 +4,7 @@ import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export default function SearchPages() {
   const { isDark } = useLight();
@@ -38,6 +38,7 @@ export default function SearchPages() {
     console.log(id_users);
     router.push(`/pages/search/${id_users}`);
   };
+  const DEFAULT_AVATAR = "./11789135.png";
 
   return (
     <div
@@ -97,7 +98,7 @@ export default function SearchPages() {
                 }`}
               >
                 <Image
-                  src={user.foto || "/avatar.png"}
+                  src={user.foto || DEFAULT_AVATAR}
                   alt={user.username}
                   width={48}
                   height={48}

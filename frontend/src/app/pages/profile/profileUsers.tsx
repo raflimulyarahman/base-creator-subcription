@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
 import { useLight } from "@/context/LightContext";
-import ProtectedRoute from "@/store/ProtectedRoute";
 import { useUsers } from "@/context/UsersContext";
+import ProtectedRoute from "@/store/ProtectedRoute";
+import Image from "next/image";
+import { useState } from "react";
 export default function ProfileUsers() {
   const { isDark } = useLight();
   const { user } = useUsers();
   const [activeTab, setActiveTab] = useState("Post");
   const tabs = ["Post", "Assert", "Cast", "Replies", "Badge"];
-  const DEFAULT_AVATAR =
-    "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg";
+  const DEFAULT_AVATAR = "/11789135.png";
 
   const tabContent: Record<string, React.ReactNode> = {
     Post: <h1>this post</h1>,
@@ -37,7 +36,7 @@ export default function ProfileUsers() {
             />
           </div>
 
-          <button className="px-6 py-3 text-sm font-semibold bg-blue-300 rounded-xl shadow-lg hover:scale-105 transition">
+          <button className="px-6 py-3 text-sm font-semibold text-white bg-blue-900 rounded-xl shadow-lg hover:scale-105 transition">
             Edit Profile
           </button>
         </div>

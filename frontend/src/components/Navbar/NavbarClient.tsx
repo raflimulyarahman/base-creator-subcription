@@ -1,6 +1,6 @@
 "use client";
-import ThemeToggleButton from "@/components/ToggleButton/ThemeToggleButton";
 import Toast from "@/components/Toast/Toast";
+import ThemeToggleButton from "@/components/ToggleButton/ThemeToggleButton";
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import { useWallet } from "@/context/WalletContext";
@@ -37,13 +37,7 @@ export default function Navbar({
   const router = useRouter();
   const { user } = useUsers();
   const [showToast, setShowToast] = useState(false);
-  const DEFAULT_AVATAR =
-    "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg";
-
-  const avatarSrc =
-    user?.foto && user.foto !== ""
-      ? user.foto
-      : "https://i.pravatar.cc/150?img=1";
+  if (!open) return null;
 
   const handleClick = () => {
     if (!role) {
@@ -60,7 +54,7 @@ export default function Navbar({
 
     onOpenSidebar();
   };
-
+  const DEFAULT_AVATAR = "./11789135.png";
   return (
     <div
       className={`w-full h-16 transition-colors duration-300 
@@ -105,7 +99,7 @@ export default function Navbar({
               className="flex items-center gap-3 py-4"
             >
               <Image
-                src={user?.foto?.trim() || DEFAULT_AVATAR}
+                  src={user?.foto?.trim() || DEFAULT_AVATAR}
                 alt="User Avatar"
                 width={50}
                 height={50}

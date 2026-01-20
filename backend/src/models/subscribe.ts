@@ -2,9 +2,10 @@ import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface SubscribeAttributes {
   id_subscribe: string;
+  id_creator: string;
   id_users: string;
+  id_token: number;
   type_subscribe: string;
-  subscribe: string;
   status_subscribe: string;
 }
 
@@ -16,9 +17,10 @@ export default class Subscribe
   implements SubscribeAttributes
 {
   declare id_subscribe: string;
+  declare id_creator: string;
   declare id_users: string;
+  declare id_token: number;
   declare type_subscribe: string;
-  declare subscribe: string;
   declare status_subscribe: string;
 
   static initModel(sequelize: Sequelize) {
@@ -29,9 +31,10 @@ export default class Subscribe
           primaryKey: true,
           defaultValue: DataTypes.UUIDV4,
         },
+        id_creator: { type: DataTypes.UUID, allowNull: false },
         id_users: { type: DataTypes.UUID, allowNull: false },
+        id_token: { type: DataTypes.UUID, allowNull: false },
         type_subscribe: { type: DataTypes.STRING, allowNull: false },
-        subscribe: { type: DataTypes.STRING, allowNull: false },
         status_subscribe: { type: DataTypes.STRING, allowNull: false },
       },
       {

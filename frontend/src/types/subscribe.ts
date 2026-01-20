@@ -2,9 +2,10 @@ import { UUID } from "./uuid";
 
 export interface Subscribe {
   id_subscribe: UUID;
+  id_creator: string;
   id_users: string;
+  id_token: number;
   type_subscribe: string;
-  subscribe: string;
   status_subscribe: string;
 }
 
@@ -34,15 +35,17 @@ export type AddressSubscribe = {
 
 export type SubscribeContextType = {
   subscribe: Subscribe | null;
-  createSubscribe: (
-    payload: Omit<Subscribe, "id_subscribe">,
-  ) => Promise<Subscribe>;
+  createSubscribe: (payload: Omit<Subscribe, "id_subscribe">) => Promise<Subscribe>;
   loading: boolean;
   success: boolean;
   setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
   setSubscribe: React.Dispatch<React.SetStateAction<Subscribe | null>>;
   getSubscribeIdTier: (id_users: string) => Promise<AddressSubscribe | null>;
-  paySubscribe: (payload: TierInfo) => Promise<TierInfo>;
-  tiers: TierInfo[];
-  setTiers: React.Dispatch<React.SetStateAction<TierInfo[]>>;
+  paySubscribe: (payload: TierData & { addressCreator: string }) => Promise<{ tokenId: bigint | null }>;
+  tiers: TierData[];
+  setTiers: React.Dispatch<React.SetStateAction<TierData[]>>;
+  getSubscribeIdUsers: (id_users: string) => Promise<Subscribe | null>;
+  subscribedata: Subscribe[];
+  setSubscribedata: React.Dispatch<React.SetStateAction<Subscribe[]>>;
 };
+

@@ -1,31 +1,30 @@
 "use client";
 
+import { erc1155Abi } from "@/abi/erc1155Abi";
 import { subscriptionManagerAbi } from "@/abi/SubscriptionManager";
 import { CONTRACT_ADDRESSES } from "@/config/contract";
 import { useWallet } from "@/context/WalletContext";
 import { fetchWithAuth } from "@/store/fetchWithAuth";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, decodeEventLog, http } from "viem";
 import { baseSepolia } from "viem/chains";
 import { useWriteContract } from "wagmi";
-import { waitForTransactionReceipt } from "wagmi/actions";
-import { decodeEventLog } from "viem";
-import { erc1155Abi } from "@/abi/erc1155Abi";
 
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 
 import {
-  Subscribe,
-  SubscribePayload,
   AddressSubscribe,
-  TierInfo,
-  TierData,
+  Subscribe,
   SubscribeContextType,
+  SubscribePayload,
+  TierData,
+  TierInfo,
 } from "@/types";
 
 const SubscribeContext = createContext<SubscribeContextType | undefined>(
@@ -76,7 +75,9 @@ export const SubscribeProvider = ({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { accessToken, sendRefreshToken } = useWallet();
+  const [subscribedata, setSubscribedata] = useState<Subscribe[]>([]);
   const [tiers, setTiers] = useState<TierInfo[]>([]);
+  const { userId } = useWallet();
 
   const publicClient = createPublicClient({
     chain: baseSepolia,
@@ -103,10 +104,10 @@ export const SubscribeProvider = ({
       //   id_subscribe: crypto.randomUUID(),
       //   ...payload,
       // };
-
-      // setSubscribe(res);
-      // setSuccess(true);
-      // return res;
+      console.log(res)
+      setSubscribe(res);
+      setSuccess(true);
+      return res;
     } catch (err) {
       console.error("Error creating subscription:", err);
       setSuccess(false);
@@ -116,28 +117,34 @@ export const SubscribeProvider = ({
     }
   };
 
-  // Helper: parse ERC-1155 TransferSingle log manual
-
   const paySubscribe = async (
-    payload: TierInfo & { userAddress: string },
+    payload: PaySubscribePayload
   ): Promise<{ tokenId: bigint | null }> => {
     setLoading(true);
 
     try {
-      const { addressCreator, tiersId, payTiers, userAddress } = payload;
+      const {
+        id_creator,
+        id_users,
+        type_subscribe,
+        tiersId,
+        price,
+        addressCreator,
+        userAddress,
+      } = payload;
 
-      // 1️⃣ Kirim transaction
+      // 1️⃣ Kirim transaction ke smart contract
       const hash = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
         functionName: "subscribe",
         args: [addressCreator, BigInt(tiersId)],
-        value: BigInt(payTiers),
+        value: BigInt(price),
       });
 
       console.log("TX HASH:", hash);
 
-      // 2️⃣ Tunggu transaction di-mine
+      // 2️⃣ Tunggu TX di-mine
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       console.log("TX RECEIPT:", receipt);
 
@@ -152,9 +159,30 @@ export const SubscribeProvider = ({
         }
       }
 
-      if (!tokenId) {
-        console.log("⚠️ TOKEN ID: Tidak ditemukan");
-      }
+      // 3️⃣ Simpan ke backend (SESUI DB KAMU)
+      const response = await fetchWithAuth(
+        "http://localhost:8000/api/subscribe/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}),
+          },
+          body: JSON.stringify({
+            subscibe: {
+              id_creator,
+              id_users,
+              type_subscribe,
+            },
+          }),
+        },
+        accessToken,
+        sendRefreshToken
+      );
+
+      console.log("Backend response:", response);
 
       return { tokenId };
     } catch (err) {
@@ -167,7 +195,7 @@ export const SubscribeProvider = ({
 
   const getSubscribeIdTier = useCallback(
     async (id_users: string): Promise<AddressSubscribe | null> => {
-      console.log("getSubscribeIdTier called with:", id_users);
+      console.log("getTiers:", id_users);
       try {
         const data = await fetchWithAuth(
           `http://localhost:8000/api/address/${id_users}`,
@@ -220,9 +248,50 @@ export const SubscribeProvider = ({
     [accessToken, sendRefreshToken, publicClient],
   );
 
+  const getSubscribeIdUsers = useCallback(
+    async (id_users: string) => {
+      console.log("getSubscribeIdUser useCallBack:", id_users);
+      try {
+        const respone = await fetchWithAuth(
+          `http://localhost:8000/api/subscribe/getSUb`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(accessToken
+                ? { Authorization: `Bearer ${accessToken}` }
+                : {}),
+            },
+            body: JSON.stringify({ id_users }),
+          },
+          accessToken,
+          sendRefreshToken,
+        );
+
+        console.log(respone, "respone");
+        const data = Array.isArray(respone.data) ? respone.data : [];
+        setSubscribedata(data);
+        return respone;
+      } catch (err) {
+        console.error("Error fetching chat group:", err);
+        return [];
+      }
+    },
+    [accessToken, sendRefreshToken],
+  );
+
+  useEffect(() => {
+    if (userId) {
+      console.log("getSubscribeIdUsers called with:", userId);
+      getSubscribeIdUsers(userId);
+    }
+  }, [userId, getSubscribeIdUsers]);
+
+
   const value = useMemo(
     () => ({
       subscribe,
+      subscribedata,
       createSubscribe,
       success,
       loading,
@@ -231,9 +300,11 @@ export const SubscribeProvider = ({
       getSubscribeIdTier,
       tiers,
       paySubscribe,
-      setTiers,
+      setTiers, 
+      setSubscribedata,
+      getSubscribeIdUsers,
     }),
-    [subscribe, success, loading, tiers, paySubscribe, getSubscribeIdTier],
+    [subscribe, subscribedata, success, loading, tiers, setSubscribe, setSubscribedata, paySubscribe, getSubscribeIdTier, getSubscribeIdUsers],
   );
 
   return (
