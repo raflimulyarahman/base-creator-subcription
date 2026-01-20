@@ -57,9 +57,9 @@ export default function ProfileClientPages({ id_users }: Props) {
 
   useEffect(() => {
     if (!profileUser?.address?.address) return;
-    console.log(profileUser?.address?.address, "address");
+    console.log(profileUser, "address");
     const fetchTiers = async () => {
-      const res = await getSubscribeIdTier(profileUser.address.address);
+      const res = await getSubscribeIdTier(profileUser.id_users);
       console.log(res);
       setTiers(res);
     };
