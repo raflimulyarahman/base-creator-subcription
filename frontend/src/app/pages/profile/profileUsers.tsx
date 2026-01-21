@@ -1,6 +1,7 @@
 "use client";
 
 import { useLight } from "@/context/LightContext";
+import { useSubscribe } from "@/context/SubscribeContext";
 import { useUsers } from "@/context/UsersContext";
 import ProtectedRoute from "@/store/ProtectedRoute";
 import Image from "next/image";
@@ -8,16 +9,45 @@ import { useState } from "react";
 export default function ProfileUsers() {
   const { isDark } = useLight();
   const { user } = useUsers();
+  const { subUsersId } = useSubscribe();
+  console.log(subUsersId);
   const [activeTab, setActiveTab] = useState("Post");
   const tabs = ["Post", "Assert", "Cast", "Replies", "Badge"];
   const DEFAULT_AVATAR = "/11789135.png";
 
   const tabContent: Record<string, React.ReactNode> = {
-    Post: <h1>this post</h1>,
-    Assert: <h1>this assert</h1>,
-    Cast: <h1>this cast</h1>,
-    Replies: <h1>this replies</h1>,
-    Badge: <h1>this badge</h1>,
+    Post: (
+      <div className="flex flex-row space-x-2">
+        <div className="h-20 w-20 bg-gray-400 rounded-md overflow-hidden">
+          <img
+            className="h-full w-full object-cover"
+            src="https://delifru.co.id/wp-content/uploads/2024/06/apa-itu-cafe.jpg"
+            alt="Cafe"
+          />
+        </div>
+
+        <div className="h-20 w-20 bg-gray-400 rounded-md overflow-hidden">
+          <img
+            className="h-full w-full object-cover"
+            src="https://mawatu.co.id/wp-content/uploads/2024/11/6.-Desain-Cafe-Sederhana-di-Ruko-Kecil-dengan-Konsep-Klasik.jpg"
+            alt="Cafe"
+          />
+        </div>
+      </div>
+    ),
+    Assert: <></>,
+    Cast: <></>,
+    Replies: <></>,
+    Badge: (
+      <div>
+        {subUsersId?.map((badge: any) => (
+          <div key={badge.id_subscribe}>
+            <p>{badge.id_token}</p>
+          </div>
+        ))
+        }
+      </div >
+    )
   };
 
   return (
@@ -50,7 +80,7 @@ export default function ProfileUsers() {
                 : user.username
               : "Loading..."}
           </h1>
-          <p className="text-sm text-gray-500">{user.username}</p>
+          {/* <p className="text-sm text-gray-500">{user.username}</p> */}
 
           <div className="flex gap-4">
             <p className="text-sm">

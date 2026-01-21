@@ -4,7 +4,6 @@ import { subscriptionManagerAbi } from "@/abi/SubscriptionManager";
 import { CONTRACT_ADDRESSES } from "@/config/contract";
 import { useWallet } from "@/context/WalletContext";
 import { fetchWithAuth } from "@/store/fetchWithAuth";
-import { useWriteContract } from "wagmi";
 import {
   createContext,
   ReactNode,
@@ -13,6 +12,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useWriteContract } from "wagmi";
 
 import { User, UsersContextType } from "@/types";
 
@@ -84,13 +84,13 @@ export function UsersProvider({ children }: { children: ReactNode }) {
         formData.get("first_name") + " " + formData.get("last_name");
       const username = formData.get("username") as string;
       const fotoFile = formData.get("foto") as File;
-
+      console.log(fotoFile.name, "ini file");
       //Smart contract registration
       const res = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
         functionName: "registerCreator",
-        args: [fullName, username, fotoFile],
+        args: [fullName, username, fotoFile.name, 1000000000n],
       });
 
       if (!res) return null;

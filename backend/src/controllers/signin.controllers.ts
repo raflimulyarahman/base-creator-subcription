@@ -93,8 +93,8 @@ export const getSession = (req: Request, res: Response) => {
 
   res.json({
     ...req.session.user,
-    accessToken: (req.session as any).accessToken, // ✅ KIRIM
-    refreshToken: (req.session as any).refreshToken, // ✅ KIRIM
+    accessToken: (req.session as any).accessToken,
+    refreshToken: (req.session as any).refreshToken, 
   });
 };
 

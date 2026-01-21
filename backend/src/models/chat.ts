@@ -1,7 +1,7 @@
 // src/models/chat.ts
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-import MessageChat from "./message"; // pastikan untuk import MessageChat
-import User from "./user"; // pastikan untuk import User
+import MessageChat from "./message"; 
+import User from "./user"; 
 
 export interface PersonalChatAttributes {
   id_personal_chat: string;
@@ -24,7 +24,6 @@ export default class PersonalChat
   declare createdAt?: Date;
   declare updatedAt?: Date;
 
-  // Menambahkan properti hasil eager-loading
   declare user1?: User;
   declare user2?: User;
   declare messages?: MessageChat[];
@@ -44,13 +43,12 @@ export default class PersonalChat
         sequelize,
         modelName: "PersonalChat",
         tableName: "PersonalChat",
-        timestamps: true, // pastikan untuk menyertakan timestamps
+        timestamps: true, 
       }
     );
   }
 
   static associate(models: any) {
-    // Relasi dengan User
     PersonalChat.belongsTo(User, {
       foreignKey: "id_users1",
       as: "user1",
@@ -59,11 +57,9 @@ export default class PersonalChat
       foreignKey: "id_users2",
       as: "user2",
     });
-
-    // Relasi dengan MessageChat
     PersonalChat.hasMany(MessageChat, {
       foreignKey: "id_personal_chat",
-      as: "messages", // Ensure this name is consistent in your queries
+      as: "messages", 
     });
   }
 }

@@ -84,3 +84,44 @@ export const getSubscribe = async (req: Request, res: Response) => {
   }
 };
 
+export const getSubscribeUserProfileId = async (req: Request, res: Response) => {
+  try {
+    const { id_users } = req.params;
+
+    if (!id_users) {
+      return res.status(400).json({
+        success: false,
+        message: "id_users is required",
+      });
+    }
+
+    const subscribes = await db.Subscribe.findAll({
+      where: { id_users },
+      include: [
+        {
+          model: db.User,
+          as: "user",
+          attributes: ["id_users", "first_name", "last_name", "foto"],
+        },
+      ],
+    });
+
+    console.log("SUBSCRIBES:", subscribes);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get subscribes success",
+      data: subscribes,
+    });
+  } catch (error) {
+    console.error("getSubscribeUserProfileId error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+

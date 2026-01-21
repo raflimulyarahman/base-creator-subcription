@@ -13,23 +13,23 @@ import subscribeRouter from "./router/subscribe.route";
 import usersRoute from "./router/users.route";
 const app: Application = express();
 
-// 1️⃣ CORS
+
 app.use(
   cors({
-    origin: (origin, callback) => callback(null, true), // menerima semua origin
-    credentials: true, // wajib untuk cookies
+    origin: (origin, callback) => callback(null, true), 
+    credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-access-token"],
   }),
 );
-// 3️⃣ Body parser
-app.use(express.json()); // untuk JSON
-app.use(express.urlencoded({ extended: true })); // untuk x-www-form-urlencoded
 
-// 4️⃣ Static folder
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
+
+
 app.use("/images", express.static(path.join(__dirname, "/images")));
 app.use("/imagesGroup", express.static(path.join(__dirname, "/imagesGroup")));
-// 5️⃣ Session
+
 app.use(
   session({
     name: "sid",
@@ -38,7 +38,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // localhost
+      secure: false, 
       sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24,
     },

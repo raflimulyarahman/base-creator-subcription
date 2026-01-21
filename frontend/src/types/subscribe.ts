@@ -45,6 +45,7 @@ export type SubscribeContextType = {
   tiers: TierData[];
   setTiers: React.Dispatch<React.SetStateAction<TierData[]>>;
   getSubscribeIdUsers: (id_users: string) => Promise<Subscribe | null>;
+  getSubscribeUserIdProfile: (id_users: string) => Promise<Subscribe[]>;
   subscribedata: Subscribe[];
   setSubscribedata: React.Dispatch<React.SetStateAction<Subscribe[]>>;
 };

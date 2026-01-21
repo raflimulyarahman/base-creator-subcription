@@ -23,9 +23,9 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
   const currentTier = activeTiers[currentIndex];
   // Jika tidak ada tier aktif, modal tidak tampil
   if (activeTiers.length === 0 || !currentTier) return null;
-  console.log(currentTier.price, "price");
+  console.log(userId, "price");
   const handleSubscribe = async () => {
-    const id_creator = profileUser?.address?.id_users;
+    const id_creator = profileUser?.id_users;
     const addressCreator = profileUser?.address?.address;
     const id_users = userId;
     const price = currentTier.price;

@@ -28,8 +28,8 @@ export const getUser = async (req: Request, res: Response) => {
   try {
     const users = await db.User.findAll({
       include: [
-        { model: db.Address, as: "address" }, // alias harus sama dengan User.belongsTo
-        { model: db.Role, as: "role" }, // alias sama dengan association Role
+        { model: db.Address, as: "address" }, 
+        { model: db.Role, as: "role" }, 
       ],
     });
 
@@ -44,12 +44,12 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const getUserId = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params; // ambil id dari route parameter
+    const { id } = req.params;
 
     const user = await db.User.findOne({
       where: { id_users: id },
       include: [
-        { model: db.Address, as: "address" }, // pastikan alias sama dengan User.belongsTo
+        { model: db.Address, as: "address" }, 
         { model: db.Role, as: "role" },
       ],
     });
@@ -74,16 +74,14 @@ export const getUserId = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { first_name, last_name, username } = req.body; // tidak ada id_role
+    const { first_name, last_name, username } = req.body; 
 
     const user = await db.User.findOne({ where: { id_users: id } });
     if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
 
-    // Cari role "Creators" dari database
     const creatorsRole = await db.Role.findOne({ where: { role: "Creators" } });
     console.log(creatorsRole);
-    // if (!creatorsRole) return res.status(500).json({ message: "Role 'Creators' tidak ditemukan" });
-    // console.log(creatorsRole);
+ 
     const fotoUrl = req.file
       ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
       : user.foto;
@@ -93,7 +91,7 @@ export const updateUser = async (req: Request, res: Response) => {
       last_name: last_name ?? user.last_name,
       username: username ?? user.username,
       foto: fotoUrl,
-      id_role: creatorsRole?.id_role, // langsung pakai Creators
+      id_role: creatorsRole?.id_role, 
     });
 
     console.log(updatedUser);

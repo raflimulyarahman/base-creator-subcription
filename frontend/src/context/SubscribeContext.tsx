@@ -76,6 +76,7 @@ export const SubscribeProvider = ({
   const [success, setSuccess] = useState(false);
   const { accessToken, sendRefreshToken } = useWallet();
   const [subscribedata, setSubscribedata] = useState<Subscribe[]>([]);
+  const [subUsersId, setSubUsersId] = useState<Subscribe[]>();
   const [tiers, setTiers] = useState<TierInfo[]>([]);
   const { userId } = useWallet();
 
@@ -118,10 +119,10 @@ export const SubscribeProvider = ({
   };
 
   const paySubscribe = async (
-    payload: PaySubscribePayload,
+    payload: Subscribe,
   ): Promise<{ tokenId: bigint | null }> => {
     setLoading(true);
-
+    // console.log("📦 PAY SUBSCRIBE PAYLOAD:", payload);
     try {
       const {
         id_creator,
@@ -133,7 +134,6 @@ export const SubscribeProvider = ({
         userAddress,
       } = payload;
 
-      // 1️⃣ Kirim transaction ke smart contract
       const hash = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
@@ -148,7 +148,7 @@ export const SubscribeProvider = ({
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       console.log("TX RECEIPT:", receipt);
 
-      let tokenId: bigint | null = null;
+      // let tokenId: bigint | null = null;
 
       for (const log of receipt.logs) {
         const parsed = parseERC1155TransferSingleLog(log, userAddress);
@@ -182,7 +182,7 @@ export const SubscribeProvider = ({
 
       console.log("Backend response:", response);
 
-      return { tokenId };
+      //return { tokenId };
     } catch (err) {
       console.error("Error subscribing:", err);
       throw err;
@@ -195,22 +195,6 @@ export const SubscribeProvider = ({
     async (address: string): Promise<AddressSubscribe | null> => {
       console.log("getTiers:", address);
       try {
-        // const data = await fetchWithAuth(
-        //   `http://localhost:8000/api/address/${id_users}`,
-        //   {
-        //     method: "GET",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       ...(accessToken
-        //         ? { Authorization: `Bearer ${accessToken}` }
-        //         : {}),
-        //     },
-        //   },
-        //   accessToken,
-        //   sendRefreshToken,
-        // );
-
-        // console.log(data);
         const tierIds = [1n, 2n, 3n];
 
         // 🔥 Read tiers dari kontrak
@@ -279,6 +263,30 @@ export const SubscribeProvider = ({
     [accessToken, sendRefreshToken],
   );
 
+  const getSubscribeUserIdProfile = useCallback(
+    async (id_users: string) => {
+      const response = await fetchWithAuth(
+        `http://localhost:8000/api/subscribe/${id_users}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}),
+          },
+        },
+        accessToken,
+        sendRefreshToken,
+      );
+      const data = Array.isArray(response.data) ? response.data : [];
+      console.log(data)
+      return data;
+    },
+    [accessToken, sendRefreshToken],
+  );
+
+
   useEffect(() => {
     if (userId) {
       console.log("getSubscribeIdUsers called with:", userId);
@@ -286,9 +294,28 @@ export const SubscribeProvider = ({
     }
   }, [userId, getSubscribeIdUsers]);
 
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchData = async () => {
+      try {
+        const result = await getSubscribeUserIdProfile(userId);
+        console.log(result);
+        setSubUsersId(result);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchData();
+  }, [userId, getSubscribeUserIdProfile]);
+
+
   const value = useMemo(
     () => ({
-      subscribe,
+      subscribe, 
+      subUsersId,
+      setSubUsersId,
       subscribedata,
       createSubscribe,
       success,
@@ -301,6 +328,7 @@ export const SubscribeProvider = ({
       setTiers,
       setSubscribedata,
       getSubscribeIdUsers,
+      getSubscribeUserIdProfile
     }),
     [
       subscribe,
@@ -308,11 +336,14 @@ export const SubscribeProvider = ({
       success,
       loading,
       tiers,
+      subUsersId,
+      setSubUsersId,
       setSubscribe,
       setSubscribedata,
       paySubscribe,
       getSubscribeIdTier,
       getSubscribeIdUsers,
+      getSubscribeUserIdProfile
     ],
   );
 

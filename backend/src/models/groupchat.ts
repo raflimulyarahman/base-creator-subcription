@@ -52,28 +52,25 @@ export default class GroupChat
       },
       {
         sequelize,
-        modelName: "GroupChat", // Corrected model name to "GroupChat"
-        tableName: "GroupChats", // Corrected table name to "GroupChats"
-        timestamps: true, // Enable timestamps for createdAt and updatedAt
+        modelName: "GroupChat", 
+        tableName: "GroupChats", 
+        timestamps: true, 
       },
     );
   }
 
-  // Define model associations (many-to-many relationships with User and MemberGroupChat)
+ 
   static associate(models: any) {
-    // Define relationship with MemberGroupChat (join table for group chat members)
     GroupChat.hasMany(models.MemberGroupChat, {
       foreignKey: "id_group_chat",
       as: "members",
     });
 
-    // Define relationship with MessageGroupChat (messages in the group)
     GroupChat.hasMany(MessageGroupChat, {
       foreignKey: "id_group_chat",
       as: "messages",
     });
 
-    // Define relationship with User (creator of the group)
     GroupChat.belongsTo(User, {
       foreignKey: "id_users",
       as: "creator",

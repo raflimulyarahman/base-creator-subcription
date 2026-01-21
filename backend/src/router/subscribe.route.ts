@@ -6,4 +6,5 @@ const router = Router();
 
 router.post("/getSUb", verifyToken, checkRole(["Creators","Users"]), subscibeController.getSubscribe);
 router.post("/", verifyToken, checkRole(["Creators","Users"]), subscibeController.createSubscribe);
+router.get("/:id_users", verifyToken, checkRole(["Creators","Users"]), subscibeController.getSubscribeUserProfileId);
 export default router;

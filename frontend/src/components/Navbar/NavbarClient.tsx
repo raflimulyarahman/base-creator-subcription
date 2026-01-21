@@ -58,7 +58,7 @@ export default function NavbarClient({
 
     onOpenSidebar();
   };
-  const DEFAULT_AVATAR = "./11789135.png";
+  const DEFAULT_AVATAR = "./../public/11789135.png";
   return (
     <div
       className={`w-full h-16 transition-colors duration-300 

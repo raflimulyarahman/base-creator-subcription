@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import db from "../models";
 
-export const createMessage = async (req: Request, res: Response) => {
+export const createMessageGroup = async (req: Request, res: Response) => {
   try {
-    const { id_personal_chat, id_users, message } = req.body;
+    const { id_group_chat, id_users, message } = req.body;
 
-    if (!id_personal_chat || !message) {
+    if (!id_group_chat || !message) {
       return res
         .status(400)
         .json({ error: "id_personal_chat and message are required" });
@@ -15,19 +15,19 @@ export const createMessage = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const chat = await db.ChatPersonal.findByPk(id_personal_chat);
+    const chat = await db.GroupChat.findByPk(id_group_chat);
     if (!chat) {
       return res.status(404).json({ error: "Chat not found" });
     }
 
-    const newMessage = await db.MessageChat.create({
-      id_personal_chat,
+    const newMessage = await db.MessageGroupChat.create({
+      id_group_chat,
       id_users,
       message,
       date: new Date().toISOString(),
     });
 
-    const fullMessage = await db.MessageChat.findByPk(newMessage.id_message, {
+    const fullMessage = await db.MemberGroupChat.findByPk(newMessage.id_message_group, {
       include: [
         {
           model: db.User,
@@ -44,17 +44,17 @@ export const createMessage = async (req: Request, res: Response) => {
   }
 };
 
-export const getMessageByChatId = async (req: Request, res: Response) => {
+export const getMessageByGroupChatId = async (req: Request, res: Response) => {
   try {
-    const { id_personal_chat } = req.body; // read from POST body
-    console.log("Received id_personal_chat:", id_personal_chat);
+    const { id_group_chat } = req.body; 
+    console.log("Received id_personal_chat:", id_group_chat);
 
-    if (!id_personal_chat) {
+    if (!id_group_chat) {
       return res.status(400).json({ error: "id_personal_chat is required" });
     }
 
-    const messages = await db.MessageChat.findAll({
-      where: { id_personal_chat },
+    const messages = await db.MessageGroupChat.findAll({
+      where: { id_group_chat },
       order: [["createdAt", "ASC"]],
       include: [
         {

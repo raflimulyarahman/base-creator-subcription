@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Op } from "sequelize"; // If you need to perform any complex queries
+import { Op } from "sequelize"; 
 import db from "../models";
 
 export const createGroupChat = async (req: Request, res: Response) => {
@@ -49,7 +49,7 @@ export const createGroupChat = async (req: Request, res: Response) => {
      await t.commit();
     console.log("Fetched groupMembers:", groupMembers);
     const mappedMembers = groupMembers.map((member: any) => {
-      const user = member.user || { username: "Unknown Creator" }; // Fallback if user is missing
+      const user = member.user || { username: "Unknown Creator" }; 
       return user;
     });
     console.log("Mapped Members:", mappedMembers);
@@ -112,25 +112,20 @@ export const getGroupChatAll = async (req: Request, res: Response) => {
 
 export const getIdGroup = async (req: Request, res: Response) => {
   try {
-    // Ambil id_group_chat dari parameter URL
     const { id_group_chat } = req.params;
     console.log(id_group_chat);
-    // Ambil data grup berdasarkan id_group_chat
     const group = await db.GroupChat.findOne({
       where: { id_group_chat },
     });
 
-    // Jika grup tidak ditemukan
     if (!group) {
       return res.status(404).json({ message: "Group not found" });
     }
 
-    // Ambil member dari grup ini
     const members = await db.MemberGroupChat.findAll({
       where: { id_group_chat },
     });
 
-    // Kembalikan data grup dan member
     res.status(200).json({
       message: "Success",
       group: group,

@@ -9,8 +9,8 @@ const storage = multer.diskStorage({
 
     const safeName = file.originalname
       .toLowerCase()
-      .replace(/\s+/g, "-") // 🔥 hapus spasi
-      .replace(/[^a-z0-9.-]/g, ""); // 🔥 hapus karakter aneh
+      .replace(/\s+/g, "-") 
+      .replace(/[^a-z0-9.-]/g, ""); 
 
     cb(null, `${timestamp}-${safeName}`);
   },

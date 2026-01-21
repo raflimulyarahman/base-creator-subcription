@@ -58,13 +58,12 @@ export const getIdRoomPersonal = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Chat room not found" });
     }
 
-    // 🔥 PILIH USER LAWAN
     const otherUser =
       chat.id_users1 === currentUserId ? chat.id_users2 : chat.id_users1;
 
     return res.status(200).json({
       chatRoom: chat,
-      otherUser, // ✅ OBJECT
+      otherUser, 
     });
   } catch (error: any) {
     console.error(error);
@@ -79,7 +78,6 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
   try {
     const { id_users } = req.body;
 
-    // Check if the user ID is available
     if (!id_users) {
       return res.status(400).json({ message: "User ID is required." });
     }
@@ -127,7 +125,7 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
 
     const formatted = chats.map((chat) => {
       const otherUser = chat.id_users1 === id_users ? chat.user2 : chat.user1;
-      const lastMessage = chat.messages?.[0] || null; // Ensure it's not undefined
+      const lastMessage = chat.messages?.[0] || null; 
 
       return {
         id_personal_chat: chat.id_personal_chat,
@@ -139,7 +137,7 @@ export const getAllRoomPersonal = async (req: Request, res: Response) => {
 
     res.status(200).json(formatted);
   } catch (err: any) {
-    console.error("Failed to get all personal rooms:", err); // Log the error for debugging
+    console.error("Failed to get all personal rooms:", err); 
     res.status(500).json({ message: err.message });
   }
 };
