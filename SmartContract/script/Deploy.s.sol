@@ -82,10 +82,14 @@ contract DeployScript is Script {
         /**
          * @dev Fee recipient = deployer untuk simplicity
          * Production: bisa set ke multisig/treasury
+         *
+         * Verifier = deployer for now, can be updated via setVerifier()
+         * This is the address that signs follower verification proofs
          */
         subscriptionManager = new SubscriptionManager(
             address(badge),
-            deployer // feeRecipient
+            deployer, // feeRecipient
+            deployer // verifier (backend signer for follower verification)
         );
         console.log(
             "2. SubscriptionManager deployed at:",

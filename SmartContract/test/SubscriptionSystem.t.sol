@@ -35,6 +35,11 @@ contract SubscriptionSystemTest is Test {
                             TEST ADDRESSES
     //////////////////////////////////////////////////////////////*/
 
+    // Use known private key for verifier so we can sign in tests
+    uint256 public constant VERIFIER_PK =
+        0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    address public verifier = vm.addr(VERIFIER_PK);
+
     address public deployer = makeAddr("deployer");
     address public creator1 = makeAddr("creator1");
     address public creator2 = makeAddr("creator2");
@@ -62,7 +67,7 @@ contract SubscriptionSystemTest is Test {
 
         // Deploy contracts in correct order
         badge = new TieredBadge("ipfs://test/");
-        manager = new SubscriptionManager(address(badge), deployer);
+        manager = new SubscriptionManager(address(badge), deployer, verifier); // badge, feeRecipient, verifier
         content = new GatedContent(address(badge), address(manager));
 
         // Configure badge
@@ -87,8 +92,17 @@ contract SubscriptionSystemTest is Test {
     function _setupCreator(address creator, string memory handle) internal {
         vm.startPrank(creator);
 
-        // Register dengan handle (sesuai PDF brief)
-        manager.registerCreator(handle, BRONZE_PRICE);
+        // Register dengan handle - generate valid signature using VERIFIER_PK
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(creator, uint256(15000), block.chainid)
+        );
+        bytes32 ethSignedHash = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash)
+        );
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VERIFIER_PK, ethSignedHash);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        manager.registerCreator(handle, 15000, signature);
 
         // Configure tiers
         manager.configureTier(
@@ -120,6 +134,28 @@ contract SubscriptionSystemTest is Test {
         );
 
         vm.stopPrank();
+    }
+
+    /// @dev Helper: Generate signature for creator registration
+    function _getSignature(
+        address creator,
+        uint256 followerCount
+    ) internal view returns (bytes memory) {
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(creator, followerCount, block.chainid)
+        );
+        bytes32 ethSignedHash = keccak256(
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash)
+        );
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VERIFIER_PK, ethSignedHash);
+        return abi.encodePacked(r, s, v);
+    }
+
+    /// @dev Helper: Register a creator with generated signature
+    function _registerCreator(address creator, string memory handle) internal {
+        bytes memory signature = _getSignature(creator, 15000);
+        vm.prank(creator);
+        manager.registerCreator(handle, 15000, signature);
     }
 
     /// @dev Helper: Subscribe to creator
@@ -198,8 +234,7 @@ contract SubscriptionSystemTest is Test {
 
     /// @dev Test creator registration dengan handle (sesuai PDF brief)
     function test_RegisterCreatorWithHandle() public {
-        vm.prank(creator1);
-        manager.registerCreator("alice_creator", BRONZE_PRICE);
+        _registerCreator(creator1, "alice_creator");
 
         SubscriptionManager.Creator memory creatorData = manager.getCreator(
             creator1
@@ -210,24 +245,25 @@ contract SubscriptionSystemTest is Test {
         assertTrue(creatorData.isActive);
         assertEq(creatorData.creatorIndex, 1);
         assertEq(creatorData.totalSubscribers, 0);
-        assertEq(creatorData.basePrice, BRONZE_PRICE);
+        assertEq(creatorData.followerCount, 15000);
     }
 
     /// @dev Test handle uniqueness
     function test_RevertWhen_HandleAlreadyTaken() public {
-        vm.prank(creator1);
-        manager.registerCreator("unique_handle", BRONZE_PRICE);
+        _registerCreator(creator1, "unique_handle");
 
+        bytes memory sig2 = _getSignature(creator2, 15000);
         vm.prank(creator2);
         vm.expectRevert(SubscriptionManager.HandleAlreadyTaken.selector);
-        manager.registerCreator("unique_handle", BRONZE_PRICE);
+        manager.registerCreator("unique_handle", 15000, sig2);
     }
 
     /// @dev Test handle length validation
     function test_RevertWhen_HandleTooShort() public {
+        bytes memory sig = _getSignature(creator1, 15000);
         vm.prank(creator1);
         vm.expectRevert(SubscriptionManager.HandleTooShort.selector);
-        manager.registerCreator("ab", BRONZE_PRICE); // < 3 chars
+        manager.registerCreator("ab", 15000, sig); // < 3 chars
     }
 
     /// @dev Test totalSubscribers counter (sesuai PDF brief)
@@ -303,10 +339,12 @@ contract SubscriptionSystemTest is Test {
         // Fast forward to meet minHoldTime (0 for Bronze in test)
         vm.warp(block.timestamp + 1 days);
 
-        // Upgrade to Gold
+        // Upgrade to Gold - use startPrank with origin to mock tx.origin
+        // TieredBadge.upgradeBadge uses tx.origin for subscriber address
         uint256 priceDiff = GOLD_PRICE - BRONZE_PRICE;
-        vm.prank(subscriber1);
+        vm.startPrank(subscriber1, subscriber1); // (msg.sender, tx.origin)
         manager.upgradeSubscription{value: priceDiff}(creator1, 3);
+        vm.stopPrank();
 
         assertEq(manager.getSubscriptionTier(subscriber1, creator1), 3);
         assertEq(badge.balanceOf(subscriber1, 1001), 0); // Bronze burned
@@ -514,8 +552,7 @@ contract SubscriptionSystemTest is Test {
     /// @dev Full flow test sesuai PDF brief
     function test_FullFlow() public {
         // 1. Creator registers dengan handle
-        vm.prank(creator1);
-        manager.registerCreator("alice_web3", BRONZE_PRICE);
+        _registerCreator(creator1, "alice_web3");
 
         // 2. Creator configures tiers
         vm.startPrank(creator1);
@@ -622,8 +659,7 @@ contract SubscriptionSystemTest is Test {
 
     /// @dev Test getCreatorByHandle
     function test_GetCreatorByHandle() public {
-        vm.prank(creator1);
-        manager.registerCreator("my_handle", BRONZE_PRICE);
+        _registerCreator(creator1, "my_handle");
 
         assertEq(manager.getCreatorByHandle("my_handle"), creator1);
         assertEq(manager.getCreatorByHandle("nonexistent"), address(0));
