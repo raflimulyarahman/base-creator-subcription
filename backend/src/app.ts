@@ -11,6 +11,7 @@ import rolesRoute from "./router/roles.route";
 import signinRoute from "./router/signin.route";
 import subscribeRouter from "./router/subscribe.route";
 import usersRoute from "./router/users.route";
+import verificationRoute from "./router/verification.route";
 const app: Application = express();
 
 
@@ -53,5 +54,6 @@ app.use("/api/subscribe", subscribeRouter);
 app.use("/api/chatpersonal", chatPersonalRoute);
 app.use("/api/message", messageChatRoute);
 app.use("/api/group", groupChatRoute);
+app.use("/api/verify-followers", verificationRoute);
 
 export default app;

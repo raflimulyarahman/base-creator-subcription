@@ -2,6 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "./TieredBadge.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 /**
  * @title SubscriptionManager
@@ -9,6 +11,9 @@ import "./TieredBadge.sol";
  * @dev Platform fee: 5% (500 bps), Creator: 95%
  */
 contract SubscriptionManager is Ownable {
+    using ECDSA for bytes32;
+    using MessageHashUtils for bytes32;
+
     /*//////////////////////////////////////////////////////////////
                                 STRUCTS
     //////////////////////////////////////////////////////////////*/
@@ -20,7 +25,7 @@ contract SubscriptionManager is Ownable {
         bool isActive;
         uint256 totalSubscribers;
         uint256 creatorIndex;
-        uint256 basePrice;
+        uint256 followerCount; // Verified follower count at registration
     }
 
     struct Subscription {
@@ -48,6 +53,7 @@ contract SubscriptionManager is Ownable {
     uint256 public constant TIER_BRONZE = 1;
     uint256 public constant TIER_SILVER = 2;
     uint256 public constant TIER_GOLD = 3;
+    uint256 public constant MIN_FOLLOWER_COUNT = 10000;
 
     /*//////////////////////////////////////////////////////////////
                                 STORAGE
@@ -58,6 +64,7 @@ contract SubscriptionManager is Ownable {
     uint256 public platformFeeBps = 500;
     address public feeRecipient;
     uint256 public pendingPlatformFees;
+    address public verifier; // Backend signer for follower verification
 
     mapping(address => Creator) public creators;
     mapping(string => address) public handleToCreator;
@@ -66,6 +73,7 @@ contract SubscriptionManager is Ownable {
     mapping(address => uint256) public creatorRevenue;
     mapping(address => uint256) public pendingWithdraw;
     mapping(address => mapping(uint256 => TierConfig)) public tierConfigs;
+    mapping(bytes32 => bool) public usedSignatureHashes; // Prevent replay attacks
 
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
@@ -134,6 +142,10 @@ contract SubscriptionManager is Ownable {
     error SubscriptionExpired();
     error HandleTooShort();
     error HandleTooLong();
+    error InsufficientFollowers();
+    error InvalidSignature();
+    error SignatureAlreadyUsed();
+    error VerifierNotSet();
 
     /*//////////////////////////////////////////////////////////////
                                MODIFIERS
@@ -153,19 +165,32 @@ contract SubscriptionManager is Ownable {
                               CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(address _badge, address _feeRecipient) Ownable(msg.sender) {
+    constructor(
+        address _badge,
+        address _feeRecipient,
+        address _verifier
+    ) Ownable(msg.sender) {
         badge = TieredBadge(_badge);
         feeRecipient = _feeRecipient;
+        verifier = _verifier;
     }
 
     /*//////////////////////////////////////////////////////////////
                           CREATOR MANAGEMENT
     //////////////////////////////////////////////////////////////*/
 
+    /**
+     * @notice Register as a creator with verified follower proof
+     * @param _handle Unique creator handle (3-32 chars)
+     * @param _followerCount Verified follower count from Farcaster
+     * @param _signature Backend-signed proof of follower count
+     */
     function registerCreator(
         string memory _handle,
-        uint256 _basePrice
+        uint256 _followerCount,
+        bytes memory _signature
     ) external {
+        if (verifier == address(0)) revert VerifierNotSet();
         if (creators[msg.sender].wallet != address(0))
             revert CreatorAlreadyRegistered();
 
@@ -173,6 +198,24 @@ contract SubscriptionManager is Ownable {
         if (handleBytes.length < 3) revert HandleTooShort();
         if (handleBytes.length > 32) revert HandleTooLong();
         if (handleToCreator[_handle] != address(0)) revert HandleAlreadyTaken();
+
+        // Verify follower count meets minimum
+        if (_followerCount < MIN_FOLLOWER_COUNT) revert InsufficientFollowers();
+
+        // Verify signature from backend
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(msg.sender, _followerCount, block.chainid)
+        );
+        bytes32 signedHash = messageHash.toEthSignedMessageHash();
+
+        // Prevent replay attacks
+        if (usedSignatureHashes[signedHash]) revert SignatureAlreadyUsed();
+
+        address signer = signedHash.recover(_signature);
+        if (signer != verifier) revert InvalidSignature();
+
+        // Mark signature as used
+        usedSignatureHashes[signedHash] = true;
 
         creatorCount++;
 
@@ -183,7 +226,7 @@ contract SubscriptionManager is Ownable {
             isActive: true,
             totalSubscribers: 0,
             creatorIndex: creatorCount,
-            basePrice: _basePrice
+            followerCount: _followerCount
         });
 
         handleToCreator[_handle] = msg.sender;
@@ -467,5 +510,10 @@ contract SubscriptionManager is Ownable {
 
     function deactivateCreator(address creator) external onlyOwner {
         creators[creator].isActive = false;
+    }
+
+    function setVerifier(address newVerifier) external onlyOwner {
+        require(newVerifier != address(0), "Invalid verifier");
+        verifier = newVerifier;
     }
 }
