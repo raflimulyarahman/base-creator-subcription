@@ -55,6 +55,10 @@ const PostThumbnail = ({ post }: { post: any }) => {
     );
 };
 
+interface Props {
+  id_users: string;
+}
+
 export default function ProfileClientPages({ id_users }: Props) {
   const { isDark } = useLight();
   const router = useRouter();

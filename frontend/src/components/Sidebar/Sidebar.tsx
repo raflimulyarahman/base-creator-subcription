@@ -53,7 +53,7 @@ export default function SidebarPages({
     address: process.env.NEXT_PUBLIC_SUBSCRIPTION_MANAGER_ADDRESS as `0x${string}` || "0x13127807Ef2E0392e0f57e09e8b11608737E48E8",
     abi: subscriptionManagerAbi,
     functionName: "pendingWithdraw",
-    args: address ? [address] : undefined,
+    args: address ? [address as `0x${string}`] : undefined,
     query: {
         enabled: !!address,
     }
