@@ -28,7 +28,7 @@ type ChatPersonalContextType = {
     chat: ChatPersonal;
     otherUser: any;
   } | null>;
-  getAllChatPersonal: () => Promise<ChatPersonal[] | null>;
+  getAllChatPersonal: (id_users: string) => Promise<ChatPersonal[] | null>;
   loading: boolean;
   success: boolean;
 };
@@ -56,7 +56,7 @@ export const ChatPersonalProvider = ({
     setSuccess(false);
     try {
       const response = await fetchWithAuth(
-        "http://localhost:8000/api/chatpersonal/",
+        "/api/chatpersonal/",
         {
           method: "POST",
           headers: {
@@ -85,7 +85,7 @@ export const ChatPersonalProvider = ({
     async (id_chat_personal: string) => {
       try {
         const chat = await fetchWithAuth(
-          `http://localhost:8000/api/chatpersonal/${id_chat_personal}`,
+          `/api/chatpersonal/${id_chat_personal}`,
           {
             method: "GET",
             headers: {
@@ -112,7 +112,7 @@ export const ChatPersonalProvider = ({
     async (id_users: string): Promise<ChatPersonal[] | null> => {
       try {
         const chat = await fetchWithAuth(
-          `http://localhost:8000/api/chatpersonal/get/`,
+          `/api/chatpersonal/get/`,
           {
             method: "POST",
             headers: {

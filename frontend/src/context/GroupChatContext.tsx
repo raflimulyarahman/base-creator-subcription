@@ -1,6 +1,7 @@
+"use client";
+
 import { useWallet } from "@/context/WalletContext";
 import { fetchWithAuth } from "@/store/fetchWithAuth";
-import { useSearchParams } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -18,6 +19,7 @@ export interface ChatGroup {
   id_users: string; // User ID of the creator or other relevant users
   name_group: string;
   foto: string; // Group's photo URL
+  members?: any[];
 }
 
 // Context type
@@ -25,7 +27,9 @@ type ChatGroupContextType = {
   createChatGroup: (payload: FormData) => Promise<ChatGroup | null>; // Fungsi untuk membuat grup baru
   getChatGroup: (id_users: string) => Promise<any[]>; // Fungsi untuk mengambil semua grup berdasarkan user ID
   getChatGroupId: (id_group_chat: string) => Promise<ChatGroup | null>; // Fungsi untuk mendapatkan detail grup berdasarkan group ID
+  loadHeaderGroup: (id_group_chat: string) => Promise<void>; // Manual loader
   chatGroups: ChatGroup[]; // Daftar grup chat yang telah diambil
+  headerchatGroups: any; // Header chat groups
   loading: boolean; // Status loading
   success: boolean; // Status sukses dari operasi terakhir
 };
@@ -45,9 +49,7 @@ export const ChatGroupProvider = ({
   const [success, setSuccess] = useState(false);
   const { accessToken, sendRefreshToken, userId } = useWallet();
   const [chatGroups, setChatGroups] = useState<any[]>([]);
-  const [headerchatGroups, setheaderchatGroups] = useState<any[]>([]);
-  const searchParams = useSearchParams();
-  const chatGroupId = searchParams.get("chatGroupId");
+  const [headerchatGroups, setheaderchatGroups] = useState<any>(null);
   // Create Chat Group function wrapped in useCallback
   const createChatGroup = useCallback(
     async (formData: FormData): Promise<ChatGroup | null> => {
@@ -57,7 +59,7 @@ export const ChatGroupProvider = ({
 
       try {
         const data = await fetchWithAuth(
-          `http://localhost:8000/api/group/`,
+          `/api/group/`,
           {
             method: "POST",
             body: formData,
@@ -74,7 +76,7 @@ export const ChatGroupProvider = ({
           const { groupChat, admin, members } = data;
 
           // Update members array by adding user info if not present
-          const updatedMembers = members?.map((member) => ({
+          const updatedMembers = members?.map((member: any) => ({
             ...member,
             user: member.user || { username: "Unknown Creator" }, // Ensure user data exists
           }));
@@ -113,7 +115,7 @@ export const ChatGroupProvider = ({
     async (id_users: string) => {
       try {
         const groups = await fetchWithAuth(
-          `http://localhost:8000/api/group/getHeaderGroup`,
+          `/api/group/getHeaderGroup`,
           {
             method: "POST",
             headers: {
@@ -130,7 +132,7 @@ export const ChatGroupProvider = ({
 
         setChatGroups((prev) => {
           const map = new Map(prev.map((g) => [g.id_group_chat, g]));
-          groups.forEach((g) => map.set(g.id_group_chat, g));
+          groups.forEach((g: ChatGroup) => map.set(g.id_group_chat, g));
           return Array.from(map.values());
         });
 
@@ -150,7 +152,7 @@ export const ChatGroupProvider = ({
       try {
         // Pastikan URL dibangun dengan benar
         const response = await fetchWithAuth(
-          `http://localhost:8000/api/group/${id_group_chat}`,
+          `/api/group/${id_group_chat}`,
           {
             method: "GET",
             headers: {
@@ -174,19 +176,7 @@ export const ChatGroupProvider = ({
     [accessToken, sendRefreshToken], // Menambahkan dependency untuk callback
   );
 
-  useEffect(() => {
-    if (userId && chatGroupId) {
-      const fetchGroupData = async () => {
-        try {
-          const headerGroup = await getChatGroupId(chatGroupId);
-          setheaderchatGroups(headerGroup);
-        } catch (error) {
-          console.error("Error fetching group data:", error);
-        }
-      };
-      fetchGroupData();
-    }
-  }, [userId, chatGroupId, getChatGroupId]);
+
 
   useEffect(() => {
     if (userId && chatGroups.length === 0) {
@@ -198,10 +188,23 @@ export const ChatGroupProvider = ({
     }
   }, [userId, chatGroups.length, getChatGroup]);
 
+  // Manual loader for header group
+  const loadHeaderGroup = useCallback(
+    async (id_group_chat: string) => {
+      const data = await getChatGroupId(id_group_chat);
+      if (data) {
+        setheaderchatGroups(data);
+      }
+    },
+    [getChatGroupId]
+  );
+
   const value = useMemo(
     () => ({
       createChatGroup,
       getChatGroup,
+      getChatGroupId,
+      loadHeaderGroup, // Exposed
       headerchatGroups,
       chatGroups,
       loading,
@@ -210,11 +213,13 @@ export const ChatGroupProvider = ({
     [
       createChatGroup,
       getChatGroup,
+      getChatGroupId,
+      loadHeaderGroup,
       headerchatGroups,
       chatGroups,
       loading,
       success,
-    ], // Only memoize value when createChatGroup, loading, or success change
+    ],
   );
 
   return (

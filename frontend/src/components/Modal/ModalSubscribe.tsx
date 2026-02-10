@@ -1,63 +1,100 @@
 "use client";
 import { useLight } from "@/context/LightContext";
 import { useSubscribe } from "@/context/SubscribeContext";
+import Toast from "@/components/Toast/Toast";
 import { useUsers } from "@/context/UsersContext";
 import { useWallet } from "@/context/WalletContext";
 import Image from "next/image";
+import { TierData } from "@/types";
 import { useState } from "react";
 
 interface ModalProps {
   onClose: () => void;
   profileUser: any;
+  tiers?: TierData[];
 }
 
-export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
+export default function ModalSubscribe({ onClose, profileUser, tiers: propTiers }: ModalProps) {
   const { user } = useUsers();
-  const { userId } = useWallet();
-  const { paySubscribe, tiers } = useSubscribe();
-  const { isDark } = useLight();
-  const [setUserSubscription] = useState<any>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  // Hanya tier aktif
-  const activeTiers = tiers.filter((tier) => tier.isActive);
-  const currentTier = activeTiers[currentIndex];
-  // Jika tidak ada tier aktif, modal tidak tampil
-  if (activeTiers.length === 0 || !currentTier) return null;
-  console.log(userId, "price");
-  const handleSubscribe = async () => {
-    const id_creator = profileUser?.id_users;
-    const addressCreator = profileUser?.address?.address;
-    const id_users = userId;
-    const price = currentTier.price;
-    const type_subscribe = currentTier?.name;
-    const tiersId = currentTier?.id;
-
-    if (
-      !addressCreator ||
-      !id_creator ||
-      !id_users ||
-      !type_subscribe ||
-      !price ||
-      !tiersId
-    ) {
-      console.error("Missing creator address, tier ID, or price");
-      return;
-    }
-
-    try {
-      const result = await paySubscribe({
-        id_creator: id_creator,
-        id_users: id_users,
-        type_subscribe: type_subscribe,
-        price: price,
-        tiersId: tiersId,
-        addressCreator: addressCreator,
-      });
-      console.log(result);
-    } catch (err) {
-      console.error("Error subscribing:", err);
-    }
-  };
+    const { userId, address: userAddress } = useWallet();
+    const { paySubscribe, tiers: contextTiers, loading, getSubscribeIdUsers } = useSubscribe();
+    const tiers = propTiers || contextTiers;
+    const { isDark } = useLight();
+    const [toast, setToast] = useState<{
+      show: boolean;
+      message: string;
+      type?: "success" | "error";
+    }>({
+      show: false,
+      message: "",
+      type: "success",
+    });
+    const [setUserSubscription] = useState<any>(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    // Hanya tier aktif, diurutkan berdasarkan ID (1: Bronze, 2: Silver, 3: Gold)
+    const activeTiers = tiers
+      .filter((tier) => tier.isActive)
+      .sort((a, b) => Number(a.id) - Number(b.id)); 
+    console.log("Active Tiers:", activeTiers);
+    const currentTier = activeTiers[currentIndex];
+    // Jika tidak ada tier aktif, modal tidak tampil
+    if (activeTiers.length === 0 || !currentTier) return null;
+    console.log(userId, "price");
+    const handleSubscribe = async () => {
+      const id_creator = profileUser?.id_users || profileUser?.id;
+      // Fallback to wallet_address if address.address is missing (e.g. for mock profiles)
+      const addressCreator = profileUser?.address?.address || profileUser?.wallet_address;
+      const id_users = userId;
+      const price = currentTier.price;
+      const tiersId = currentTier?.id;
+      // Standardize tier name based on ID (regardless of what creator named it)
+      let type_subscribe = "Bronze";
+      if (Number(tiersId) === 2) type_subscribe = "Silver";
+      if (Number(tiersId) === 3) type_subscribe = "Gold";
+  
+      if (
+        !addressCreator ||
+        !id_creator ||
+        !id_users ||
+        !type_subscribe ||
+        !price ||
+        !tiersId ||
+        !userAddress
+      ) {
+        const errorMsg = `Missing Data: ${!addressCreator ? "[Creator Address] " : ""}${!tiersId ? "[Tier ID] " : ""}${!price ? "[Price] " : ""}${!id_creator ? "[Creator ID] " : ""}${!id_users ? "[User ID] " : ""}${!type_subscribe ? "[Tier Name] " : ""}${!userAddress ? "[Wallet Address] " : ""}`;
+        console.error(errorMsg);
+        setToast({ show: true, message: errorMsg, type: "error" });
+        return;
+      }
+  
+      try {
+        const result = await paySubscribe({
+          id_creator: id_creator,
+          id_users: id_users,
+          type_subscribe: type_subscribe,
+          price: BigInt(price),
+          tiersId: tiersId,
+          addressCreator: addressCreator,
+          userAddress: userAddress,
+        });
+        console.log(result);
+        setToast({
+          show: true,
+          message: "Subscription Successful!",
+          type: "success",
+        });
+        // Refresh subscription data to update UI (enable Chat button)
+        await getSubscribeIdUsers(userId);
+        setTimeout(onClose, 2000); 
+      } catch (err: any) {
+        console.error("Error subscribing:", err);
+        setToast({
+          show: true,
+          message: err.message || "Subscription Failed",
+          type: "error",
+        });
+      }
+    };
 
   const silver = [
     {
@@ -135,9 +172,11 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
     },
   ];
 
-  const getAccessText = (tierName: string) => {
-    switch (tierName.toLowerCase()) {
-      case "bronze":
+  const getAccessText = (tierId: number | bigint) => {
+    // Ensure we match number
+    const id = Number(tierId);
+    switch (id) {
+      case 1: // Bronze
         return (
           <div className="mt-4 p-4 bg-gray-300 rounded-lg shadow-md max-w-md">
             <h2 className="text-base font-bold mb-3 px-6 text-left">
@@ -160,7 +199,7 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
             </div>
           </div>
         );
-      case "silver":
+      case 2: // Silver
         return (
           <div className="mt-4 p-4 bg-gray-300 rounded-lg shadow-md max-w-md">
             <h2 className="text-base font-bold mb-3 px-6 text-left">
@@ -183,7 +222,7 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
             </div>
           </div>
         );
-      case "gold":
+      case 3: // Gold
         return (
           <div className="mt-4 p-4 bg-gray-300 rounded-lg shadow-md max-w-md">
             <h2 className="text-base font-bold mb-3 px-6 text-left">
@@ -211,14 +250,14 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
     }
   };
 
-  const tierImages: Record<string, string> = {
-    bronze: "/bronze.png", // cukup mulai dari root
-    silver: "/silver.png",
-    gold: "/gold.png",
+  const tierImages: Record<number, string> = {
+    1: "/bronze.png", 
+    2: "/silver.png",
+    3: "/gold.png",
   };
 
   const tierImage =
-    tierImages[currentTier.name.toLowerCase()] || "/default.png";
+    tierImages[Number(currentTier.id)] || "/default.png";
 
   const handlePrev = () =>
     setCurrentIndex((prev) => (prev === 0 ? activeTiers.length - 1 : prev - 1));
@@ -261,15 +300,18 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
 
           <div>
             <p className="mt-1 text-gray-700">
-              {getAccessText(currentTier.name)}
+              {getAccessText(currentTier.id || 0)}
             </p>
           </div>
 
           <button
-            onClick={() => handleSubscribe(currentTier.name)}
-            className="mt-4 w-full py-3 rounded-xl bg-blue-900 shadow-2xl text-white font-semibold hover:bg-gray-700 transition shadow-md"
+            onClick={() => handleSubscribe()}
+            disabled={loading}
+            className={`mt-4 w-full py-3 rounded-xl shadow-2xl text-white font-semibold transition shadow-md ${
+              loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-900 hover:bg-gray-700"
+            }`}
           >
-            Pay & Join Now!
+            {loading ? "Processing..." : "Pay & Join Now!"}
           </button>
         </div>
 
@@ -286,6 +328,17 @@ export default function ModalSubscribe({ onClose, profileUser }: ModalProps) {
         >
           &#8250;
         </button>
+
+        {toast.show && (
+          <Toast
+            message={toast.message}
+            show={toast.show}
+            type={toast.type}
+            onClose={() =>
+              setToast({ show: false, message: "", type: "success" })
+            }
+          />
+        )}
       </div>
     </div>
   );

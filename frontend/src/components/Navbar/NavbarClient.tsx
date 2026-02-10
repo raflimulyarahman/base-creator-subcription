@@ -27,7 +27,7 @@ export default function NavbarClient({
   const isSearch = pathname === "/pages/search";
 
   const isSearchId =
-    pathname.startsWith("/pages/search/") && pathname !== "/pages/search";
+    pathname?.startsWith("/pages/search/") && pathname !== "/pages/search";
 
   const isCreator = pathname === "/pages/creator";
   const isRegist = pathname === "/pages/regist";
@@ -37,7 +37,6 @@ export default function NavbarClient({
   const router = useRouter();
   const { user } = useUsers();
   const [showToast, setShowToast] = useState(false);
-  if (!open) return null;
 
   const handleClick = () => {
     if (!role) {
@@ -58,19 +57,19 @@ export default function NavbarClient({
 
     onOpenSidebar();
   };
-  const DEFAULT_AVATAR = "./../public/11789135.png";
+  const DEFAULT_AVATAR = "/11789135.png";
   return (
     <div
-      className={`w-full h-16 transition-colors duration-300 
+      className={`w-full h-16 transition-colors duration-300 z-50 fixed top-0 left-0 right-0 border-b
     ${
-      isDark ? "bg-black text-white" : "bg-white text-black"
-    } md:bg-transparent`}
+      isDark ? "bg-black text-white border-gray-800" : "bg-blue-600 text-white border-blue-500"
+    }`}
     >
       <div className="justify-center items-center">
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
-          message="not access"
+          message="Please connect wallet first"
           type="error"
         />
       </div>
@@ -103,7 +102,7 @@ export default function NavbarClient({
               className="flex items-center gap-3 py-4"
             >
               <Image
-                src={user?.foto?.trim() || DEFAULT_AVATAR}
+                src={user?.avatar_url?.trim() || user?.foto?.trim() || DEFAULT_AVATAR}
                 alt="User Avatar"
                 width={50}
                 height={50}
@@ -156,8 +155,8 @@ export default function NavbarClient({
                       key={tab}
                       onClick={() => handleTabClick(tab)}
                       className={`relative pb-2 font-bold transition-colors focus:outline-none
-    ${activeTab === tab ? "text-black" : "text-gray-500 hover:text-black"}
-    after:absolute after:left-1/2 after:bottom-0 after:h-[2px] after:bg-black after:rounded-full after:transition-all
+    ${activeTab === tab ? "text-white" : "text-blue-200 hover:text-white"}
+    after:absolute after:left-1/2 after:bottom-0 after:h-[2px] after:bg-white after:rounded-full after:transition-all
     ${activeTab === tab ? "after:w-10 after:-translate-x-1/2" : "after:w-0 after:-translate-x-1/2"}
   `}
                     >

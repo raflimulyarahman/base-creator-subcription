@@ -15,6 +15,7 @@ import { ChatPersonalProvider } from "@/context/ChatPersonalContext";
 import { MessageChatProvider } from "@/context/MessageContext";
 import { ChatGroupProvider } from "@/context/GroupChatContext";
 import { ActiveTabProvider } from "@/context/ActiveTabContext";
+import { PostsProvider } from "@/context/PostsContext";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
@@ -40,7 +41,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                     <SubscribeProvider>
                       <ChatPersonalProvider>
                         <MessageChatProvider>
-                          <ChatGroupProvider>{children}</ChatGroupProvider>
+                          <ChatGroupProvider>
+                            <PostsProvider>{children}</PostsProvider>
+                          </ChatGroupProvider>
                         </MessageChatProvider>
                       </ChatPersonalProvider>
                     </SubscribeProvider>

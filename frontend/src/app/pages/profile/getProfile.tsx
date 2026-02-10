@@ -11,7 +11,7 @@ export function useProfile() {
         ? `${user.first_name} ${user.last_name}`.trim()
         : user.username,
     username: user.username,
-    avatar: user.foto,
+    avatar: user.avatar_url || user.foto,
     followers: 100,
     following: 100,
   };

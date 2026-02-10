@@ -5,6 +5,7 @@ export interface ChatGroup {
   id_users: string;
   name_group: string;
   foto: string;
+  members?: any[];
 }
 
 export type ChatGroupContextType = {

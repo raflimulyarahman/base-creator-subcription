@@ -6,10 +6,9 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
-import { useAccount, useSignMessage, useAccountEffect } from "wagmi";
+import { useAccount, useAccountEffect } from "wagmi";
 import { UUID, UserRole, WalletContextType } from "@/types";
 import { supabase } from "@/lib/supabase";
 
@@ -28,7 +27,6 @@ const WalletContext = createContext<WalletContextType>({
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
 
   const [role, setRole] = useState<UserRole>(null);
   const [userId, setUserId] = useState<UUID | null>(null);
@@ -36,82 +34,73 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const hasTriedLogin = useRef(false);
-
-  // Restore session from Supabase
-  const restoreSession = useCallback(async (): Promise<boolean> => {
-    if (!address) return false;
-    
-    try {
-      // Check if user exists in Supabase
-      const { data: user, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("wallet_address", address.toLowerCase())
-        .single();
-
-      if (error || !user) {
-        return false;
-      }
-
-      setRole(user.role as UserRole);
-      setUserId(user.id);
-      setAccessToken(user.id); // Using user.id as token for now
-      return true;
-    } catch {
-      return false;
-    }
-  }, [address]);
-
-  // Auto login with wallet signature
-  const autoLogin = useCallback(async () => {
-    if (!isConnected || !address || !signMessageAsync || hasTriedLogin.current)
+  // Authenticate user when wallet connects
+  const authenticateUser = useCallback(async () => {
+    if (!address) {
+      setRole(null);
+      setUserId(null);
+      setAccessToken(null);
+      setIsLoading(false);
       return;
-    hasTriedLogin.current = true;
+    }
+
+    setIsLoading(true);
 
     try {
-      // Generate nonce for signature
-      const nonce = `Sign this message to authenticate with your wallet.\n\nNonce: ${Date.now()}`;
+      const walletAddress = address.toLowerCase();
       
-      // Request signature from user
-      const signature = await signMessageAsync({ message: nonce });
-
-      // Check if user exists
-      const { data: existingUser } = await supabase
+      // Try to find existing user
+      const { data: existingUser, error: fetchError } = await supabase
         .from("users")
         .select("*")
-        .eq("wallet_address", address.toLowerCase())
+        .eq("wallet_address", walletAddress)
         .single();
 
-      if (existingUser) {
-        // User exists, log them in
+      if (existingUser && !fetchError) {
+        // User exists
+        console.log("[WalletProvider] User found:", existingUser.id);
         setRole(existingUser.role as UserRole);
         setUserId(existingUser.id);
         setAccessToken(existingUser.id);
       } else {
         // Create new user
-        const { data: newUser, error } = await supabase
+        console.log("[WalletProvider] Creating new user for:", walletAddress);
+        const { data: newUser, error: insertError } = await supabase
           .from("users")
-          .insert({
-            wallet_address: address.toLowerCase(),
-            role: "user",
-          })
+          .insert({ wallet_address: walletAddress, role: "user" })
           .select()
           .single();
 
-        if (error) throw error;
-
-        setRole("user");
-        setUserId(newUser.id);
-        setAccessToken(newUser.id);
+        if (insertError) {
+          console.error("[WalletProvider] Failed to create user:", insertError);
+          // Maybe user was created in parallel, try fetching again
+          const { data: retryUser } = await supabase
+            .from("users")
+            .select("*")
+            .eq("wallet_address", walletAddress)
+            .single();
+          
+          if (retryUser) {
+            setRole(retryUser.role as UserRole);
+            setUserId(retryUser.id);
+            setAccessToken(retryUser.id);
+          }
+        } else if (newUser) {
+          console.log("[WalletProvider] User created:", newUser.id);
+          setRole("user");
+          setUserId(newUser.id);
+          setAccessToken(newUser.id);
+        }
       }
     } catch (err) {
-      console.error("[WalletProvider] autoLogin failed", err);
+      console.error("[WalletProvider] Auth error:", err);
       setRole(null);
       setUserId(null);
-      hasTriedLogin.current = false;
+      setAccessToken(null);
+    } finally {
+      setIsLoading(false);
     }
-  }, [address, isConnected, signMessageAsync]);
+  }, [address]);
 
   // Logout - clear local state
   const logout = useCallback(async () => {
@@ -119,29 +108,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setUserId(null);
     setAccessToken(null);
     setRefreshToken(null);
-    hasTriedLogin.current = false;
   }, []);
 
-  // Refresh token (not needed for Supabase, but keep for interface compatibility)
-  const sendRefreshToken = useCallback(async (): Promise<string | null> => {
-    // With Supabase, we just restore session
-    await restoreSession();
-    return accessToken;
-  }, [restoreSession, accessToken]);
-
+  // Handle wallet disconnect
   useAccountEffect({ onDisconnect: logout });
 
-  // Initialize auth on mount and address change
+  // Refresh token
+  const sendRefreshToken = useCallback(async (): Promise<string | null> => {
+    await authenticateUser();
+    return accessToken;
+  }, [authenticateUser, accessToken]);
+
+  // Authenticate when address changes
   useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const hasSession = await restoreSession();
-      if (!hasSession && isConnected) {
-        await autoLogin();
-      }
-      setIsLoading(false);
-    })();
-  }, [restoreSession, autoLogin, isConnected]);
+    authenticateUser();
+  }, [authenticateUser]);
 
   return (
     <WalletContext.Provider

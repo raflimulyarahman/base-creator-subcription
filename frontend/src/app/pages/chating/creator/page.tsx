@@ -1,19 +1,26 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { MessageChat, useMessageChat } from "@/context/MessageContext";
 import { useWallet } from "@/context/WalletContext";
-import Image from "next/image";
+import { useUsers } from "@/context/UsersContext";
+import { useLight } from "@/context/LightContext";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import ChatInput from "./ChatInput";
+import MessageBubble from "@/components/Message/MessageBubble";
 
-export default function CreatorChating() {
+function CreatorChatContent() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chatId");
   const { getMessagesByChatId } = useMessageChat();
   const { userId } = useWallet();
+  const { user } = useUsers();
+  const { isDark } = useLight();
 
   const [messages, setMessages] = useState<MessageChat[]>([]);
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
@@ -22,10 +29,14 @@ export default function CreatorChating() {
 
   useEffect(() => {
     if (!chatId) return;
-
+    setLoading(true);
     (async () => {
-      const data = await getMessagesByChatId(chatId);
-      if (data) setMessages(data);
+      try {
+        const data = await getMessagesByChatId(chatId);
+        if (data) setMessages(data);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [chatId, getMessagesByChatId]);
 
@@ -33,100 +44,49 @@ export default function CreatorChating() {
     scrollToBottom();
   }, [messages]);
 
-  // 🔥 ambil data user dari message yang sudah ada
-  const currentUserFromMessages = messages.find(
-    (m) => m.id_users === userId,
-  )?.user;
-
-  const DEFAULT_AVATAR = "/11789135.png";
+  // Current User Identity
+  const currentUser = {
+    id_users: userId || "",
+    first_name: user?.first_name || "Me",
+    last_name: user?.last_name || "",
+    foto: user?.foto || user?.avatar_url || null,
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-white">
+    <div className={`flex flex-col h-full ${isDark ? "bg-black" : "bg-white"}`}>
       {/* CHAT LIST */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-20 flex flex-col gap-3">
-        {messages.length ? (
-          messages.map((msg) => {
-            const isCurrentUser = msg.id_users === userId;
-
-            return (
-              <div
-                key={msg.id_message}
-                className={`flex items-start gap-2 ${
-                  isCurrentUser ? "justify-end" : "justify-start"
-                }`}
-              >
-                {!isCurrentUser && (
-                  <Image
-                    src={
-                      msg.user?.foto ||
-                      DEFAULT_AVATAR
-                    }
-                    alt="Avatar"
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 rounded-full object-cover"
-                    unoptimized
-                  />
-                )}
-
-                <div className={`flex flex-col items-start max-w-[70%]`}>
-                  <div
-                    className={`p-2 rounded-lg shadow-md ${isCurrentUser
-                      ? "bg-blue-500 text-white rounded-br-none"
-                      : "bg-white text-gray-800 rounded-bl-none"
-                      }`}
-                    style={{
-                      wordWrap: "break-word",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    <p className="text-base px-2">{msg.message}</p>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(msg.date).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-
-                {isCurrentUser && (
-                  <Image
-                    src={
-                      msg.user?.foto ||
-                      "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
-                    }
-                    alt="You"
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 rounded-full object-cover"
-                    unoptimized
-                  />
-                )}
-              </div>
-            );
-          })
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 pt-20 flex flex-col gap-2 mb-20 scrollbar-hide">
+        {loading ? (
+          <div className="flex justify-center items-center h-full text-gray-500">Loading messages...</div>
+        ) : messages.length ? (
+          messages.map((msg) => (
+            <MessageBubble 
+              key={msg.id_message || Math.random()} 
+              message={msg} 
+              isOwnMessage={msg.id_users === userId} 
+            />
+          ))
         ) : (
-          <p className="text-center text-gray-400 mt-4">Loading messages...</p>
+          <p className="text-center text-gray-400 mt-4">No messages yet.</p>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
       {/* CHAT INPUT */}
-      <div className="sticky bottom-0 w-full bg-white px-4 py-3 shadow">
-        <ChatInput
-          currentUser={{
-            id_users: userId,
-            first_name: currentUserFromMessages?.first_name || "You",
-            last_name: currentUserFromMessages?.last_name || "",
-            foto: currentUserFromMessages?.foto || null,
-          }}
-          onSend={(newMessage) => {
-            setMessages((prev) => [...prev, newMessage]);
-          }}
-        />
-      </div>
+      <ChatInput
+        currentUser={currentUser}
+        onSend={(newMessage) => {
+          setMessages((prev) => [...prev, newMessage]);
+        }}
+      />
     </div>
+  );
+}
+
+export default function CreatorChating() {
+  return (
+    <Suspense fallback={<div>Loading chat...</div>}>
+      <CreatorChatContent />
+    </Suspense>
   );
 }

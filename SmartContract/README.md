@@ -71,7 +71,7 @@ Creator #5:  Bronze=5001, Silver=5002, Gold=5003
 - `totalSubscribers` counter per creator
 - `checkAccess(creator, subscriber, postId)`
 - `creatorRevenue` mapping
-- Platform fee (5% default)
+- Platform fee (0.5% default)
 
 ### 3. GatedContent.sol
 

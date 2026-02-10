@@ -3,6 +3,7 @@
 import { useChatPersonal } from "@/context/ChatPersonalContext";
 import { useChatGroup } from "@/context/GroupChatContext";
 import { useLight } from "@/context/LightContext";
+import { useSubscribe } from "@/context/SubscribeContext";
 import { useWallet } from "@/context/WalletContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +14,7 @@ export default function ChatingClient() {
   const { userId } = useWallet();
   const { chatGroups } = useChatGroup();
   const { getAllChatPersonal } = useChatPersonal();
+  const { getSubscribeIdUsers, subscribedata } = useSubscribe();
   const [chattAll, setAllPersonal] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<"groups" | "messages">("groups");
 
@@ -29,34 +31,35 @@ export default function ChatingClient() {
         } else {
           console.warn("No data received from getAllChatPersonal.");
         }
+        await getSubscribeIdUsers(userId);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, activeTab]);
 
   return (
-    <div className="w-screen py-2 h-full flex flex-col">
+    <div className="w-full h-[calc(100vh-80px)] md:h-full flex flex-col">
       {/* Tab Navigation */}
-      <div className="px-6 md:px-8">
-        <div className="flex space-x-4 mb-4">
+      <div className="px-6 md:px-8 py-2">
+        <div className="flex space-x-4 mb-2">
           <button
-            className={`font-semibold text-base ${
+            className={`font-semibold text-base px-3 py-1 rounded-full transition ${
               activeTab === "groups"
-              ? "text-black bg-gray-300 px-2 rounded-full border-blue-500"
-                : "text-gray-500"
+              ? "text-black bg-gray-200 border border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("groups")}
           >
             Group
           </button>
           <button
-            className={`font-semibold text-base ${
+            className={`font-semibold text-base px-3 py-1 rounded-full transition ${
               activeTab === "messages"
-              ? "text-black bg-gray-300 px-2 rounded-full border-blue-500"
-                : "text-gray-500"
+              ? "text-black bg-gray-200 border border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("messages")}
           >
@@ -66,11 +69,11 @@ export default function ChatingClient() {
       </div>
 
       {/* Tab Content */}
-      <div className="overflow-y-auto flex-1 md:w-1/2 min-w-0">
+      <div className="flex-1 overflow-y-auto min-h-0 pb-20">
         {activeTab === "groups" && (
-          <div className="mt-2 h-[300px] md:h-[400px] lg:h-[500px]">
+          <div className="h-full">
             {chatGroups.length > 0 ? (
-              <div className="grid grid-cols-1 gap-2">
+              <div className="flex flex-col">
                 {chatGroups.map((group) => (
                   <Link
                     key={group.id_group_chat}
@@ -84,7 +87,7 @@ export default function ChatingClient() {
                     {/* Left section: Image + Info */}
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <Image
-                        src={group.foto_group || "/images/default-group.png"}
+                        src={group.foto || "/images/default-group.png"}
                         alt={group.name_group}
                         width={48}
                         height={48}
@@ -128,15 +131,80 @@ export default function ChatingClient() {
         )}
 
         {activeTab === "messages" && (
-          <div className="mt-6 h-[300px] md:h-[400px] lg:h-[500px]"> {/* Tentukan tinggi atau gunakan min-h-screen */}
+          <div className="h-full"> 
+            <h3 className="px-8 pb-2 text-sm font-bold text-gray-500">Subscribed Creators</h3>
+            {subscribedata && subscribedata.length > 0 ? (
+              <div className="flex flex-col">
+                {(() => {
+                  // Deduplicate subscriptions by id_creator
+                  const uniqueSubs = Array.from(
+                    new Map(
+                      subscribedata
+                        .filter((sub) => sub.status_subscribe === "Done")
+                        .map((sub) => [sub.id_creator, sub])
+                    ).values()
+                  );
+
+                  return uniqueSubs.map((sub: any) => {
+                    return (
+                      <Link
+                        key={sub.id_subscribe}
+                        href={`/pages/search/${sub.id_creator}`} // Navigate to profile to Chat/Subscribe
+                        className="
+            flex w-full items-center justify-between md:px-8 px-6 p-2
+            hover:bg-gray-100 dark:hover:bg-gray-200
+            transition cursor-pointer
+          "
+                      >
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                          {/* Placeholder Avatar since sub data doesn't have profile info yet */}
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
+                            {sub.id_creator.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div className="flex flex-col px-2 min-w-0">
+                            <h3
+                              className={`font-semibold text-base truncate ${
+                                isDark ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              Creator {sub.id_creator.slice(0, 6)}...
+                            </h3>
+                            <p
+                              className={`text-sm ${
+                                sub.type_subscribe === "Gold"
+                                  ? "text-yellow-600"
+                                  : "text-gray-500"
+                              } truncate font-medium`}
+                            >
+                              {sub.type_subscribe} Tier
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  });
+                })()}
+              </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center w-full h-full gap-2">
+                  <p className="text-gray-400 text-sm font-bold text-center">
+                    You haven't subscribed to any creators yet.
+                  </p>
+                </div>
+            )}
+            
+            {/* Divider */}
+            <div className="border-t border-gray-200 dark:border-gray-700 my-4 mx-8"></div>
+            
+             <h3 className="px-8 pb-2 text-sm font-bold text-gray-500">Active Chats</h3>
             {chattAll.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="flex flex-col">
                 {chattAll.map((chat: any) => {
                   const otherUser = chat.otherUser;
                   return (
                     <Link
                       key={chat.id_chat_personal}
-                      href={`/pages/chating/creator?chatId=${chat.id_personal_chat}`}
+                      href={`/pages/chating/creator?chatId=${chat.id_chat_personal}`}
                       className="
             flex w-full items-center justify-between md:px-8 px-6 p-2
             hover:bg-gray-100 dark:hover:bg-gray-200
@@ -147,7 +215,7 @@ export default function ChatingClient() {
                         <Image
                           src={
                             otherUser?.foto ||
-                            "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
+                            "/11789135.png"
                           }
                           alt={otherUser?.first_name || "User"}
                           width={48}
@@ -172,20 +240,8 @@ export default function ChatingClient() {
                 })}
               </div>
             ) : (
-                <div className="flex flex-col items-center justify-center w-full h-full gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-12 h-12 text-gray-400"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                  </svg>
-                  <p className="text-gray-400 text-sm font-bold text-center">
-                    No messages found.
-                  </p>
+                <div className="px-8 text-gray-400 text-sm">
+                   No active chats. Start one from a Creator's profile!
                 </div>
             )}
           </div>

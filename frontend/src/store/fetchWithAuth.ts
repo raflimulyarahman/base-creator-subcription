@@ -6,7 +6,7 @@ export async function fetchWithAuth(
 ) {
   const authToken = token;
   // Tentukan headers tanpa memaksa content-type
-  const headers: Record<string, string> = {
+  const headers: any = {
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
     ...options.headers,
   };

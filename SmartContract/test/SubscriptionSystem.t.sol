@@ -311,8 +311,8 @@ contract SubscriptionSystemTest is Test {
 
         _subscribe(subscriber1, creator1, 3); // Gold = 0.01 ETH
 
-        // Platform fee = 5%, creator gets 95%
-        uint256 expectedRevenue = (GOLD_PRICE * 9500) / 10000;
+        // Platform fee = 0.5%, creator gets 99.5%
+        uint256 expectedRevenue = (GOLD_PRICE * 9950) / 10000;
         assertEq(manager.getCreatorRevenue(creator1), expectedRevenue);
     }
 
@@ -357,7 +357,7 @@ contract SubscriptionSystemTest is Test {
         uint256 balanceBefore = creator1.balance;
         _subscribe(subscriber1, creator1, 3);
 
-        uint256 expectedAmount = (GOLD_PRICE * 9500) / 10000;
+        uint256 expectedAmount = (GOLD_PRICE * 9950) / 10000;
 
         vm.prank(creator1);
         manager.withdraw();

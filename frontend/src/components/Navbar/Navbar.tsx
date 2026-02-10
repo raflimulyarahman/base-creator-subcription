@@ -8,7 +8,7 @@ export default function Navbar({
   currentPath: string;
 }) {
   return (
-    <nav className="w-full h-16 bg-white text-black md:bg-transparent">
+    <nav className="w-full h-16 bg-white dark:bg-black text-black dark:text-white md:bg-transparent">
       <NavbarClient onOpenSidebar={onOpenSidebar} currentPath={currentPath} />
     </nav>
   );

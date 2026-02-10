@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 /**
  * @title SubscriptionManager
  * @notice Core contract for managing subscriptions, payments, and creator earnings
- * @dev Platform fee: 5% (500 bps), Creator: 95%
+ * @dev Platform fee: 0.5% (50 bps), Creator: 99.5%
  */
 contract SubscriptionManager is Ownable {
     using ECDSA for bytes32;
@@ -61,10 +61,11 @@ contract SubscriptionManager is Ownable {
 
     TieredBadge public immutable badge;
     uint256 public creatorCount;
-    uint256 public platformFeeBps = 500;
+    uint256 public platformFeeBps = 50;
     address public feeRecipient;
     uint256 public pendingPlatformFees;
     address public verifier; // Backend signer for follower verification
+    bool public signatureRequired = true; // Toggle for development
 
     mapping(address => Creator) public creators;
     mapping(string => address) public handleToCreator;
@@ -183,14 +184,13 @@ contract SubscriptionManager is Ownable {
      * @notice Register as a creator with verified follower proof
      * @param _handle Unique creator handle (3-32 chars)
      * @param _followerCount Verified follower count from Farcaster
-     * @param _signature Backend-signed proof of follower count
+     * @param _signature Backend-signed proof of follower count (can be empty if signatureRequired is false)
      */
     function registerCreator(
         string memory _handle,
         uint256 _followerCount,
         bytes memory _signature
     ) external {
-        if (verifier == address(0)) revert VerifierNotSet();
         if (creators[msg.sender].wallet != address(0))
             revert CreatorAlreadyRegistered();
 
@@ -202,20 +202,25 @@ contract SubscriptionManager is Ownable {
         // Verify follower count meets minimum
         if (_followerCount < MIN_FOLLOWER_COUNT) revert InsufficientFollowers();
 
-        // Verify signature from backend
-        bytes32 messageHash = keccak256(
-            abi.encodePacked(msg.sender, _followerCount, block.chainid)
-        );
-        bytes32 signedHash = messageHash.toEthSignedMessageHash();
+        // Only verify signature if required (for production)
+        if (signatureRequired) {
+            if (verifier == address(0)) revert VerifierNotSet();
 
-        // Prevent replay attacks
-        if (usedSignatureHashes[signedHash]) revert SignatureAlreadyUsed();
+            // Verify signature from backend
+            bytes32 messageHash = keccak256(
+                abi.encodePacked(msg.sender, _followerCount, block.chainid)
+            );
+            bytes32 signedHash = messageHash.toEthSignedMessageHash();
 
-        address signer = signedHash.recover(_signature);
-        if (signer != verifier) revert InvalidSignature();
+            // Prevent replay attacks
+            if (usedSignatureHashes[signedHash]) revert SignatureAlreadyUsed();
 
-        // Mark signature as used
-        usedSignatureHashes[signedHash] = true;
+            address signer = signedHash.recover(_signature);
+            if (signer != verifier) revert InvalidSignature();
+
+            // Mark signature as used
+            usedSignatureHashes[signedHash] = true;
+        }
 
         creatorCount++;
 
@@ -515,5 +520,13 @@ contract SubscriptionManager is Ownable {
     function setVerifier(address newVerifier) external onlyOwner {
         require(newVerifier != address(0), "Invalid verifier");
         verifier = newVerifier;
+    }
+
+    /**
+     * @notice Toggle signature requirement (for development/testing)
+     * @param _required True to require signature, false to skip
+     */
+    function setSignatureRequired(bool _required) external onlyOwner {
+        signatureRequired = _required;
     }
 }

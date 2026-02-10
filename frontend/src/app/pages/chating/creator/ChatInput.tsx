@@ -10,7 +10,7 @@ type Props = {
     id_users: string;
     first_name: string;
     last_name: string;
-    foto: string | null;
+    foto: string | null | undefined;
   };
 };
 
@@ -63,16 +63,16 @@ export default function ChatInput({ onSend, currentUser }: Props) {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full px-4 py-2 bg-white shadow">
-      <div className="flex flex-col gap-3 w-full md:w-1/2 mx-auto">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 py-3 pb-6 bg-white dark:bg-black shadow border-x border-gray-100 dark:border-gray-800 z-50">
+      <div className="flex flex-col gap-3 w-full mx-auto">
         <div className="relative w-full">
-          <div className="relative w-full bg-gray-300 rounded-lg flex items-center">
+          <div className="relative w-full bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center border border-gray-200 dark:border-gray-700">
             <textarea
               ref={textareaRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Message ..."
-              className="flex-1 pr-12 pl-4 rounded-lg py-2 resize-none focus:outline-none"
+              className="flex-1 pr-12 pl-4 rounded-xl py-3 resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500"
               rows={1}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={loading}
@@ -81,16 +81,16 @@ export default function ChatInput({ onSend, currentUser }: Props) {
               <button
                 onClick={handleSend}
                 disabled={loading}
-                className="absolute right-2 bottom-2 rounded bg-black px-2 py-1 text-white"
+                className="absolute right-2 bottom-2 rounded-xl bg-blue-600 px-3 py-1.5 text-white shadow-sm hover:bg-blue-700 transition"
               >
                 {loading ? (
-                  "Sending..."
+                  "..."
                 ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
-                    strokeWidth="1.5"
+                    strokeWidth={2}
                     stroke="currentColor"
                     className="w-5 h-5"
                   >

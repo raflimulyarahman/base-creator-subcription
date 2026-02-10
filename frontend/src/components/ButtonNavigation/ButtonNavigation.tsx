@@ -4,27 +4,36 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { useState } from "react";
 import Toast from "../Toast/Toast";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { usePosts } from "@/context/PostsContext"; // Ensure this context exists and is exported
+import CreatePostModal from "../CreatePostModal/CreatePostModal";
 
 export default function ButtonNavigator() {
   const { isDark } = useLight();
   const { role } = useWallet();
   const pathname = usePathname();
-
+  const { refreshPosts } = usePosts();
+  const router = useRouter(); 
+  
   const [showToast, setShowToast] = useState(false);
-  const handleClickNotif = () => {
-    if (!role) {
-      setShowToast(true);
-      return;
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  
+  const handleHomeClick = (e: React.MouseEvent) => {
+    // Always refresh posts when clicking home
+    refreshPosts();
+    
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-
-    onOpenSidebar();
+    // If not on home, Link will handle navigation
   };
+  
   return (
     <div
       className={`
     fixed bottom-0 left-1/2 -translate-x-1/2
-    z-50 w-full ${isDark ? "bg-gray-900" : "bg-white"}
+    z-50 w-full max-w-2xl ${isDark ? "bg-gray-900" : "bg-white"}
     border-t border-gray-300 border-default 
   `}
     >
@@ -32,19 +41,20 @@ export default function ButtonNavigator() {
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
-          message="not access"
+          message="Please connect wallet first"
           type="error" // bisa "error" juga
         />
       </div>
       <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
         <Link
           href="/"
+          onClick={handleHomeClick}
           className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group"
         >
           <svg
             className={`
       w-6 h-6 mb-1
-      ${pathname === "/" ? "text-blue-500" : "text-gray-500"}
+      ${pathname === "/" ? "text-blue-500" : "text-gray-500 dark:text-gray-400"}
       group-hover:text-blue-500 group-active:text-blue-600
       transition-colors
     `}
@@ -84,9 +94,12 @@ export default function ButtonNavigator() {
             />
           </svg>
         </Link>
-        <button className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group">
+        <Link
+          href="/pages/create-post"
+          className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group"
+        >
           <svg
-            className="w-6 h-6 mb-1 text-body group-hover:text-fg-brand"
+            className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-500"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -99,14 +112,13 @@ export default function ButtonNavigator() {
               d="M5 12h14m-7 7V5"
             />
           </svg>
-        </button>
-        <button
-          onClick={handleClickNotif}
-          //href={`/${pages}/notif`}
+        </Link>
+        <Link
+          href="/pages/notif"
           className="inline-flex flex-col items-center justify-center p-4 hover:bg-neutral-secondary-medium group"
         >
           <svg
-            className="w-6 h-6 mb-1 text-body group-hover:text-fg-brand"
+            className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-500"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -119,7 +131,7 @@ export default function ButtonNavigator() {
               d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
             />
           </svg>
-        </button>
+        </Link>
         <ConnectButton.Custom>
           {({ account, mounted, openConnectModal, openAccountModal }) => {
             if (!mounted) return null;
@@ -143,7 +155,7 @@ export default function ButtonNavigator() {
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="size-6"
+                  className="size-6 text-gray-500 dark:text-gray-400 group-hover:text-blue-500"
                 >
                   <path
                     d="M3 6V17C3 18.8856 3 19.8284 3.58579 20.4142C4.17157 21 5.11438 21 7 21H17C18.8856 21 19.8284 21 20.4142 20.4142C21 19.8284 21 18.8856 21 17V12C21 10.1144 21 9.17157 20.4142 8.58579C19.8284 8 18.8856 8 17 8H7.82843C6.67474 8 6.0979 8 5.56035 7.84678C5.26506 7.7626 4.98044 7.64471 4.71212 7.49543C4.22367 7.22367 3.81578 6.81578 3 6ZM3 6C3 5.06812 3 4.60218 3.15224 4.23463C3.35523 3.74458 3.74458 3.35523 4.23463 3.15224C4.60218 3 5.06812 3 6 3H16"

@@ -18,7 +18,7 @@ export default function NavbarChating() {
   const isCreatorGroup = pathname === "/pages/chating/group";
   const [otherUser, setOtherUser] = useState<any>(null);
   const { getHeaderPersonalChat } = useChatPersonal();
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false); // Menyimpan status menu (terbuka/tutup)
   const [openModalMakeGroup, setOpenModalMakeGroup] = useState(false);
   const toggleMenu = () => {
@@ -31,8 +31,8 @@ export default function NavbarChating() {
   const handleModalGroup = () => setOpenModalMakeGroup(true);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -81,15 +81,15 @@ export default function NavbarChating() {
           </button>
         </div>
 
-        <div className="flex w-full items-center justify-center gap-3">
+        <div className="flex flex-1 items-center justify-center gap-3 min-w-0">
           <ul className="flex gap-4 text-sm font-medium">
             {isCreatorChat ? (
               <div className="flex items-center gap-3">
                 <Image
                   src={
-                    (userId === otherUser?.chatRoom.id_users1
-                      ? otherUser?.chatRoom.user2?.foto
-                      : otherUser?.chatRoom.user1?.foto) ||
+                    (userId === otherUser?.chatRoom?.id_users1
+                      ? otherUser?.chatRoom?.user2?.foto
+                      : otherUser?.chatRoom?.user1?.foto) ||
                     "https://img.freepik.com/vektor-gratis/ilustrasi-kera-gaya-nft-digambar-tangan_23-2149622021.jpg"
                   }
                   alt="Creator Avatar"
@@ -104,9 +104,9 @@ export default function NavbarChating() {
                       isDark ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {userId === otherUser?.chatRoom.id_users1
-                      ? otherUser?.chatRoom.user2?.username
-                      : otherUser?.chatRoom.user1?.username}
+                    {userId === otherUser?.chatRoom?.id_users1
+                      ? otherUser?.chatRoom?.user2?.username
+                      : otherUser?.chatRoom?.user1?.username}
                   </h1>
                   <span className="text-xs text-green-500">Online</span>
                 </div>

@@ -19,6 +19,7 @@ export interface MessageChat {
   id_users: string;
   message: string;
   date: string;
+  user?: any;
 }
 
 // Context type
@@ -61,7 +62,7 @@ export const MessageChatProvider = ({
         }
 
         const response = await fetchWithAuth(
-          "http://localhost:8000/api/message/",
+          "/api/message/",
           {
             method: "POST",
             headers: {
@@ -97,7 +98,7 @@ export const MessageChatProvider = ({
       console.log("Berhasil");
       try {
         const response = await fetchWithAuth(
-          `http://localhost:8000/api/message/get`,
+          `/api/message/get`,
           {
             method: "POST",
             headers: {

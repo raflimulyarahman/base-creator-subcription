@@ -1,11 +1,18 @@
 import { UUID } from "./uuid";
 
 export interface User {
-  id_users: UUID;
-  address: { address: string };
-  first_name: string;
-  last_name: string;
-  role: string;
+  id?: string;
+  id_users?: UUID; 
+  address?: { address: string };
+  wallet_address?: string;
+  first_name?: string;
+  last_name?: string;
+  name?: string;
+  handle?: string;
+  username?: string;
+  role?: string;
+  foto?: string;
+  avatar_url?: string;
 }
 
 export type UsersContextType = {

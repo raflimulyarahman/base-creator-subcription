@@ -28,12 +28,12 @@ export default function ClientShell({ children }: { children: ReactNode }) {
     );
   }
 
-  const hideNavbar = pathname.startsWith("/pages/chating");
-  const hideNavigator = pathname.startsWith("/pages/chating");
+  const hideNavbar = pathname?.startsWith("/pages/chating");
+  const hideNavigator = pathname?.startsWith("/pages/chating");
 
   return (
     <div className="flex justify-center min-h-screen">
-      <div className="flex flex-col w-full md:w-1/2 min-w-0">
+      <div className="flex flex-col w-full max-w-2xl min-w-0 bg-white dark:bg-black mx-auto border-x border-gray-200 dark:border-gray-800 shadow-2xl">
         {/* Navbar tanpa activeTab */}
         {!hideNavbar && (
           <Navbar onOpenSidebar={() => setOpen(true)} currentPath={pathname} />

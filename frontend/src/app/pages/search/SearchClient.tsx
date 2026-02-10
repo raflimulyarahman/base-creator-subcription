@@ -3,6 +3,7 @@
 import { useLight } from "@/context/LightContext";
 import { useUsers } from "@/context/UsersContext";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -10,35 +11,53 @@ export default function SearchPages() {
   const { isDark } = useLight();
   const { usersAll } = useUsers();
   const router = useRouter();
-  console.log(usersAll);
+  const { address } = useAccount();
   const [query, setQuery] = useState("");
 
-  // Filter hanya saat query diisi
   const filteredCreators = useMemo(() => {
     if (!Array.isArray(usersAll)) return [];
 
     const q = query.toLowerCase().trim();
 
     return usersAll.filter((user) => {
-      if (user.role?.role?.toLowerCase() !== "creators") return false;
+      if (user.role?.toLowerCase() !== "creator") return false;
 
-      if (!q) return true; // ← tampilkan semua creators
+      if (!q) return true;
 
-      const fullName = `${user.first_name ?? ""} ${user.last_name ?? ""}`
-        .toLowerCase()
-        .trim();
+      const firstName = (user.first_name || "").toLowerCase();
+      const lastName = (user.last_name || "").toLowerCase();
+      const username = (user.username || "").toLowerCase();
+      const handle = (user.handle || "").toLowerCase();
+      const fullName = `${firstName} ${lastName}`.trim();
 
-      const username = (user.username ?? "").toLowerCase();
-
-      return fullName.includes(q) || username.includes(q);
+      return (
+        firstName.includes(q) ||
+        lastName.includes(q) ||
+        fullName.includes(q) ||
+        username.includes(q) ||
+        handle.includes(q)
+      );
     });
   }, [query, usersAll]);
 
-  const handleProfileClick = (id_users: string) => {
-    console.log(id_users);
-    router.push(`/pages/search/${id_users}`);
+  const handleProfileClick = (user: any) => {
+    const userId = user.id_users || user.id;
+    const userAddress = user.wallet_address || user.address?.address;
+
+    // Check if it's me
+    if (address && userAddress && address.toLowerCase() === userAddress.toLowerCase()) {
+      router.push("/pages/profile");
+      return;
+    }
+
+    if (userId) {
+      router.push(`/pages/search/${userId}`);
+    } else if (userAddress) {
+      router.push(`/pages/subscribe/${userAddress}`);
+    }
   };
-  const DEFAULT_AVATAR = "./11789135.png";
+
+  const DEFAULT_AVATAR = "/11789135.png";
 
   return (
     <div
@@ -89,33 +108,43 @@ export default function SearchPages() {
       <div className="max-w-3xl mx-auto px-4 py-2 space-y-2">
         {query.trim() !== "" &&
           (filteredCreators.length > 0 ? (
-            filteredCreators.map((user) => (
-              <div
-                key={user.id_users}
-                onClick={() => handleProfileClick(user.id_users)}
-                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
-                  isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"
-                }`}
-              >
-                <Image
-                  src={user.foto || DEFAULT_AVATAR}
-                  alt={user.username}
-                  width={48}
-                  height={48}
-                  unoptimized
-                  className="rounded-full object-cover border border-gray-300"
-                />
+            filteredCreators.map((user) => {
+              const userId = user.id_users || user.id;
+              const displayName =
+                user.name ||
+                user.handle ||
+                user.username ||
+                ((user.first_name
+                  ? `${user.first_name} ${user.last_name || ""}`.trim()
+                  : null) ||
+                  "Unknown");
 
-                <div>
-                  <p className="font-semibold leading-tight">
-                    {user.first_name} {user.last_name}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {user.username} || {user.role?.role}
-                  </p>
+              return (
+                <div
+                  key={userId || Math.random()}
+                  onClick={() => handleProfileClick(user)}
+                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
+                    isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"
+                  }`}
+                >
+                  <Image
+                    src={user.avatar_url || user.foto || DEFAULT_AVATAR}
+                    alt={displayName}
+                    width={48}
+                    height={48}
+                    unoptimized
+                    className="rounded-full object-cover border border-gray-300 w-12 h-12"
+                  />
+
+                  <div>
+                    <p className="font-semibold leading-tight">{displayName}</p>
+                    <p className="text-sm text-gray-500">
+                      {user.handle || user.username || "Creator"} || {user.role}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-sm text-gray-400">No creators found.</p>
           ))}
@@ -144,7 +173,6 @@ export default function SearchPages() {
             <h1 className="text-sm font-bold text-center mt-2">Apps</h1>
           </div>
 
-
           <div className="flex flex-col items-center w-20">
             <div className="h-17 w-17 rounded-md overflow-hidden bg-gray-100 border border-gray-400 shadow-2xl flex justify-center items-center">
               <svg
@@ -165,7 +193,6 @@ export default function SearchPages() {
             <h1 className="text-sm font-bold text-center mt-2">Browser</h1>
           </div>
 
-
           <div className="flex flex-col items-center w-20">
             <div className="h-17 w-17 rounded-md overflow-hidden bg-gray-100 border border-gray-400 shadow-2xl flex justify-center items-center">
               <svg
@@ -185,7 +212,6 @@ export default function SearchPages() {
             </div>
             <h1 className="text-sm font-bold text-center mt-2">Verify</h1>
           </div>
-
 
           <div className="flex flex-col items-center w-20">
             <div className="h-17 w-17 rounded-md overflow-hidden bg-gray-100 border border-gray-400 shadow-2xl flex justify-center items-center">
@@ -231,7 +257,6 @@ export default function SearchPages() {
             </div>
             <h1 className="text-sm font-bold text-center mt-2">Other</h1>
           </div>
-
         </div>
       </div>
 

@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-white">
+      <body className="min-h-screen bg-gray-100 dark:bg-gray-950" suppressHydrationWarning>
         <Providers>
           <ClientShell>
             {children} {/* Ensure children are passed down correctly */}

@@ -8,7 +8,15 @@ const config: Config = {
     "./src/context/**/*.{ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        brand: {
+          blue: "#0052FF", // Base Blue (Official)
+          black: "#050608",
+          gray: "#F5F5F5",
+        }
+      }
+    },
   },
   plugins: [],
 };

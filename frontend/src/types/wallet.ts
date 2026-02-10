@@ -1,6 +1,6 @@
 import { UUID } from "./uuid";
 
-export type UserRole = "Creators" | "Users" | null;
+export type UserRole = "creator" | "user" | "admin" | null;
 
 export type WalletContextType = {
   address?: string;

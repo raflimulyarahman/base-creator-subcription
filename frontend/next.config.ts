@@ -22,14 +22,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*", // Semua request ke /api/...
-        destination: "http://localhost:8000/api/:path*", // Diteruskan ke backend Express
-      },
-    ];
-  },
+
 };
 
 export default nextConfig;

@@ -11,18 +11,14 @@ type Props = {
     id_users: string;
     first_name: string;
     last_name: string;
-    foto: string | null;
+    foto: string | null | undefined;
   };
 };
 
-type ExtraProps = {
-  onCloseContentExlusive: () => void;
-};
-
-export default function ChatInputGroup({ onCloseContentExlusive,
+export default function ChatInputGroup({
   onSend,
   currentUser,
-}: Props & ExtraProps) {
+}: Props) {
 
   const [message, setMessage] = useState("");
   const { createMessageChat, loading } = useMessageChat();
@@ -62,8 +58,8 @@ export default function ChatInputGroup({ onCloseContentExlusive,
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white shadow px-4 py-2">
-      <div className="w-full md:w-1/2 mx-auto">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white shadow px-4 py-2 border-x border-gray-100 dark:border-gray-800">
+      <div className="w-full mx-auto">
         <div className="flex items-center gap-2 bg-gray-200 rounded-xl px-3">
           <button
             onClick={() => setOpenModalContent(true)}

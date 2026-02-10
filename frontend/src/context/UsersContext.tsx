@@ -14,7 +14,7 @@ import {
 } from "react";
 import { useWriteContract } from "wagmi";
 
-import { User, UsersContextType } from "@/types";
+import { User, UsersContextType, UUID } from "@/types";
 
 const UsersContext = createContext<UsersContextType | null>(null);
 
@@ -30,7 +30,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
 
       try {
         const res = await fetchWithAuth(
-          `http://localhost:8000/api/users/${userId}`,
+          `/api/users/${userId}`,
           {
             credentials: "include",
             headers: {
@@ -53,16 +53,21 @@ export function UsersProvider({ children }: { children: ReactNode }) {
   );
 
   const fetchUsersAll = useCallback(async () => {
-    if (!accessToken) return [];
+    // Attempt fetch even without token (for public feed)
     try {
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetchWithAuth(
-        "http://localhost:8000/api/users",
+        "/api/users",
         {
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers,
         },
         accessToken,
         sendRefreshToken,
@@ -70,6 +75,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
       return res.data ?? [];
     } catch (err) {
       console.error("fetchUsersAll error:", err);
+      // Fallback - maybe return empty or handle error
       return [];
     }
   }, [accessToken, sendRefreshToken]);
@@ -81,26 +87,27 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     if (!accessToken || !sendRefreshToken) return null;
     try {
       const fullName =
-        formData.get("first_name") + " " + formData.get("last_name");
+        (formData.get("first_name") + " " + formData.get("last_name")).trim();
       const username = formData.get("username") as string;
       const fotoFile = formData.get("foto") as File;
-      console.log(fotoFile.name, "ini file");
-      //Smart contract registration
-      const res = await writeContractAsync({
-        address: CONTRACT_ADDRESSES.SubscriptionManager,
-        abi: subscriptionManagerAbi,
-        functionName: "registerCreator",
-        args: [fullName, username, fotoFile.name, 1000000000n],
-      });
+      console.log(fotoFile?.name, "ini file");
+      
+      // Removed smart contract registration from here - should be in registerCreator flow only
+      // If user is just updating profile, we don't register them as creator again
 
-      if (!res) return null;
-
-      // Backend update
+      // Backend update (Next.js API)
       const data = await fetchWithAuth(
-        `http://localhost:8000/api/users/${id}`,
+        `/api/users/${id}`,
         {
           method: "PUT",
-          body: formData,
+          body: JSON.stringify({
+            name: fullName,
+            username: username,
+            avatar_url: formData.get("avatar_url"), // Use URL for now as per plan
+          }),
+          headers: {
+            "Content-Type": "application/json", // Changed to JSON for Next.js API
+          },
           credentials: "include",
         },
         accessToken,
@@ -109,16 +116,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
 
       const updatedUser = data?.data ?? null;
       console.log("updateProfileUsers: updatedUser", updatedUser);
-      console.log("updateProfileUsers: role from response", data?.role);
-
-      // Set role baru di WalletContext
-      if (data?.role) {
-        const normalizedRole =
-          data.role.toLowerCase() === "creators" ? "Creators" : "Users";
-        console.log("updateProfileUsers: setting role to", normalizedRole);
-        setRole(normalizedRole);
-      }
-
+      
       setUser(updatedUser);
       return updatedUser;
     } catch (err) {
@@ -131,7 +129,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     async (id: string) => {
       try {
         const data = await fetchWithAuth(
-          `http://localhost:8000/api/users/${id}`,
+          `/api/users/${id}`,
           {
             credentials: "include",
             headers: {
@@ -160,8 +158,8 @@ export function UsersProvider({ children }: { children: ReactNode }) {
   }, [userId, fetchUserById]);
 
   useEffect(() => {
-    if (accessToken) fetchUsersAll().then(setUsersAll);
-  }, [accessToken, fetchUsersAll]);
+    fetchUsersAll().then(setUsersAll);
+  }, [fetchUsersAll]);
 
   return (
     <UsersContext.Provider

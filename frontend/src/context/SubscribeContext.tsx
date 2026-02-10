@@ -25,6 +25,7 @@ import {
   SubscribePayload,
   TierData,
   TierInfo,
+  PaySubscribePayload,
 } from "@/types";
 
 const SubscribeContext = createContext<SubscribeContextType | undefined>(
@@ -65,6 +66,12 @@ export function parseERC1155TransferSingleLog(log: any, userAddress: string) {
   return null;
 }
 
+
+const publicClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http(baseSepolia.rpcUrls.default.http[0]),
+});
+
 export const SubscribeProvider = ({
   children,
 }: {
@@ -77,38 +84,29 @@ export const SubscribeProvider = ({
   const { accessToken, sendRefreshToken } = useWallet();
   const [subscribedata, setSubscribedata] = useState<Subscribe[]>([]);
   const [subUsersId, setSubUsersId] = useState<Subscribe[]>();
-  const [tiers, setTiers] = useState<TierInfo[]>([]);
+  const [tiers, setTiers] = useState<TierData[]>([]);
   const { userId } = useWallet();
 
-  const publicClient = createPublicClient({
-    chain: baseSepolia,
-    transport: http(baseSepolia.rpcUrls.default.http[0]),
-  });
 
   const createSubscribe = async (
     payload: SubscribePayload,
-  ): Promise<Subscribe> => {
+  ): Promise<string> => {
     setLoading(true);
     try {
       const bronzeTier = BigInt(Math.round(payload.bronze * 1e18));
       const silverTier = BigInt(Math.round(payload.silver * 1e18));
       const goldTier = BigInt(Math.round(payload.gold * 1e18));
 
-      await writeContractAsync({
+      const hash = await writeContractAsync({
         address: CONTRACT_ADDRESSES.SubscriptionManager,
         abi: subscriptionManagerAbi,
         functionName: "configureTiers",
         args: [bronzeTier, silverTier, goldTier],
       });
 
-      // const data: Subscribe = {
-      //   id_subscribe: crypto.randomUUID(),
-      //   ...payload,
-      // };
-      console.log(res);
-      setSubscribe(res);
+      console.log(hash);
       setSuccess(true);
-      return res;
+      return hash;
     } catch (err) {
       console.error("Error creating subscription:", err);
       setSuccess(false);
@@ -119,9 +117,15 @@ export const SubscribeProvider = ({
   };
 
   const paySubscribe = async (
-    payload: Subscribe,
+    payload: PaySubscribePayload,
   ): Promise<{ tokenId: bigint | null }> => {
     setLoading(true);
+    console.log("📦 PAY SUBSCRIBE ARGS:", {
+       addressCreator: payload.addressCreator,
+       tiersId: payload.tiersId,
+       price: payload.price, 
+       userAddress: payload.userAddress
+    });
     // console.log("📦 PAY SUBSCRIBE PAYLOAD:", payload);
     try {
       const {
@@ -134,34 +138,73 @@ export const SubscribeProvider = ({
         userAddress,
       } = payload;
 
-      const hash = await writeContractAsync({
-        address: CONTRACT_ADDRESSES.SubscriptionManager,
-        abi: subscriptionManagerAbi,
-        functionName: "subscribe",
-        args: [addressCreator, BigInt(tiersId)],
-        value: BigInt(price),
-      });
+      let tokenId: bigint | null = null;
 
-      console.log("TX HASH:", hash);
+      // 1️⃣ CHECK ON-CHAIN FIRST (Prevent "Already Subscribed" Revert)
+      try {
+        const onChainSub = await publicClient.readContract({
+          address: CONTRACT_ADDRESSES.SubscriptionManager,
+          abi: subscriptionManagerAbi,
+          functionName: "getSubscription",
+          args: [addressCreator as `0x${string}`, userAddress as `0x${string}`],
+        }) as any;
 
-      // 2️⃣ Tunggu TX di-mine
-      const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      console.log("TX RECEIPT:", receipt);
+        console.log("Existing Subscription Check:", onChainSub);
+        
+        const isActive = onChainSub?.isActive || onChainSub?.[4];
+        const renewalDate = onChainSub?.renewalDate || onChainSub?.[3];
+        const isExpired = renewalDate ? Number(renewalDate) * 1000 < Date.now() : true;
 
-      // let tokenId: bigint | null = null;
-
-      for (const log of receipt.logs) {
-        const parsed = parseERC1155TransferSingleLog(log, userAddress);
-        if (parsed) {
-          tokenId = parsed.tokenId;
-          console.log("🎉 TOKEN ID:", tokenId.toString());
-          break;
+        if (isActive && !isExpired) {
+           console.log("✅ User is ALREADY subscribed on-chain. Skipping payment & syncing backend.");
+        } else {
+           // Not subscribed or expired -> Pay
+           const hash = await writeContractAsync({
+            address: CONTRACT_ADDRESSES.SubscriptionManager,
+            abi: subscriptionManagerAbi,
+            functionName: "subscribe",
+            args: [addressCreator as `0x${string}`, BigInt(tiersId)],
+            value: BigInt(price),
+          });
+    
+          console.log("TX HASH:", hash);
+    
+          // 2️⃣ Tunggu TX di-mine
+          const receipt = await publicClient.waitForTransactionReceipt({ hash });
+          console.log("TX RECEIPT:", receipt);
+    
+          for (const log of receipt.logs) {
+            const parsed = parseERC1155TransferSingleLog(log, userAddress);
+            if (parsed) {
+              tokenId = parsed.tokenId;
+              console.log("🎉 TOKEN ID:", tokenId.toString());
+              break;
+            }
+          }
         }
+      } catch (checkErr) { 
+          console.warn("Could not check existing subscription, trying payment:", checkErr); 
+           const hash = await writeContractAsync({
+            address: CONTRACT_ADDRESSES.SubscriptionManager,
+            abi: subscriptionManagerAbi,
+            functionName: "subscribe",
+            args: [addressCreator as `0x${string}`, BigInt(tiersId)],
+            value: BigInt(price),
+          });
+          const receipt = await publicClient.waitForTransactionReceipt({ hash });
+          // Try to get tokenId from receipt if possible (duplicate logic)
+           for (const log of receipt.logs) {
+            const parsed = parseERC1155TransferSingleLog(log, userAddress);
+            if (parsed) {
+              tokenId = parsed.tokenId;
+              break;
+            }
+          }
       }
 
       // 3️⃣ Simpan ke backend (SESUI DB KAMU)
       const response = await fetchWithAuth(
-        "http://localhost:8000/api/subscribe/",
+        "/api/subscribe/",
         {
           method: "POST",
           headers: {
@@ -182,7 +225,7 @@ export const SubscribeProvider = ({
 
       console.log("Backend response:", response);
 
-      //return { tokenId };
+      return { tokenId };
     } catch (err) {
       console.error("Error subscribing:", err);
       throw err;
@@ -195,7 +238,7 @@ export const SubscribeProvider = ({
     async (address: string): Promise<AddressSubscribe | null> => {
       console.log("getTiers:", address);
       try {
-        const tierIds = [1n, 2n, 3n];
+        const tierIds = [BigInt(1), BigInt(2), BigInt(3)];
 
         // 🔥 Read tiers dari kontrak
         const tierData: TierData[] = await Promise.all(
@@ -204,7 +247,7 @@ export const SubscribeProvider = ({
               address: CONTRACT_ADDRESSES.SubscriptionManager,
               abi: subscriptionManagerAbi,
               functionName: "getTierConfig",
-              args: [address, id],
+              args: [address as `0x${string}`, id],
             });
 
             return {
@@ -236,7 +279,7 @@ export const SubscribeProvider = ({
       console.log("getSubscribeIdUser useCallBack:", id_users);
       try {
         const respone = await fetchWithAuth(
-          `http://localhost:8000/api/subscribe/getSUb`,
+          `/api/subscribe/getSUb`,
           {
             method: "POST",
             headers: {
@@ -266,7 +309,7 @@ export const SubscribeProvider = ({
   const getSubscribeUserIdProfile = useCallback(
     async (id_users: string) => {
       const response = await fetchWithAuth(
-        `http://localhost:8000/api/subscribe/${id_users}`,
+        `/api/subscribe/${id_users}`,
         {
           method: "GET",
           headers: {
